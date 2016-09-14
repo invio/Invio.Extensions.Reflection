@@ -10,6 +10,7 @@
       "version": "0.2.0",
       "target": "project"
     },
+    "Invio.Xunit" : "0.1.0",
     "dotnet-test-xunit": "2.2.0-*",
     "xunit": "2.2.0-*"
   },
