@@ -6,6 +6,12 @@ using System.Reflection;
 
 namespace Invio.Extensions.Reflection {
 
+    /// <summary>
+    ///   A collections of extension methods on <see cref="ConstructorInfo" />
+    ///   that allows the caller to cache the reflection-based objects into
+    ///   a delegate. This speeds up the instantiation of objects normally
+    ///   created from the extended <see cref="ConstructorInfo" />.
+    /// </summary>
     public static class ConstructorInfoExtensions {
 
         private static ConcurrentDictionary<ConstructorInfo, Func<object[], object>> cache;
@@ -15,7 +21,9 @@ namespace Invio.Extensions.Reflection {
         }
 
         /// <summary>
-        ///   Return an efficient functor for the specified constructor.
+        ///   Return an efficient functor for the specified constructor which, when called,
+        ///   creates a new instance of the class that the <paramref name="constructor" />
+        ///   references via the 'DeclaringType' property on <see cref="ConstructorInfo" />.
         /// </summary>
         /// <param name="constructor">
         ///   The <see cref="ConstructorInfo" /> instance the caller wants to turn into
@@ -25,8 +33,8 @@ namespace Invio.Extensions.Reflection {
         ///   Thrown when <paramref name="constructor" /> is null.
         /// </exception>
         /// <returns>
-        ///   A <see cref="Func<object[], object>" /> delegate that can create efficiently
-        ///   create instances normally created by <paramref name="constructor" />.
+        ///   A delegate that can called to efficiently create instances normally created
+        ///   by invoking the <paramref name="constructor" /> directly.
         /// </returns>
         public static Func<object[], object> CreateArrayFunc(this ConstructorInfo constructor) {
             if (constructor == null) {
@@ -89,6 +97,25 @@ namespace Invio.Extensions.Reflection {
             return Expression.Lambda<Func<object[], object>>(body, array).Compile();
         }
 
+        /// <summary>
+        ///   Return an efficient functor for the specified constructor which, when called,
+        ///   creates a new instance of the class that the <paramref name="constructor" />
+        ///   references via the 'DeclaringType' property on <see cref="ConstructorInfo" />.
+        /// </summary>
+        /// <param name="constructor">
+        ///   The <see cref="ConstructorInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be recalled efficiently.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="constructor" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="constructor" /> isn't parameterless.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently create instances normally created
+        ///   by invoking the <paramref name="constructor" /> directly.
+        /// </returns>
         public static Func<object> CreateFunc0(this ConstructorInfo constructor) {
             CheckParameters(constructor, expected: 0);
 
@@ -100,6 +127,25 @@ namespace Invio.Extensions.Reflection {
             return Expression.Lambda<Func<object>>(body).Compile();
         }
 
+        /// <summary>
+        ///   Return an efficient functor for the specified constructor which, when called,
+        ///   creates a new instance of the class that the <paramref name="constructor" />
+        ///   references via the 'DeclaringType' property on <see cref="ConstructorInfo" />.
+        /// </summary>
+        /// <param name="constructor">
+        ///   The <see cref="ConstructorInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be recalled efficiently.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="constructor" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="constructor" /> does not have 1 parameter.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently create instances normally created
+        ///   by invoking the <paramref name="constructor" /> directly.
+        /// </returns>
         public static Func<object, object>
             CreateFunc1(this ConstructorInfo constructor) {
 
@@ -108,6 +154,25 @@ namespace Invio.Extensions.Reflection {
             return CreateFunc<Func<object, object>>(constructor);
         }
 
+        /// <summary>
+        ///   Return an efficient functor for the specified constructor which, when called,
+        ///   creates a new instance of the class that the <paramref name="constructor" />
+        ///   references via the 'DeclaringType' property on <see cref="ConstructorInfo" />.
+        /// </summary>
+        /// <param name="constructor">
+        ///   The <see cref="ConstructorInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be recalled efficiently.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="constructor" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="constructor" /> does not have 2 parameters.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently create instances normally created
+        ///   by invoking the <paramref name="constructor" /> directly.
+        /// </returns>
         public static Func<object, object, object>
             CreateFunc2(this ConstructorInfo constructor) {
 
@@ -116,6 +181,25 @@ namespace Invio.Extensions.Reflection {
             return CreateFunc<Func<object, object, object>>(constructor);
         }
 
+        /// <summary>
+        ///   Return an efficient functor for the specified constructor which, when called,
+        ///   creates a new instance of the class that the <paramref name="constructor" />
+        ///   references via the 'DeclaringType' property on <see cref="ConstructorInfo" />.
+        /// </summary>
+        /// <param name="constructor">
+        ///   The <see cref="ConstructorInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be recalled efficiently.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="constructor" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="constructor" /> does not have 3 parameters.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently create instances normally created
+        ///   by invoking the <paramref name="constructor" /> directly.
+        /// </returns>
         public static Func<object, object, object, object>
             CreateFunc3(this ConstructorInfo constructor) {
 
@@ -124,6 +208,25 @@ namespace Invio.Extensions.Reflection {
             return CreateFunc<Func<object, object, object, object>>(constructor);
         }
 
+        /// <summary>
+        ///   Return an efficient functor for the specified constructor which, when called,
+        ///   creates a new instance of the class that the <paramref name="constructor" />
+        ///   references via the 'DeclaringType' property on <see cref="ConstructorInfo" />.
+        /// </summary>
+        /// <param name="constructor">
+        ///   The <see cref="ConstructorInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be recalled efficiently.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="constructor" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="constructor" /> does not have 4 parameters.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently create instances normally created
+        ///   by invoking the <paramref name="constructor" /> directly.
+        /// </returns>
         public static Func<object, object, object, object, object>
             CreateFunc4(this ConstructorInfo constructor) {
 
@@ -132,6 +235,25 @@ namespace Invio.Extensions.Reflection {
             return CreateFunc<Func<object, object, object, object, object>>(constructor);
         }
 
+        /// <summary>
+        ///   Return an efficient functor for the specified constructor which, when called,
+        ///   creates a new instance of the class that the <paramref name="constructor" />
+        ///   references via the 'DeclaringType' property on <see cref="ConstructorInfo" />.
+        /// </summary>
+        /// <param name="constructor">
+        ///   The <see cref="ConstructorInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be recalled efficiently.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="constructor" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="constructor" /> does not have 5 parameters.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently create instances normally created
+        ///   by invoking the <paramref name="constructor" /> directly.
+        /// </returns>
         public static Func<object, object, object, object, object, object>
             CreateFunc5(this ConstructorInfo constructor) {
 
@@ -140,6 +262,25 @@ namespace Invio.Extensions.Reflection {
             return CreateFunc<Func<object, object, object, object, object, object>>(constructor);
         }
 
+        /// <summary>
+        ///   Return an efficient functor for the specified constructor which, when called,
+        ///   creates a new instance of the class that the <paramref name="constructor" />
+        ///   references via the 'DeclaringType' property on <see cref="ConstructorInfo" />.
+        /// </summary>
+        /// <param name="constructor">
+        ///   The <see cref="ConstructorInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be recalled efficiently.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="constructor" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="constructor" /> does not have 6 parameters.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently create instances normally created
+        ///   by invoking the <paramref name="constructor" /> directly.
+        /// </returns>
         public static Func<object, object, object, object, object, object, object>
             CreateFunc6(this ConstructorInfo constructor) {
 
@@ -150,6 +291,25 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
+        /// <summary>
+        ///   Return an efficient functor for the specified constructor which, when called,
+        ///   creates a new instance of the class that the <paramref name="constructor" />
+        ///   references via the 'DeclaringType' property on <see cref="ConstructorInfo" />.
+        /// </summary>
+        /// <param name="constructor">
+        ///   The <see cref="ConstructorInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be recalled efficiently.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="constructor" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="constructor" /> does not have 7 parameters.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently create instances normally created
+        ///   by invoking the <paramref name="constructor" /> directly.
+        /// </returns>
         public static Func<object, object, object, object, object, object, object, object>
             CreateFunc7(this ConstructorInfo constructor) {
 
@@ -160,6 +320,25 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
+        /// <summary>
+        ///   Return an efficient functor for the specified constructor which, when called,
+        ///   creates a new instance of the class that the <paramref name="constructor" />
+        ///   references via the 'DeclaringType' property on <see cref="ConstructorInfo" />.
+        /// </summary>
+        /// <param name="constructor">
+        ///   The <see cref="ConstructorInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be recalled efficiently.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="constructor" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="constructor" /> does not have 8 parameters.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently create instances normally created
+        ///   by invoking the <paramref name="constructor" /> directly.
+        /// </returns>
         public static Func<object, object, object, object, object, object, object, object, object>
             CreateFunc8(this ConstructorInfo constructor) {
 
@@ -170,6 +349,25 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
+        /// <summary>
+        ///   Return an efficient functor for the specified constructor which, when called,
+        ///   creates a new instance of the class that the <paramref name="constructor" />
+        ///   references via the 'DeclaringType' property on <see cref="ConstructorInfo" />.
+        /// </summary>
+        /// <param name="constructor">
+        ///   The <see cref="ConstructorInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be recalled efficiently.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="constructor" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="constructor" /> does not have 9 parameters.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently create instances normally created
+        ///   by invoking the <paramref name="constructor" /> directly.
+        /// </returns>
         public static Func<object, object, object, object, object, object, object, object, object, object>
             CreateFunc9(this ConstructorInfo constructor) {
 

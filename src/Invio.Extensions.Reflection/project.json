@@ -6,7 +6,8 @@
   "authors": [ "Saqib Rokadia <saqib@invioinc.com>" ],
 
   "buildOptions": {
-    "debugType": "portable"
+    "debugType": "portable",
+    "xmlDoc": false
   },
 
   "tooling": {
