@@ -145,7 +145,9 @@ namespace Invio.Extensions.Reflection {
 
             CheckParameters(constructor, expected: 6);
 
-            return CreateFunc<Func<object, object, object, object, object, object, object>>(constructor);
+            return CreateFunc<Func<object, object, object, object, object, object, object>>(
+                constructor
+            );
         }
 
         public static Func<object, object, object, object, object, object, object, object>
