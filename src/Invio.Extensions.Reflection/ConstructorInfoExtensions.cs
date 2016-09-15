@@ -14,10 +14,12 @@ namespace Invio.Extensions.Reflection {
     /// </summary>
     public static class ConstructorInfoExtensions {
 
-        private static ConcurrentDictionary<ConstructorInfo, Func<object[], object>> cache;
+        private static ConcurrentDictionary<ConstructorInfo, Func<object[], object>> arrays;
+        private static ConcurrentDictionary<ConstructorInfo, object> untyped;
 
         static ConstructorInfoExtensions() {
-            cache = new ConcurrentDictionary<ConstructorInfo, Func<object[], object>>();
+            arrays = new ConcurrentDictionary<ConstructorInfo, Func<object[], object>>();
+            untyped = new ConcurrentDictionary<ConstructorInfo, object>();
         }
 
         /// <summary>
@@ -41,10 +43,7 @@ namespace Invio.Extensions.Reflection {
                 throw new ArgumentNullException(nameof(constructor));
             }
 
-            return cache.GetOrAdd(
-                constructor,
-                _ => CreateArrayFuncImpl(constructor)
-            );
+            return arrays.GetOrAdd(constructor, CreateArrayFuncImpl);
         }
 
         private static Func<object[], object> CreateArrayFuncImpl(ConstructorInfo constructor) {
@@ -395,6 +394,10 @@ namespace Invio.Extensions.Reflection {
         }
 
         private static TFunc CreateFunc<TFunc>(ConstructorInfo constructor) {
+            return (TFunc)untyped.GetOrAdd(constructor, CreateFuncImpl<TFunc>);
+        }
+
+        private static object CreateFuncImpl<TFunc>(ConstructorInfo constructor) {
             var parameters = constructor.GetParameters();
 
             Func<ParameterInfo, int, ParameterExpression> toArgument =
