@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
+using Peddler;
 using Xunit;
 
 using Invio.Xunit;
@@ -13,7 +15,7 @@ namespace Invio.Extensions.Reflection {
         public static TheoryData ClassUnderTestCreateFuncs {
             get {
                 var theoryData = new TheoryData<String, Action<MethodInfo>>();
-                var actions = MakeCreateFuncActions<MethodInfoExtensionsTests>();
+                var actions = MakeCreateFuncActions<ClassUnderTest>();
                 foreach (var action in actions) {
                     theoryData.Add(action.Key, action.Value);
                 }
@@ -27,6 +29,19 @@ namespace Invio.Extensions.Reflection {
                 var actions = MakeCreateFuncActions<MethodInfoExtensionsTests>();
                 foreach (var action in actions) {
                     theoryData.Add(action.Key, action.Value);
+                }
+
+                return theoryData;
+            }
+        }
+
+        public static TheoryData ArgumentCountCreateFuncs {
+            get {
+                var theoryData = new TheoryData<Int32, Int32, String, Action<MethodInfo>>();
+                var actions = MakeCreateFuncActions<ClassUnderTest>();
+                for (var i = 0; i < actions.Count; i++) {
+                    var action = actions.ElementAt(i);
+                    theoryData.Add(i, actions.Count, action.Key, action.Value);
                 }
 
                 return theoryData;
@@ -48,11 +63,7 @@ namespace Invio.Extensions.Reflection {
             };
         }
 
-        private Random random { get; }
-
-        public MethodInfoExtensionsTests() {
-            this.random = new Random();
-        }
+        private Int32Generator intGenerator { get; } = new Int32Generator(0, 100);
 
         [Fact]
         public void MethodInfoDelegateFunc0_WrongReturnType() {
@@ -64,12 +75,19 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc0_WithReturnType() {
-            var sut = new ClassUnderTest(this.random.Next(1, 100));
+            var sut = new ClassUnderTest(this.intGenerator.Next());
 
             var func0MethodInfo = sutType.GetMethod("Func0", BindingFlags.Instance | BindingFlags.Public);
             var func0 = (Func<ClassUnderTest, int>)func0MethodInfo.CreateFunc0<ClassUnderTest, int>();
             Assert.Equal(sut.Func0(), func0(sut));
         }
+
+        [Theory]
+        [MemberData(nameof(ClassUnderTestCreateFuncs))]
+         public void CreateMethodInfoDelegate(string functionName, Action<MethodInfo> createFunc) {
+             var methodInfo = sutType.GetMethod(functionName, BindingFlags.Instance | BindingFlags.Public);
+             createFunc(methodInfo);
+         }
 
         [Theory]
         [MemberData(nameof(InvalidDeclaringTypeCreateFuncs))]
@@ -98,9 +116,27 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
+        [Theory]
+        [MemberData(nameof(ArgumentCountCreateFuncs))]
+        public void MethodInfoDelegate_ArgumentCount(
+            int argumentCount,
+            int totalFunctions,
+            String functionName,
+            Action<MethodInfo> createFunc) {
+            var argumentCountGenerator = new Int32Generator(0, totalFunctions);
+            var selectedFunctionName =
+                ClassUnderTest.FunctionPrefix + argumentCountGenerator.NextDistinct(argumentCount);
+            var methodInfo = sutType.GetMethod(selectedFunctionName, BindingFlags.Instance | BindingFlags.Public);
+
+            var ex = Record.Exception(() => createFunc(methodInfo));
+            Assert.NotNull(ex);
+            Assert.Equal(typeof(ArgumentException), ex.GetType());
+            Assert.Contains($"exactly {argumentCount} argument", ex.Message);
+        }
+
         [Fact]
         public void MethodInfoDelegateFunc0() {
-            var sut = new ClassUnderTest(this.random.Next(1, 100));
+            var sut = new ClassUnderTest(this.intGenerator.Next());
 
             var func0MethodInfo = sutType.GetMethod("Func0", BindingFlags.Instance | BindingFlags.Public);
             var typedFunc0 = func0MethodInfo.CreateFunc0<ClassUnderTest>();
@@ -111,7 +147,7 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc1() {
-            var sut = new ClassUnderTest(this.random.Next(1, 100));
+            var sut = new ClassUnderTest(this.intGenerator.Next());
             var args = getArgumentArray(1);
 
             var func1MethodInfo = sutType.GetMethod("Func1", BindingFlags.Instance | BindingFlags.Public);
@@ -123,7 +159,7 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc2() {
-            var sut = new ClassUnderTest(this.random.Next(1, 100));
+            var sut = new ClassUnderTest(this.intGenerator.Next());
             var args = getArgumentArray(2);
 
             var func2MethodInfo = sutType.GetMethod("Func2", BindingFlags.Instance | BindingFlags.Public);
@@ -135,7 +171,7 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc3() {
-            var sut = new ClassUnderTest(this.random.Next(1, 100));
+            var sut = new ClassUnderTest(this.intGenerator.Next());
             var args = getArgumentArray(3);
 
             var func3MethodInfo = sutType.GetMethod("Func3", BindingFlags.Instance | BindingFlags.Public);
@@ -147,7 +183,7 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc4() {
-            var sut = new ClassUnderTest(this.random.Next(1, 100));
+            var sut = new ClassUnderTest(this.intGenerator.Next());
             var args = getArgumentArray(4);
 
             var func4MethodInfo = sutType.GetMethod("Func4", BindingFlags.Instance | BindingFlags.Public);
@@ -165,7 +201,7 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc5() {
-            var sut = new ClassUnderTest(this.random.Next(1, 100));
+            var sut = new ClassUnderTest(this.intGenerator.Next());
             var args = getArgumentArray(5);
 
             var func5MethodInfo = sutType.GetMethod("Func5", BindingFlags.Instance | BindingFlags.Public);
@@ -183,7 +219,7 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc6() {
-            var sut = new ClassUnderTest(this.random.Next(1, 100));
+            var sut = new ClassUnderTest(this.intGenerator.Next());
             var args = getArgumentArray(6);
 
             var func6MethodInfo = sutType.GetMethod("Func6", BindingFlags.Instance | BindingFlags.Public);
@@ -201,7 +237,7 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc7() {
-            var sut = new ClassUnderTest(this.random.Next(1, 100));
+            var sut = new ClassUnderTest(this.intGenerator.Next());
             var args = getArgumentArray(7);
 
             var func7MethodInfo = sutType.GetMethod("Func7", BindingFlags.Instance | BindingFlags.Public);
@@ -219,7 +255,7 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc8() {
-            var sut = new ClassUnderTest(this.random.Next(1, 100));
+            var sut = new ClassUnderTest(this.intGenerator.Next());
             var args = getArgumentArray(8);
 
             var func8MethodInfo = sutType.GetMethod("Func8", BindingFlags.Instance | BindingFlags.Public);
@@ -237,7 +273,7 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc9() {
-            var sut = new ClassUnderTest(this.random.Next(1, 100));
+            var sut = new ClassUnderTest(this.intGenerator.Next());
             var args = getArgumentArray(9);
 
             var func9MethodInfo = sutType.GetMethod("Func9", BindingFlags.Instance | BindingFlags.Public);
@@ -270,13 +306,15 @@ namespace Invio.Extensions.Reflection {
         private int[] getArgumentArray(int argCount) {
             var args = new int[argCount];
             for (int i = 0; i < argCount; i++) {
-                args[i] = this.random.Next(1, 100);
+                args[i] = this.intGenerator.Next();
             }
             return args;
         }
 
         private static readonly Type sutType = typeof(ClassUnderTest);
         class ClassUnderTest {
+            public const String FunctionPrefix = "Func";
+
             private readonly int modifier;
             private int modified;
 

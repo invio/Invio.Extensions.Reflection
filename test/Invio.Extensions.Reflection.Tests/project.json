@@ -11,6 +11,7 @@
       "target": "project"
     },
     "Invio.Xunit" : "0.1.0",
+    "Peddler": "0.5.1",
     "dotnet-test-xunit": "2.2.0-*",
     "xunit": "2.2.0-*"
   },
