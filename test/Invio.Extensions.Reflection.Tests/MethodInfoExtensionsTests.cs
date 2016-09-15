@@ -310,6 +310,9 @@ namespace Invio.Extensions.Reflection {
             Assert.Throws<ArgumentNullException>(
                 () => nullMI.CreateAction1<ClassUnderTest>()
             );
+            Assert.Throws<ArgumentNullException>(
+                () => nullMI.CreateAction1<ClassUnderTest, int>()
+            );
         }
 
         public static TheoryData WrongArgumentCountCreateActionData {
@@ -320,6 +323,7 @@ namespace Invio.Extensions.Reflection {
                 return new TheoryData<Int32, String, Action<MethodInfo>> {
                     { 0, addMethodName, m => { m.CreateAction0<ClassUnderTest>(); } },
                     { 0, addMethodName, m => { m.CreateAction0(); } },
+                    { 1, incrementMethodName, m => { m.CreateAction1<ClassUnderTest, int>(); } },
                     { 1, incrementMethodName, m => { m.CreateAction1<ClassUnderTest>(); } },
                     { 1, incrementMethodName, m => { m.CreateAction1(); } }
                 };
@@ -384,10 +388,17 @@ namespace Invio.Extensions.Reflection {
 
              var action1MethodInfo =
                  sutType.GetMethod("addToModified", BindingFlags.Instance | BindingFlags.Public);
+             var argTypeAction1 = action1MethodInfo.CreateAction1<ClassUnderTest, int>();
+             for (int i = 0; i < iterateCount; i++) {
+                 expected.addToModified(argsPerIterate[i]);
+                 argTypeAction1(sut, argsPerIterate[i]);
+             }
+             Assert.Equal(expected.modified, sut.modified);
+
+             sut = new ClassUnderTest(initialValue);
              var typeAction1 = action1MethodInfo.CreateAction1<ClassUnderTest>();
              for (int i = 0; i < iterateCount; i++) {
                  typeAction1(sut, argsPerIterate[i]);
-                 expected.addToModified(argsPerIterate[i]);
              }
              Assert.Equal(expected.modified, sut.modified);
 
