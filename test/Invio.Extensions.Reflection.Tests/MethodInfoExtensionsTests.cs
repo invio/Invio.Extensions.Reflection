@@ -63,7 +63,13 @@ namespace Invio.Extensions.Reflection {
             };
         }
 
-        private Int32Generator intGenerator { get; } = new Int32Generator(1, 101);
+        public static TheoryData IteratorCount {
+            get {
+                return new TheoryData<Int32> { MethodInfoExtensionsTests.intGenerator.Next() };
+            }
+        }
+
+        private static Int32Generator intGenerator { get; } = new Int32Generator(1, 101);
 
         [Fact]
         public void MethodInfoDelegateFunc0_WrongReturnType() {
@@ -75,7 +81,7 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc0_WithReturnType() {
-            var sut = new ClassUnderTest(this.intGenerator.Next());
+            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
 
             var func0MethodInfo = sutType.GetMethod("Func0", BindingFlags.Instance | BindingFlags.Public);
             var func0 = (Func<ClassUnderTest, int>)func0MethodInfo.CreateFunc0<ClassUnderTest, int>();
@@ -136,7 +142,7 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc0() {
-            var sut = new ClassUnderTest(this.intGenerator.Next());
+            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
 
             var func0MethodInfo = sutType.GetMethod("Func0", BindingFlags.Instance | BindingFlags.Public);
             var typedFunc0 = func0MethodInfo.CreateFunc0<ClassUnderTest>();
@@ -147,8 +153,8 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc1() {
-            var sut = new ClassUnderTest(this.intGenerator.Next());
-            var args = getArgumentArray(1);
+            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
+            var args = generateIntArray(1);
 
             var func1MethodInfo = sutType.GetMethod("Func1", BindingFlags.Instance | BindingFlags.Public);
             var typedFunc1 = func1MethodInfo.CreateFunc1<ClassUnderTest>();
@@ -159,8 +165,8 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc2() {
-            var sut = new ClassUnderTest(this.intGenerator.Next());
-            var args = getArgumentArray(2);
+            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
+            var args = generateIntArray(2);
 
             var func2MethodInfo = sutType.GetMethod("Func2", BindingFlags.Instance | BindingFlags.Public);
             var typedFunc2 = func2MethodInfo.CreateFunc2<ClassUnderTest>();
@@ -171,8 +177,8 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc3() {
-            var sut = new ClassUnderTest(this.intGenerator.Next());
-            var args = getArgumentArray(3);
+            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
+            var args = generateIntArray(3);
 
             var func3MethodInfo = sutType.GetMethod("Func3", BindingFlags.Instance | BindingFlags.Public);
             var typedFunc3 = func3MethodInfo.CreateFunc3<ClassUnderTest>();
@@ -183,8 +189,8 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc4() {
-            var sut = new ClassUnderTest(this.intGenerator.Next());
-            var args = getArgumentArray(4);
+            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
+            var args = generateIntArray(4);
 
             var func4MethodInfo = sutType.GetMethod("Func4", BindingFlags.Instance | BindingFlags.Public);
             var typedFunc4 = func4MethodInfo.CreateFunc4<ClassUnderTest>();
@@ -201,8 +207,8 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc5() {
-            var sut = new ClassUnderTest(this.intGenerator.Next());
-            var args = getArgumentArray(5);
+            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
+            var args = generateIntArray(5);
 
             var func5MethodInfo = sutType.GetMethod("Func5", BindingFlags.Instance | BindingFlags.Public);
             var typedFunc5 = func5MethodInfo.CreateFunc5<ClassUnderTest>();
@@ -219,8 +225,8 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc6() {
-            var sut = new ClassUnderTest(this.intGenerator.Next());
-            var args = getArgumentArray(6);
+            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
+            var args = generateIntArray(6);
 
             var func6MethodInfo = sutType.GetMethod("Func6", BindingFlags.Instance | BindingFlags.Public);
             var typedFunc6 = func6MethodInfo.CreateFunc6<ClassUnderTest>();
@@ -237,8 +243,8 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc7() {
-            var sut = new ClassUnderTest(this.intGenerator.Next());
-            var args = getArgumentArray(7);
+            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
+            var args = generateIntArray(7);
 
             var func7MethodInfo = sutType.GetMethod("Func7", BindingFlags.Instance | BindingFlags.Public);
             var typedFunc7 = func7MethodInfo.CreateFunc7<ClassUnderTest>();
@@ -255,8 +261,8 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc8() {
-            var sut = new ClassUnderTest(this.intGenerator.Next());
-            var args = getArgumentArray(8);
+            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
+            var args = generateIntArray(8);
 
             var func8MethodInfo = sutType.GetMethod("Func8", BindingFlags.Instance | BindingFlags.Public);
             var typedFunc8 = func8MethodInfo.CreateFunc8<ClassUnderTest>();
@@ -273,8 +279,8 @@ namespace Invio.Extensions.Reflection {
 
         [Fact]
         public void MethodInfoDelegateFunc9() {
-            var sut = new ClassUnderTest(this.intGenerator.Next());
-            var args = getArgumentArray(9);
+            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
+            var args = generateIntArray(9);
 
             var func9MethodInfo = sutType.GetMethod("Func9", BindingFlags.Instance | BindingFlags.Public);
             var typedFunc9 = func9MethodInfo.CreateFunc9<ClassUnderTest>();
@@ -290,6 +296,110 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
+        public void MethodInfoCreateAction_ArgNull() {
+            MethodInfo nullMI = null;
+            Assert.Throws<ArgumentNullException>(
+                () => nullMI.CreateAction0()
+            );
+            Assert.Throws<ArgumentNullException>(
+                () => nullMI.CreateAction0<ClassUnderTest>()
+            );
+            Assert.Throws<ArgumentNullException>(
+                () => nullMI.CreateAction1()
+            );
+            Assert.Throws<ArgumentNullException>(
+                () => nullMI.CreateAction1<ClassUnderTest>()
+            );
+        }
+
+        public static TheoryData WrongArgumentCountCreateActionData {
+            get {
+                var incrementMethodName = "incrementModified";
+                var addMethodName = "addToModified";
+
+                return new TheoryData<Int32, String, Action<MethodInfo>> {
+                    { 0, addMethodName, m => { m.CreateAction0<ClassUnderTest>(); } },
+                    { 0, addMethodName, m => { m.CreateAction0(); } },
+                    { 1, incrementMethodName, m => { m.CreateAction1<ClassUnderTest>(); } },
+                    { 1, incrementMethodName, m => { m.CreateAction1(); } }
+                };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(WrongArgumentCountCreateActionData))]
+        public void MethodInfoDelegateAction0_WrongArgumentCount(
+            int expectedArgCount,
+            String methodName,
+            Action<MethodInfo> createAction) {
+            var methodInfo = sutType.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
+
+            var ex = Record.Exception(() => createAction(methodInfo));
+            Assert.NotNull(ex);
+            Assert.Equal(typeof(ArgumentException), ex.GetType());
+            Assert.Contains($"exactly {expectedArgCount} argument", ex.Message);
+        }
+
+        [Fact]
+        public void MethodInfoDelegateAction1_WrongArgumentCount() {
+            var methodInfo = sutType.GetMethod("incrementModified", BindingFlags.Instance | BindingFlags.Public);
+
+            var ex = Record.Exception(() => methodInfo.CreateAction1());
+            Assert.NotNull(ex);
+            Assert.Equal(typeof(ArgumentException), ex.GetType());
+            Assert.Contains($"exactly 1 argument", ex.Message);
+        }
+
+        [Theory]
+        [MemberData(nameof(IteratorCount))]
+        public void MethodInfoDelegateAction0(int iterateCount) {
+            var initialValue = MethodInfoExtensionsTests.intGenerator.Next();
+            var sut = new ClassUnderTest(initialValue);
+            var expected = new ClassUnderTest(initialValue);
+
+            var action0MethodInfo =
+                sutType.GetMethod("incrementModified", BindingFlags.Instance | BindingFlags.Public);
+            var typedAction0 = action0MethodInfo.CreateAction0<ClassUnderTest>();
+            for (int i = 0; i < iterateCount; i++) {
+                typedAction0(sut);
+                expected.incrementModified();
+            }
+            Assert.Equal(expected.modified, sut.modified);
+
+            sut = new ClassUnderTest(initialValue);
+            var action0 = action0MethodInfo.CreateAction0();
+            for (int i = 0; i < iterateCount; i++) {
+                action0(sut);
+            }
+            Assert.Equal(expected.modified, sut.modified);
+        }
+
+        [Theory]
+        [MemberData(nameof(IteratorCount))]
+         public void MethodInfoDelegateAction1(int iterateCount) {
+             var initialValue = MethodInfoExtensionsTests.intGenerator.Next();
+             var sut = new ClassUnderTest(initialValue);
+             var expected = new ClassUnderTest(initialValue);
+             var argsPerIterate = generateIntArray(iterateCount);
+
+             var action1MethodInfo =
+                 sutType.GetMethod("addToModified", BindingFlags.Instance | BindingFlags.Public);
+             var typeAction1 = action1MethodInfo.CreateAction1<ClassUnderTest>();
+             for (int i = 0; i < iterateCount; i++) {
+                 typeAction1(sut, argsPerIterate[i]);
+                 expected.addToModified(argsPerIterate[i]);
+             }
+             Assert.Equal(expected.modified, sut.modified);
+
+             sut = new ClassUnderTest(initialValue);
+             var action1 = action1MethodInfo.CreateAction1();
+             for (int i = 0; i < iterateCount; i++) {
+                 action1(sut, argsPerIterate[i]);
+             }
+             Assert.Equal(expected.modified, sut.modified);
+         }
+
+        [Fact]
         public void CreateCompatibleDelegate_ArgNull_Checks() {
             var methodInfo = sutType.GetMethod("Func0", BindingFlags.Instance | BindingFlags.Public);
             Assert.Throws<ArgumentNullException>(
@@ -300,31 +410,138 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
+        [Fact]
+        public void IsImplementationOf_ArgNull_Checks() {
+            MethodInfo nullMI = null;
+            var methodInfo = isutType.GetMethod("interfaceAction", BindingFlags.Instance | BindingFlags.Public);
+            Assert.Throws<ArgumentNullException>(
+                () => nullMI.IsImplementationOf(methodInfo)
+            );
+            Assert.Throws<ArgumentNullException>(
+                () => methodInfo.IsImplementationOf(interfaceMethod: null)
+            );
+        }
+
+        [Fact]
+        public void IsImplementationOf_InterfaceSameMethod() {
+            var methodInfo = isutType.GetMethod("interfaceAction", BindingFlags.Instance | BindingFlags.Public);
+            var interfaceMethodInfo = isutType.GetMethod("interfaceAction");
+
+            Assert.True(methodInfo.IsImplementationOf(interfaceMethodInfo));
+        }
+
+        [Fact]
+        public void IsImplementationOf_ClassSameMethod() {
+            var methodInfo = sutType.GetMethod("interfaceAction", BindingFlags.Instance | BindingFlags.Public);
+            var classMethodInfo = sutType.GetMethod("interfaceAction");
+
+            Assert.True(methodInfo.IsImplementationOf(classMethodInfo));
+        }
+
+        [Fact]
+        public void IsImplementationOf_Class_DirectImplementation() {
+            var methodInfo = sutType.GetMethod("interfaceAction");
+            var interfaceMethodInfo = isutType.GetMethod("interfaceAction");
+
+            Assert.True(methodInfo.IsImplementationOf(interfaceMethodInfo));
+        }
+
+        [Fact]
+        public void IsImplementationOf_Class_DirectImplementation2() {
+            var methodInfo = sutType.GetMethod("baseInterfaceAction");
+            var interfaceMethodInfo = isutType.GetMethod("baseInterfaceAction");
+
+            Assert.True(methodInfo.IsImplementationOf(interfaceMethodInfo));
+        }
+
+        [Fact]
+        public void IsImplementationOf_Class_BaseImplementation() {
+            var methodInfo = sutType.GetMethod("baseInterfaceAction");
+            var interfaceMethodInfo = ibaseType.GetMethod("baseInterfaceAction");
+
+            Assert.True(methodInfo.IsImplementationOf(interfaceMethodInfo));
+        }
+
+        [Fact]
+        public void IsImplementationOf_MismatchedInterfaces() {
+            var methodInfo = iwrongType.GetMethod("interfaceAction");
+            var interfaceMethodInfo = isutType.GetMethod("interfaceAction");
+
+            Assert.False(methodInfo.IsImplementationOf(interfaceMethodInfo));
+        }
+
+        [Fact]
+        public void IsImplementationOf_Class_WrongInterface() {
+            var methodInfo = sutType.GetMethod("interfaceAction");
+            var interfaceMethodInfo = iwrongType.GetMethod("interfaceAction");
+
+            Assert.False(methodInfo.IsImplementationOf(interfaceMethodInfo));
+        }
+
+        [Fact]
+        public void IsImplementationOf_InterfaceInheritence_NoImplementation() {
+            var methodInfo = isutType.GetMethod("baseInterfaceAction");
+            var interfaceMethodInfo = ibaseType.GetMethod("baseInterfaceAction");
+
+            Assert.False(methodInfo.IsImplementationOf(interfaceMethodInfo));
+        }
+
+        [Fact]
+        public void IsImplementationOf_ArgsBackwards() {
+            var methodInfo = isutType.GetMethod("interfaceAction");
+            var classMethodInfo = sutType.GetMethod("interfaceAction");
+
+            Assert.False(methodInfo.IsImplementationOf(classMethodInfo));
+        }
+
         /// <summary>
         /// Creates a random arguments for the count of args supplied.
         /// </summary>
-        private int[] getArgumentArray(int argCount) {
+        private int[] generateIntArray(int argCount) {
             var args = new int[argCount];
             for (int i = 0; i < argCount; i++) {
-                args[i] = this.intGenerator.Next();
+                args[i] = MethodInfoExtensionsTests.intGenerator.Next();
             }
             return args;
         }
 
+        private static readonly Type isutType = typeof(IClassUnderTest);
+        interface IClassUnderTest : IBaseClassUnderTest {
+            void interfaceAction();
+            new void baseInterfaceAction();
+        }
+
+        private static readonly Type ibaseType = typeof(IBaseClassUnderTest);
+        interface IBaseClassUnderTest {
+            void baseInterfaceAction();
+        }
+
+        private static readonly Type iwrongType = typeof(IWrongClassInterface);
+        interface IWrongClassInterface {
+            void interfaceAction();
+        }
+
         private static readonly Type sutType = typeof(ClassUnderTest);
-        class ClassUnderTest {
+        class ClassUnderTest : IClassUnderTest {
             public const String FunctionPrefix = "Func";
 
             private readonly int modifier;
-            private int modified;
+            public int modified;
 
             public ClassUnderTest(int modifier) {
                 this.modifier = modifier;
                 this.modified = modifier;
             }
 
+            public void interfaceAction() { }
+            public void baseInterfaceAction() { }
+
             public void incrementModified() {
                 modified++;
+            }
+
+            public void addToModified(int add) {
+                modified += add;
             }
 
             public int Func0() {
