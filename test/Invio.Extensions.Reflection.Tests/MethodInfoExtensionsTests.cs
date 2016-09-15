@@ -63,7 +63,7 @@ namespace Invio.Extensions.Reflection {
             };
         }
 
-        private Int32Generator intGenerator { get; } = new Int32Generator(0, 100);
+        private Int32Generator intGenerator { get; } = new Int32Generator(1, 101);
 
         [Fact]
         public void MethodInfoDelegateFunc0_WrongReturnType() {
