@@ -1,9 +1,12 @@
 {
   "name": "Invio.Extensions.Reflection",
   "title": "Invio Extensions to System.Reflection",
-  "version": "0.1.0",
+  "version": "0.2.0",
 
-  "authors": [ "Saqib Rokadia <saqib@invioinc.com>" ],
+  "authors": [
+    "Saqib Rokadia <saqib@invioinc.com>",
+    "Brian Caruso <brian@invioinc.com>"
+  ],
 
   "buildOptions": {
     "debugType": "portable",
