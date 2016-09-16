@@ -1,5 +1,5 @@
 {
-  "version": "0.3.0",
+  "version": "0.4.0",
 
   "buildOptions": {
     "debugType": "portable",
@@ -7,7 +7,7 @@
 
   "dependencies": {
     "Invio.Extensions.Reflection": {
-      "version": "0.3.0",
+      "version": "0.4.0",
       "target": "project"
     },
     "Invio.Xunit" : "0.1.0",
