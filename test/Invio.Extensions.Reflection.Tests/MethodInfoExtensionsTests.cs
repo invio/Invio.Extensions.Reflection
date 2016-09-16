@@ -345,13 +345,13 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void MethodInfoDelegateAction1_WrongArgumentCount() {
-            var methodInfo = sutType.GetMethod("incrementModified", BindingFlags.Instance | BindingFlags.Public);
+        public void MethodInfoDelegateAction1_MismatchParameterType() {
+            var methodInfo = sutType.GetMethod("addToModified", BindingFlags.Instance | BindingFlags.Public);
 
-            var ex = Record.Exception(() => methodInfo.CreateAction1());
+            var ex = Record.Exception(() => methodInfo.CreateAction1<ClassUnderTest, double>());
             Assert.NotNull(ex);
-            Assert.Equal(typeof(ArgumentException), ex.GetType());
-            Assert.Contains($"exactly 1 argument", ex.Message);
+            Assert.IsType<ArgumentException>(ex);
+            Assert.Contains($"exactly match the generic type parameter T2", ex.Message);
         }
 
         [Theory]
