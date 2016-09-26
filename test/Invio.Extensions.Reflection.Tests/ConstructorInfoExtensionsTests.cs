@@ -702,7 +702,19 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateArrayFunc_Null() {
+        public void CreateArrayFunc_Typed_Null() {
+
+            // Arrange
+            ConstructorInfo constructor = null;
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(
+                () => constructor.CreateArrayFunc<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateArrayFunc_Untyped_Null() {
 
             // Arrange
             ConstructorInfo constructor = null;
@@ -710,6 +722,26 @@ namespace Invio.Extensions.Reflection {
             // Act & Assert
             Assert.Throws<ArgumentNullException>(
                 () => constructor.CreateArrayFunc()
+            );
+        }
+
+        [Fact]
+        public void CreateArrayFunc_Typed_MismatchedType() {
+
+            // Arrange
+            ConstructorInfo constructor = GetConstructor();
+
+            // Act
+            var exception = Assert.Throws<ArgumentException>(
+                () => constructor.CreateArrayFunc<String>()
+            );
+
+            // Assert
+            Assert.Equal(
+                "Type parameter 'String' does not match the 'DeclaringType' " +
+                "of the provided 'ConstructorInfo' object." +
+                Environment.NewLine + "Parameter name: constructor",
+                exception.Message
             );
         }
 
@@ -723,7 +755,20 @@ namespace Invio.Extensions.Reflection {
 
         [Theory]
         [MemberData(nameof(CreateArrayFunc_DelegateThrowsOnNull_Data))]
-        public void CreateArrayFunc_DelegateThrowsOnNull(ConstructorInfo constructor) {
+        public void CreateArrayFunc_Typed_DelegateThrowsOnNull(ConstructorInfo constructor) {
+
+            // Act
+            var createFake = constructor.CreateArrayFunc<Fake>();
+
+            // Assert
+            Assert.Throws<ArgumentNullException>(
+                () => createFake(null)
+            );
+        }
+
+        [Theory]
+        [MemberData(nameof(CreateArrayFunc_DelegateThrowsOnNull_Data))]
+        public void CreateArrayFunc_Untyped_DelegateThrowsOnNull(ConstructorInfo constructor) {
 
             // Act
             var createFake = constructor.CreateArrayFunc();
@@ -735,7 +780,22 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateArrayFunc_ThrowsOnTooFewParameters() {
+        public void CreateArrayFunc_Typed_ThrowsOnTooFewParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(typeof(Guid), typeof(String));
+
+            // Act
+            var createFake = constructor.CreateArrayFunc<Fake>();
+
+            // Assert
+            Assert.Throws<ArgumentException>(
+                () => createFake(new object[] { Guid.NewGuid() })
+            );
+        }
+
+        [Fact]
+        public void CreateArrayFunc_Untyped_ThrowsOnTooFewParameters() {
 
             // Arrange
             var constructor = GetConstructor(typeof(Guid), typeof(String));
@@ -750,7 +810,22 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateArrayFunc_ThrowsOnTooManyParameters() {
+        public void CreateArrayFunc_Typed_ThrowsOnTooManyParameters() {
+
+            // Arrange
+            var constructor = GetConstructor();
+
+            // Act
+            var createFake = constructor.CreateArrayFunc<Fake>();
+
+            // Assert
+            Assert.Throws<ArgumentException>(
+                () => createFake(new object[] { Guid.NewGuid() })
+            );
+        }
+
+        [Fact]
+        public void CreateArrayFunc_Untyped_ThrowsOnTooManyParameters() {
 
             // Arrange
             var constructor = GetConstructor();
@@ -765,7 +840,38 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateArrayFunc_ParameterlessConstructor() {
+        public void CreateArrayFunc_Typed_ParameterlessConstructor() {
+
+            // Arrange
+            var constructor = GetConstructor();
+
+            // Act
+            var createFake = constructor.CreateArrayFunc<Fake>();
+            var fake = createFake(new object[0]);
+
+            // Assert
+            Assert.NotNull(fake);
+            Assert.IsType<Fake>(fake);
+
+            var casted = (Fake)fake;
+            Assert.Equal(Guid.Empty, casted.Guid);
+            Assert.Equal("Default", casted.Foo);
+            Assert.Equal(1, casted.Bar);
+            Assert.Equal(1, casted.Byte);
+            Assert.Equal(1, casted.SByte);
+            Assert.Equal(1, casted.Short);
+            Assert.Equal(1, casted.UShort);
+            Assert.Equal(1L, casted.Long);
+            Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateArrayFunc<Fake>()),
+                "The created delegate should be cached."
+            );
+        }
+
+        [Fact]
+        public void CreateArrayFunc_Untyped_ParameterlessConstructor() {
 
             // Arrange
             var constructor = GetConstructor();
@@ -788,10 +894,47 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1, casted.UShort);
             Assert.Equal(1L, casted.Long);
             Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateArrayFunc()),
+                "The created delegate should be cached."
+            );
         }
 
         [Fact]
-        public void CreateArrayFunc_SingleParameterConstructor() {
+        public void CreateArrayFunc_Typed_SingleParameterConstructor() {
+
+            // Arrange
+            var guid = Guid.NewGuid();
+            var constructor = GetConstructor(typeof(Guid));
+
+            // Act
+            var createFake = constructor.CreateArrayFunc<Fake>();
+            var fake = createFake(new object[] { guid });
+
+            // Assert
+            Assert.NotNull(fake);
+            Assert.IsType<Fake>(fake);
+
+            var casted = (Fake)fake;
+            Assert.Equal(guid, casted.Guid);
+            Assert.Equal("Default", casted.Foo);
+            Assert.Equal(1, casted.Bar);
+            Assert.Equal(1, casted.Byte);
+            Assert.Equal(1, casted.SByte);
+            Assert.Equal(1, casted.Short);
+            Assert.Equal(1, casted.UShort);
+            Assert.Equal(1L, casted.Long);
+            Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateArrayFunc<Fake>()),
+                "The created delegate should be cached."
+            );
+        }
+
+        [Fact]
+        public void CreateArrayFunc_Untyped_SingleParameterConstructor() {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -815,10 +958,49 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1, casted.UShort);
             Assert.Equal(1L, casted.Long);
             Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateArrayFunc()),
+                "The created delegate should be cached."
+            );
         }
 
         [Fact]
-        public void CreateArrayFunc_ManyParameterConstructor() {
+        public void CreateArrayFunc_Typed_ManyParameterConstructor() {
+
+            // Arrange
+            var guid = Guid.NewGuid();
+            const string foo = "Foo";
+            const int bar = 5;
+            var constructor = GetConstructor(typeof(Guid), typeof(String), typeof(int));
+
+            // Act
+            var createFake = constructor.CreateArrayFunc<Fake>();
+            var fake = createFake(new object[] { guid, foo, bar });
+
+            // Assert
+            Assert.NotNull(fake);
+            Assert.IsType<Fake>(fake);
+
+            var casted = (Fake)fake;
+            Assert.Equal(guid, casted.Guid);
+            Assert.Equal(foo, casted.Foo);
+            Assert.Equal(bar, casted.Bar);
+            Assert.Equal(1, casted.Byte);
+            Assert.Equal(1, casted.SByte);
+            Assert.Equal(1, casted.Short);
+            Assert.Equal(1, casted.UShort);
+            Assert.Equal(1L, casted.Long);
+            Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateArrayFunc<Fake>()),
+                "The created delegate should be cached."
+            );
+        }
+
+        [Fact]
+        public void CreateArrayFunc_Untyped_ManyParameterConstructor() {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -844,6 +1026,11 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1, casted.UShort);
             Assert.Equal(1L, casted.Long);
             Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateArrayFunc()),
+                "The created delegate should be cached."
+            );
         }
 
         private static ConstructorInfo GetConstructor(int numberOfParameters) {
