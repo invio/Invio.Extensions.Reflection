@@ -115,15 +115,12 @@ namespace Invio.Extensions.Reflection {
         ///   A delegate that can called to efficiently create instances normally created
         ///   by invoking the <paramref name="constructor" /> directly.
         /// </returns>
-        public static Func<object> CreateFunc0(this ConstructorInfo constructor) {
+        public static Func<object>
+            CreateFunc0(this ConstructorInfo constructor) {
+
             CheckParameters(constructor, expected: 0);
 
-            var body = Expression.Convert(
-                Expression.New(constructor),
-                typeof(object)
-            );
-
-            return Expression.Lambda<Func<object>>(body).Compile();
+            return CreateFunc<Func<object>>(constructor);
         }
 
         /// <summary>
