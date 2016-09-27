@@ -9,7 +9,19 @@ namespace Invio.Extensions.Reflection {
     public class ConstructorInfoExtensionsTests {
 
         [Fact]
-        public void CreateFunc0_Null() {
+        public void CreateFunc0_Typed_Null() {
+
+            // Arrange
+            ConstructorInfo constructor = null;
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(
+                () => constructor.CreateFunc0<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc0_Untyped_Null() {
 
             // Arrange
             ConstructorInfo constructor = null;
@@ -21,7 +33,39 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc0_TooManyParameters() {
+        public void CreateFunc0_Typed_MismatchedType() {
+
+            // Arrange
+            ConstructorInfo constructor = GetConstructor();
+
+            // Act
+            var exception = Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc0<String>()
+            );
+
+            // Assert
+            Assert.Equal(
+                "Type parameter 'String' does not match the 'DeclaringType' " +
+                "of the provided 'ConstructorInfo' object." +
+                Environment.NewLine + "Parameter name: constructor",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateFunc0_Typed_TooManyParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(numberOfParameters: 1);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc0<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc0_Untyped_TooManyParameters() {
 
             // Arrange
             var constructor = GetConstructor(numberOfParameters: 1);
@@ -33,7 +77,38 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc0() {
+        public void CreateFunc0_Typed() {
+
+            // Arrange
+            var constructor = GetConstructor();
+
+            // Act
+            var createFake = constructor.CreateFunc0<Fake>();
+            var fake = createFake();
+
+            // Assert
+            Assert.NotNull(fake);
+            Assert.IsType<Fake>(fake);
+
+            var casted = (Fake)fake;
+            Assert.Equal(Guid.Empty, casted.Guid);
+            Assert.Equal("Default", casted.Foo);
+            Assert.Equal(1, casted.Bar);
+            Assert.Equal(1, casted.Byte);
+            Assert.Equal(1, casted.SByte);
+            Assert.Equal(1, casted.Short);
+            Assert.Equal(1, casted.UShort);
+            Assert.Equal(1L, casted.Long);
+            Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc0<Fake>()),
+                "The created delegate should be cached."
+            );
+        }
+
+        [Fact]
+        public void CreateFunc0_Untyped() {
 
             // Arrange
             var constructor = GetConstructor();
@@ -56,10 +131,27 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1, casted.UShort);
             Assert.Equal(1L, casted.Long);
             Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc0()),
+                "The created delegate should be cached."
+            );
         }
 
         [Fact]
-        public void CreateFunc1_Null() {
+        public void CreateFunc1_Typed_Null() {
+
+            // Arrange
+            ConstructorInfo constructor = null;
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(
+                () => constructor.CreateFunc1<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc1_Untyped_Null() {
 
             // Arrange
             ConstructorInfo constructor = null;
@@ -71,7 +163,39 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc1_TooFewParameters() {
+        public void CreateFunc1_Typed_MismatchedType() {
+
+            // Arrange
+            ConstructorInfo constructor = GetConstructor(numberOfParameters: 1);
+
+            // Act
+            var exception = Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc1<String>()
+            );
+
+            // Assert
+            Assert.Equal(
+                "Type parameter 'String' does not match the 'DeclaringType' " +
+                "of the provided 'ConstructorInfo' object." +
+                Environment.NewLine + "Parameter name: constructor",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateFunc1_Typed_TooFewParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(numberOfParameters: 0);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc1<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc1_Untyped_TooFewParameters() {
 
             // Arrange
             var constructor = GetConstructor(numberOfParameters: 0);
@@ -83,7 +207,20 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc1_TooManyParameters() {
+        public void CreateFunc1_Typed_TooManyParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(numberOfParameters: 2);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc1<Fake>()
+            );
+        }
+
+
+        [Fact]
+        public void CreateFunc1_Untyped_TooManyParameters() {
 
             // Arrange
             var constructor = GetConstructor(numberOfParameters: 2);
@@ -95,7 +232,39 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc1() {
+        public void CreateFunc1_Typed() {
+
+            // Arrange
+            var guid = Guid.NewGuid();
+            var constructor = GetConstructor(typeof(Guid));
+
+            // Act
+            var createFake = constructor.CreateFunc1<Fake>();
+            var fake = createFake(guid);
+
+            // Assert
+            Assert.NotNull(fake);
+            Assert.IsType<Fake>(fake);
+
+            var casted = (Fake)fake;
+            Assert.Equal(guid, casted.Guid);
+            Assert.Equal("Default", casted.Foo);
+            Assert.Equal(1, casted.Bar);
+            Assert.Equal(1, casted.Byte);
+            Assert.Equal(1, casted.SByte);
+            Assert.Equal(1, casted.Short);
+            Assert.Equal(1, casted.UShort);
+            Assert.Equal(1L, casted.Long);
+            Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc1<Fake>()),
+                "The created delegate should be cached."
+            );
+        }
+
+        [Fact]
+        public void CreateFunc1_Untyped() {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -119,10 +288,27 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1, casted.UShort);
             Assert.Equal(1L, casted.Long);
             Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc1()),
+                "The created delegate should be cached."
+            );
         }
 
         [Fact]
-        public void CreateFunc2_Null() {
+        public void CreateFunc2_Typed_Null() {
+
+            // Arrange
+            ConstructorInfo constructor = null;
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(
+                () => constructor.CreateFunc2<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc2_Untyped_Null() {
 
             // Arrange
             ConstructorInfo constructor = null;
@@ -134,7 +320,39 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc2_TooFewParameters() {
+        public void CreateFunc2_Typed_MismatchedType() {
+
+            // Arrange
+            ConstructorInfo constructor = GetConstructor(numberOfParameters: 2);
+
+            // Act
+            var exception = Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc2<String>()
+            );
+
+            // Assert
+            Assert.Equal(
+                "Type parameter 'String' does not match the 'DeclaringType' " +
+                "of the provided 'ConstructorInfo' object." +
+                Environment.NewLine + "Parameter name: constructor",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateFunc2_Typed_TooFewParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(numberOfParameters: 1);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc2<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc2_Untyped_TooFewParameters() {
 
             // Arrange
             var constructor = GetConstructor(numberOfParameters: 1);
@@ -146,7 +364,19 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc2_TooManyParameters() {
+        public void CreateFunc2_Typed_TooManyParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(numberOfParameters: 3);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc2<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc2_Untyped_TooManyParameters() {
 
             // Arrange
             var constructor = GetConstructor(numberOfParameters: 3);
@@ -158,7 +388,40 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc2() {
+        public void CreateFunc2_Typed() {
+
+            // Arrange
+            var guid = Guid.NewGuid();
+            var foo = "foo";
+            var constructor = GetConstructor(typeof(Guid), typeof(String));
+
+            // Act
+            var createFake = constructor.CreateFunc2<Fake>();
+            var fake = createFake(guid, foo);
+
+            // Assert
+            Assert.NotNull(fake);
+            Assert.IsType<Fake>(fake);
+
+            var casted = (Fake)fake;
+            Assert.Equal(guid, casted.Guid);
+            Assert.Equal(foo, casted.Foo);
+            Assert.Equal(1, casted.Bar);
+            Assert.Equal(1, casted.Byte);
+            Assert.Equal(1, casted.SByte);
+            Assert.Equal(1, casted.Short);
+            Assert.Equal(1, casted.UShort);
+            Assert.Equal(1L, casted.Long);
+            Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc2<Fake>()),
+                "The created delegate should be cached."
+            );
+        }
+
+        [Fact]
+        public void CreateFunc2_Untyped() {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -183,10 +446,27 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1, casted.UShort);
             Assert.Equal(1L, casted.Long);
             Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc2()),
+                "The created delegate should be cached."
+            );
         }
 
         [Fact]
-        public void CreateFunc3_Null() {
+        public void CreateFunc3_Typed_Null() {
+
+            // Arrange
+            ConstructorInfo constructor = null;
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(
+                () => constructor.CreateFunc3<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc3_Untyped_Null() {
 
             // Arrange
             ConstructorInfo constructor = null;
@@ -198,7 +478,39 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc3_TooFewParameters() {
+        public void CreateFunc3_Typed_MismatchedType() {
+
+            // Arrange
+            ConstructorInfo constructor = GetConstructor(numberOfParameters: 3);
+
+            // Act
+            var exception = Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc3<String>()
+            );
+
+            // Assert
+            Assert.Equal(
+                "Type parameter 'String' does not match the 'DeclaringType' " +
+                "of the provided 'ConstructorInfo' object." +
+                Environment.NewLine + "Parameter name: constructor",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateFunc3_Typed_TooFewParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(numberOfParameters: 2);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc3<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc3_Untyped_TooFewParameters() {
 
             // Arrange
             var constructor = GetConstructor(numberOfParameters: 2);
@@ -210,7 +522,19 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc3_TooManyParameters() {
+        public void CreateFunc3_Typed_TooManyParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(numberOfParameters: 4);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc3<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc3_Untyped_TooManyParameters() {
 
             // Arrange
             var constructor = GetConstructor(numberOfParameters: 4);
@@ -222,7 +546,44 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc3() {
+        public void CreateFunc3_Typed() {
+
+            // Arrange
+            var guid = Guid.NewGuid();
+            var foo = "foo";
+            var constructor = GetConstructor(
+                typeof(Guid),
+                typeof(String),
+                typeof(int)
+            );
+
+            // Act
+            var createFake = constructor.CreateFunc3<Fake>();
+            var fake = createFake(guid, foo, 2);
+
+            // Assert
+            Assert.NotNull(fake);
+            Assert.IsType<Fake>(fake);
+
+            var casted = (Fake)fake;
+            Assert.Equal(guid, casted.Guid);
+            Assert.Equal(foo, casted.Foo);
+            Assert.Equal(2, casted.Bar);
+            Assert.Equal(1, casted.Byte);
+            Assert.Equal(1, casted.SByte);
+            Assert.Equal(1, casted.Short);
+            Assert.Equal(1, casted.UShort);
+            Assert.Equal(1L, casted.Long);
+            Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc3<Fake>()),
+                "The created delegate should be cached."
+            );
+        }
+
+        [Fact]
+        public void CreateFunc3_Untyped() {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -251,10 +612,27 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1, casted.UShort);
             Assert.Equal(1L, casted.Long);
             Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc3()),
+                "The created delegate should be cached."
+            );
         }
 
         [Fact]
-        public void CreateFunc4_Null() {
+        public void CreateFunc4_Typed_Null() {
+
+            // Arrange
+            ConstructorInfo constructor = null;
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(
+                () => constructor.CreateFunc4<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc4_Untyped_Null() {
 
             // Arrange
             ConstructorInfo constructor = null;
@@ -266,7 +644,27 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc4_TooFewParameters() {
+        public void CreateFunc4_Typed_MismatchedType() {
+
+            // Arrange
+            ConstructorInfo constructor = GetConstructor(numberOfParameters: 4);
+
+            // Act
+            var exception = Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc4<String>()
+            );
+
+            // Assert
+            Assert.Equal(
+                "Type parameter 'String' does not match the 'DeclaringType' " +
+                "of the provided 'ConstructorInfo' object." +
+                Environment.NewLine + "Parameter name: constructor",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateFunc4_Typed_TooFewParameters() {
 
             // Arrange
             var constructor = GetConstructor(numberOfParameters: 3);
@@ -278,7 +676,31 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc4_TooManyParameters() {
+        public void CreateFunc4_Untyped_TooFewParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(numberOfParameters: 3);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc4()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc4_Typed_TooManyParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(numberOfParameters: 5);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc4<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc4_Untyped_TooManyParameters() {
 
             // Arrange
             var constructor = GetConstructor(numberOfParameters: 5);
@@ -290,7 +712,45 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc4() {
+        public void CreateFunc4_Typed() {
+
+            // Arrange
+            var guid = Guid.NewGuid();
+            var foo = "foo";
+            var constructor = GetConstructor(
+                typeof(Guid),
+                typeof(String),
+                typeof(int),
+                typeof(byte)
+            );
+
+            // Act
+            var createFake = constructor.CreateFunc4<Fake>();
+            var fake = createFake(guid, foo, 2, (byte)2);
+
+            // Assert
+            Assert.NotNull(fake);
+            Assert.IsType<Fake>(fake);
+
+            var casted = (Fake)fake;
+            Assert.Equal(guid, casted.Guid);
+            Assert.Equal(foo, casted.Foo);
+            Assert.Equal(2, casted.Bar);
+            Assert.Equal(2, casted.Byte);
+            Assert.Equal(1, casted.SByte);
+            Assert.Equal(1, casted.Short);
+            Assert.Equal(1, casted.UShort);
+            Assert.Equal(1L, casted.Long);
+            Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc4<Fake>()),
+                "The created delegate should be cached."
+            );
+        }
+
+        [Fact]
+        public void CreateFunc4_Untyped() {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -320,10 +780,27 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1, casted.UShort);
             Assert.Equal(1L, casted.Long);
             Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc4()),
+                "The created delegate should be cached."
+            );
         }
 
         [Fact]
-        public void CreateFunc5_Null() {
+        public void CreateFunc5_Typed_Null() {
+
+            // Arrange
+            ConstructorInfo constructor = null;
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(
+                () => constructor.CreateFunc5<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc5_Untyped_Null() {
 
             // Arrange
             ConstructorInfo constructor = null;
@@ -335,7 +812,39 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc5_TooFewParameters() {
+        public void CreateFunc5_Typed_MismatchedType() {
+
+            // Arrange
+            ConstructorInfo constructor = GetConstructor(numberOfParameters: 5);
+
+            // Act
+            var exception = Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc5<String>()
+            );
+
+            // Assert
+            Assert.Equal(
+                "Type parameter 'String' does not match the 'DeclaringType' " +
+                "of the provided 'ConstructorInfo' object." +
+                Environment.NewLine + "Parameter name: constructor",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateFunc5_Typed_TooFewParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(numberOfParameters: 4);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc5<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc5_Untyped_TooFewParameters() {
 
             // Arrange
             var constructor = GetConstructor(numberOfParameters: 4);
@@ -347,7 +856,19 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc5_TooManyParameters() {
+        public void CreateFunc5_Typed_TooManyParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(numberOfParameters: 6);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc5<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc5_Untyped_TooManyParameters() {
 
             // Arrange
             var constructor = GetConstructor(numberOfParameters: 6);
@@ -358,8 +879,48 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
+
         [Fact]
-        public void CreateFunc5() {
+        public void CreateFunc5_Typed() {
+
+            // Arrange
+            var guid = Guid.NewGuid();
+            var foo = "foo";
+            var constructor = GetConstructor(
+                typeof(Guid),
+                typeof(String),
+                typeof(int),
+                typeof(byte),
+                typeof(sbyte)
+            );
+
+            // Act
+            var createFake = constructor.CreateFunc5<Fake>();
+            var fake = createFake(guid, foo, 2, (byte)2, (sbyte)2);
+
+            // Assert
+            Assert.NotNull(fake);
+            Assert.IsType<Fake>(fake);
+
+            var casted = (Fake)fake;
+            Assert.Equal(guid, casted.Guid);
+            Assert.Equal(foo, casted.Foo);
+            Assert.Equal(2, casted.Bar);
+            Assert.Equal(2, casted.Byte);
+            Assert.Equal(2, casted.SByte);
+            Assert.Equal(1, casted.Short);
+            Assert.Equal(1, casted.UShort);
+            Assert.Equal(1L, casted.Long);
+            Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc5<Fake>()),
+                "The created delegate should be cached."
+            );
+        }
+
+        [Fact]
+        public void CreateFunc5_Untyped() {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -390,10 +951,27 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1, casted.UShort);
             Assert.Equal(1L, casted.Long);
             Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc5()),
+                "The created delegate should be cached."
+            );
         }
 
         [Fact]
-        public void CreateFunc6_Null() {
+        public void CreateFunc6_Typed_Null() {
+
+            // Arrange
+            ConstructorInfo constructor = null;
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(
+                () => constructor.CreateFunc6<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc6_Untyped_Null() {
 
             // Arrange
             ConstructorInfo constructor = null;
@@ -405,7 +983,39 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc6_TooFewParameters() {
+        public void CreateFunc6_Typed_MismatchedType() {
+
+            // Arrange
+            ConstructorInfo constructor = GetConstructor(numberOfParameters: 6);
+
+            // Act
+            var exception = Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc6<String>()
+            );
+
+            // Assert
+            Assert.Equal(
+                "Type parameter 'String' does not match the 'DeclaringType' " +
+                "of the provided 'ConstructorInfo' object." +
+                Environment.NewLine + "Parameter name: constructor",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateFunc6_Typed_TooFewParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(numberOfParameters: 5);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc6<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc6_Untyped_TooFewParameters() {
 
             // Arrange
             var constructor = GetConstructor(numberOfParameters: 5);
@@ -417,7 +1027,19 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc6_TooManyParameters() {
+        public void CreateFunc6_Typed_TooManyParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(numberOfParameters: 7);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc6<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc6_Untyped_TooManyParameters() {
 
             // Arrange
             var constructor = GetConstructor(numberOfParameters: 7);
@@ -429,7 +1051,47 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc6() {
+        public void CreateFunc6_Typed() {
+
+            // Arrange
+            var guid = Guid.NewGuid();
+            var foo = "foo";
+            var constructor = GetConstructor(
+                typeof(Guid),
+                typeof(String),
+                typeof(int),
+                typeof(byte),
+                typeof(sbyte),
+                typeof(short)
+            );
+
+            // Act
+            var createFake = constructor.CreateFunc6<Fake>();
+            var fake = createFake(guid, foo, 2, (byte)2, (sbyte)2, (short)2);
+
+            // Assert
+            Assert.NotNull(fake);
+            Assert.IsType<Fake>(fake);
+
+            var casted = (Fake)fake;
+            Assert.Equal(guid, casted.Guid);
+            Assert.Equal(foo, casted.Foo);
+            Assert.Equal(2, casted.Bar);
+            Assert.Equal(2, casted.Byte);
+            Assert.Equal(2, casted.SByte);
+            Assert.Equal(2, casted.Short);
+            Assert.Equal(1, casted.UShort);
+            Assert.Equal(1L, casted.Long);
+            Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc6<Fake>()),
+                "The created delegate should be cached."
+            );
+        }
+
+        [Fact]
+        public void CreateFunc6_Untyped() {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -461,10 +1123,27 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1, casted.UShort);
             Assert.Equal(1L, casted.Long);
             Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc6()),
+                "The created delegate should be cached."
+            );
         }
 
         [Fact]
-        public void CreateFunc7_Null() {
+        public void CreateFunc7_Typed_Null() {
+
+            // Arrange
+            ConstructorInfo constructor = null;
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(
+                () => constructor.CreateFunc7<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc7_Untyped_Null() {
 
             // Arrange
             ConstructorInfo constructor = null;
@@ -476,7 +1155,39 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc7_TooFewParameters() {
+        public void CreateFunc7_Typed_MismatchedType() {
+
+            // Arrange
+            ConstructorInfo constructor = GetConstructor(numberOfParameters: 7);
+
+            // Act
+            var exception = Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc7<String>()
+            );
+
+            // Assert
+            Assert.Equal(
+                "Type parameter 'String' does not match the 'DeclaringType' " +
+                "of the provided 'ConstructorInfo' object." +
+                Environment.NewLine + "Parameter name: constructor",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateFunc7_Typed_TooFewParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(numberOfParameters: 6);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc7<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc7_Untyped_TooFewParameters() {
 
             // Arrange
             var constructor = GetConstructor(numberOfParameters: 6);
@@ -488,7 +1199,19 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc7_TooManyParameters() {
+        public void CreateFunc7_Typed_TooManyParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(numberOfParameters: 8);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc7<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc7_Untyped_TooManyParameters() {
 
             // Arrange
             var constructor = GetConstructor(numberOfParameters: 8);
@@ -500,7 +1223,48 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc7() {
+        public void CreateFunc7_Typed() {
+
+            // Arrange
+            var guid = Guid.NewGuid();
+            var foo = "foo";
+            var constructor = GetConstructor(
+                typeof(Guid),
+                typeof(String),
+                typeof(int),
+                typeof(byte),
+                typeof(sbyte),
+                typeof(short),
+                typeof(ushort)
+            );
+
+            // Act
+            var createFake = constructor.CreateFunc7<Fake>();
+            var fake = createFake(guid, foo, 2, (byte)2, (sbyte)2, (short)2, (ushort)2);
+
+            // Assert
+            Assert.NotNull(fake);
+            Assert.IsType<Fake>(fake);
+
+            var casted = (Fake)fake;
+            Assert.Equal(guid, casted.Guid);
+            Assert.Equal(foo, casted.Foo);
+            Assert.Equal(2, casted.Bar);
+            Assert.Equal(2, casted.Byte);
+            Assert.Equal(2, casted.SByte);
+            Assert.Equal(2, casted.Short);
+            Assert.Equal(2, casted.UShort);
+            Assert.Equal(1L, casted.Long);
+            Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc7<Fake>()),
+                "The created delegate should be cached."
+            );
+        }
+
+        [Fact]
+        public void CreateFunc7_Untyped() {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -533,10 +1297,27 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(2, casted.UShort);
             Assert.Equal(1L, casted.Long);
             Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc7()),
+                "The created delegate should be cached."
+            );
         }
 
         [Fact]
-        public void CreateFunc8_Null() {
+        public void CreateFunc8_Typed_Null() {
+
+            // Arrange
+            ConstructorInfo constructor = null;
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(
+                () => constructor.CreateFunc8<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc8_Untyped_Null() {
 
             // Arrange
             ConstructorInfo constructor = null;
@@ -548,7 +1329,39 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc8_TooFewParameters() {
+        public void CreateFunc8_Typed_MismatchedType() {
+
+            // Arrange
+            ConstructorInfo constructor = GetConstructor(numberOfParameters: 8);
+
+            // Act
+            var exception = Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc8<String>()
+            );
+
+            // Assert
+            Assert.Equal(
+                "Type parameter 'String' does not match the 'DeclaringType' " +
+                "of the provided 'ConstructorInfo' object." +
+                Environment.NewLine + "Parameter name: constructor",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateFunc8_Typed_TooFewParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(numberOfParameters: 7);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc8<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc8_Untyped_TooFewParameters() {
 
             // Arrange
             var constructor = GetConstructor(numberOfParameters: 7);
@@ -560,7 +1373,19 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc8_TooManyParameters() {
+        public void CreateFunc8_Typed_TooManyParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(numberOfParameters: 9);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc8<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc8_Untyped_TooManyParameters() {
 
             // Arrange
             var constructor = GetConstructor(numberOfParameters: 9);
@@ -572,7 +1397,58 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc8() {
+        public void CreateFunc8_Typed() {
+
+            // Arrange
+            var guid = Guid.NewGuid();
+            var foo = "foo";
+            var constructor = GetConstructor(
+                typeof(Guid),
+                typeof(String),
+                typeof(int),
+                typeof(byte),
+                typeof(sbyte),
+                typeof(short),
+                typeof(ushort),
+                typeof(long)
+            );
+
+            // Act
+            var createFake = constructor.CreateFunc8<Fake>();
+            var fake = createFake(
+                guid,
+                foo,
+                2,
+                (byte)2,
+                (sbyte)2,
+                (short)2,
+                (ushort)2,
+                (long)2
+            );
+
+            // Assert
+            Assert.NotNull(fake);
+            Assert.IsType<Fake>(fake);
+
+            var casted = (Fake)fake;
+            Assert.Equal(guid, casted.Guid);
+            Assert.Equal(foo, casted.Foo);
+            Assert.Equal(2, casted.Bar);
+            Assert.Equal(2, casted.Byte);
+            Assert.Equal(2, casted.SByte);
+            Assert.Equal(2, casted.Short);
+            Assert.Equal(2, casted.UShort);
+            Assert.Equal(2L, casted.Long);
+            Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc8<Fake>()),
+                "The created delegate should be cached."
+            );
+        }
+
+        [Fact]
+        public void CreateFunc8_Untyped() {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -615,10 +1491,27 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(2, casted.UShort);
             Assert.Equal(2L, casted.Long);
             Assert.Equal(1UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc8()),
+                "The created delegate should be cached."
+            );
         }
 
         [Fact]
-        public void CreateFunc9_Null() {
+        public void CreateFunc9_Typed_Null() {
+
+            // Arrange
+            ConstructorInfo constructor = null;
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(
+                () => constructor.CreateFunc9<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc9_Untyped_Null() {
 
             // Arrange
             ConstructorInfo constructor = null;
@@ -630,7 +1523,39 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc9_TooFewParameters() {
+        public void CreateFunc9_Typed_MismatchedType() {
+
+            // Arrange
+            ConstructorInfo constructor = GetConstructor(numberOfParameters: 9);
+
+            // Act
+            var exception = Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc9<String>()
+            );
+
+            // Assert
+            Assert.Equal(
+                "Type parameter 'String' does not match the 'DeclaringType' " +
+                "of the provided 'ConstructorInfo' object." +
+                Environment.NewLine + "Parameter name: constructor",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateFunc9_Typed_TooFewParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(numberOfParameters: 8);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc9<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc9_Untyped_TooFewParameters() {
 
             // Arrange
             var constructor = GetConstructor(numberOfParameters: 8);
@@ -642,7 +1567,19 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc9_TooManyParameters() {
+        public void CreateFunc9_Typed_TooManyParameters() {
+
+            // Arrange
+            var constructor = GetConstructor(numberOfParameters: 10);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(
+                () => constructor.CreateFunc9<Fake>()
+            );
+        }
+
+        [Fact]
+        public void CreateFunc9_Untyped_TooManyParameters() {
 
             // Arrange
             var constructor = GetConstructor(numberOfParameters: 10);
@@ -654,7 +1591,60 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateFunc9() {
+        public void CreateFunc9_Typed() {
+
+            // Arrange
+            var guid = Guid.NewGuid();
+            var foo = "foo";
+            var constructor = GetConstructor(
+                typeof(Guid),
+                typeof(String),
+                typeof(int),
+                typeof(byte),
+                typeof(sbyte),
+                typeof(short),
+                typeof(ushort),
+                typeof(long),
+                typeof(ulong)
+            );
+
+            // Act
+            var createFake = constructor.CreateFunc9<Fake>();
+            var fake = createFake(
+                guid,
+                foo,
+                2,
+                (byte)2,
+                (sbyte)2,
+                (short)2,
+                (ushort)2,
+                (long)2,
+                (ulong)2
+            );
+
+            // Assert
+            Assert.NotNull(fake);
+            Assert.IsType<Fake>(fake);
+
+            var casted = (Fake)fake;
+            Assert.Equal(guid, casted.Guid);
+            Assert.Equal(foo, casted.Foo);
+            Assert.Equal(2, casted.Bar);
+            Assert.Equal(2, casted.Byte);
+            Assert.Equal(2, casted.SByte);
+            Assert.Equal(2, casted.Short);
+            Assert.Equal(2, casted.UShort);
+            Assert.Equal(2L, casted.Long);
+            Assert.Equal(2UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc9<Fake>()),
+                "The created delegate should be cached."
+            );
+        }
+
+        [Fact]
+        public void CreateFunc9_Untyped() {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -699,6 +1689,11 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(2, casted.UShort);
             Assert.Equal(2L, casted.Long);
             Assert.Equal(2UL, casted.ULong);
+
+            Assert.True(
+                Object.ReferenceEquals(createFake, constructor.CreateFunc9()),
+                "The created delegate should be cached."
+            );
         }
 
         [Fact]
