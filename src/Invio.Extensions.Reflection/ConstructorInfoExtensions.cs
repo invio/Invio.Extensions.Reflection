@@ -15,15 +15,15 @@ namespace Invio.Extensions.Reflection {
     public static class ConstructorInfoExtensions {
 
         private static ConcurrentDictionary<ConstructorInfo, Func<object[], object>> untypedArrays { get; }
-        private static ConcurrentDictionary<ConstructorInfo, object> typedArrays { get; }
+        private static ConcurrentDictionary<Tuple<Type, ConstructorInfo>, object> typedArrays { get; }
         private static ConcurrentDictionary<ConstructorInfo, object> untypedFuncs { get; }
-        private static ConcurrentDictionary<ConstructorInfo, object> typedFuncs { get; }
+        private static ConcurrentDictionary<Tuple<Type, ConstructorInfo>, object> typedFuncs { get; }
 
         static ConstructorInfoExtensions() {
             untypedArrays = new ConcurrentDictionary<ConstructorInfo, Func<object[], object>>();
-            typedArrays = new ConcurrentDictionary<ConstructorInfo, object>();
+            typedArrays = new ConcurrentDictionary<Tuple<Type, ConstructorInfo>, object>();
             untypedFuncs = new ConcurrentDictionary<ConstructorInfo, object>();
-            typedFuncs = new ConcurrentDictionary<ConstructorInfo, object>();
+            typedFuncs = new ConcurrentDictionary<Tuple<Type, ConstructorInfo>, object>();
         }
 
         /// <summary>
@@ -79,7 +79,10 @@ namespace Invio.Extensions.Reflection {
         public static Func<object[], T> CreateArrayFunc<T>(this ConstructorInfo constructor) {
             CheckType<T>(constructor);
 
-            return (Func<object[], T>)typedArrays.GetOrAdd(constructor, CreateArrayFuncImpl<T>);
+            return (Func<object[], T>)typedArrays.GetOrAdd(
+                Tuple.Create(typeof(T), constructor),
+                tuple => CreateArrayFuncImpl<T>(tuple.Item2)
+            );
         }
 
         private static Func<object[], T> CreateArrayFuncImpl<T>(ConstructorInfo constructor) {
@@ -809,7 +812,7 @@ namespace Invio.Extensions.Reflection {
                 throw new ArgumentNullException(nameof(constructor));
             }
 
-            if (constructor.DeclaringType != typeof(T)) {
+            if (!typeof(T).IsAssignableFrom(constructor.DeclaringType)) {
                 throw new ArgumentException(
                     $"Type parameter '{typeof(T).Name}' does not match the " +
                     $"'{nameof(MemberInfo.DeclaringType)}' of the provided " +
@@ -822,7 +825,10 @@ namespace Invio.Extensions.Reflection {
         private static TFunc CreateTypedFunc<T, TFunc>(ConstructorInfo constructor) {
             CheckType<T>(constructor);
 
-            return (TFunc)typedFuncs.GetOrAdd(constructor, CreateFuncImpl<T, TFunc>);
+            return (TFunc)typedFuncs.GetOrAdd(
+                Tuple.Create(typeof(T), constructor),
+                tuple => CreateFuncImpl<T, TFunc>(tuple.Item2)
+            );
         }
 
 

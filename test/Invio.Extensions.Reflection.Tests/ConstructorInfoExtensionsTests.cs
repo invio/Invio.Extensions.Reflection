@@ -76,45 +76,25 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
-        [Fact]
-        public void CreateFunc0_Typed() {
-
-            // Arrange
-            var constructor = GetConstructor();
-
-            // Act
-            var createFake = constructor.CreateFunc0<Fake>();
-            var fake = createFake();
-
-            // Assert
-            Assert.NotNull(fake);
-            Assert.IsType<Fake>(fake);
-
-            var casted = (Fake)fake;
-            Assert.Equal(Guid.Empty, casted.Guid);
-            Assert.Equal("Default", casted.Foo);
-            Assert.Equal(1, casted.Bar);
-            Assert.Equal(1, casted.Byte);
-            Assert.Equal(1, casted.SByte);
-            Assert.Equal(1, casted.Short);
-            Assert.Equal(1, casted.UShort);
-            Assert.Equal(1L, casted.Long);
-            Assert.Equal(1UL, casted.ULong);
-
-            Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc0<Fake>()),
-                "The created delegate should be cached."
-            );
+        public static IEnumerable<object[]> CreateFunc0_Data {
+            get {
+                return ToMemberData<Func<Object>>(
+                    constructor => constructor.CreateFunc0(),
+                    constructor => constructor.CreateFunc0<Fake>(),
+                    constructor => constructor.CreateFunc0<IFake>()
+                );
+            }
         }
 
-        [Fact]
-        public void CreateFunc0_Untyped() {
+        [Theory]
+        [MemberData(nameof(CreateFunc0_Data))]
+        public void CreateFunc0(Func<ConstructorInfo, Func<Object>> createFunc0) {
 
             // Arrange
             var constructor = GetConstructor();
 
             // Act
-            var createFake = constructor.CreateFunc0();
+            var createFake = createFunc0(constructor);
             var fake = createFake();
 
             // Assert
@@ -133,7 +113,7 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1UL, casted.ULong);
 
             Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc0()),
+                Object.ReferenceEquals(createFake, createFunc0(constructor)),
                 "The created delegate should be cached."
             );
         }
@@ -231,47 +211,26 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
-        [Fact]
-        public void CreateFunc1_Typed() {
-
-            // Arrange
-            var guid = Guid.NewGuid();
-            var constructor = GetConstructor(typeof(Guid));
-
-            // Act
-            var createFake = constructor.CreateFunc1<Fake>();
-            var fake = createFake(guid);
-
-            // Assert
-            Assert.NotNull(fake);
-            Assert.IsType<Fake>(fake);
-
-            var casted = (Fake)fake;
-            Assert.Equal(guid, casted.Guid);
-            Assert.Equal("Default", casted.Foo);
-            Assert.Equal(1, casted.Bar);
-            Assert.Equal(1, casted.Byte);
-            Assert.Equal(1, casted.SByte);
-            Assert.Equal(1, casted.Short);
-            Assert.Equal(1, casted.UShort);
-            Assert.Equal(1L, casted.Long);
-            Assert.Equal(1UL, casted.ULong);
-
-            Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc1<Fake>()),
-                "The created delegate should be cached."
-            );
+        public static IEnumerable<object[]> CreateFunc1_Data {
+            get {
+                return ToMemberData<Func<Object, Object>>(
+                    constructor => constructor.CreateFunc1(),
+                    constructor => constructor.CreateFunc1<Fake>(),
+                    constructor => constructor.CreateFunc1<IFake>()
+                );
+            }
         }
 
-        [Fact]
-        public void CreateFunc1_Untyped() {
+        [Theory]
+        [MemberData(nameof(CreateFunc1_Data))]
+        public void CreateFunc1(Func<ConstructorInfo, Func<Object, Object>> createFunc1) {
 
             // Arrange
             var guid = Guid.NewGuid();
             var constructor = GetConstructor(typeof(Guid));
 
             // Act
-            var createFake = constructor.CreateFunc1();
+            var createFake = createFunc1(constructor);
             var fake = createFake(guid);
 
             // Assert
@@ -290,7 +249,7 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1UL, casted.ULong);
 
             Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc1()),
+                Object.ReferenceEquals(createFake, createFunc1(constructor)),
                 "The created delegate should be cached."
             );
         }
@@ -387,41 +346,20 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
-        [Fact]
-        public void CreateFunc2_Typed() {
-
-            // Arrange
-            var guid = Guid.NewGuid();
-            var foo = "foo";
-            var constructor = GetConstructor(typeof(Guid), typeof(String));
-
-            // Act
-            var createFake = constructor.CreateFunc2<Fake>();
-            var fake = createFake(guid, foo);
-
-            // Assert
-            Assert.NotNull(fake);
-            Assert.IsType<Fake>(fake);
-
-            var casted = (Fake)fake;
-            Assert.Equal(guid, casted.Guid);
-            Assert.Equal(foo, casted.Foo);
-            Assert.Equal(1, casted.Bar);
-            Assert.Equal(1, casted.Byte);
-            Assert.Equal(1, casted.SByte);
-            Assert.Equal(1, casted.Short);
-            Assert.Equal(1, casted.UShort);
-            Assert.Equal(1L, casted.Long);
-            Assert.Equal(1UL, casted.ULong);
-
-            Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc2<Fake>()),
-                "The created delegate should be cached."
-            );
+        public static IEnumerable<object[]> CreateFunc2_Data {
+            get {
+                return ToMemberData<Func<Object, Object, Object>>(
+                    constructor => constructor.CreateFunc2(),
+                    constructor => constructor.CreateFunc2<Fake>(),
+                    constructor => constructor.CreateFunc2<IFake>()
+                );
+            }
         }
 
-        [Fact]
-        public void CreateFunc2_Untyped() {
+        [Theory]
+        [MemberData(nameof(CreateFunc2_Data))]
+        public void CreateFunc2(
+            Func<ConstructorInfo, Func<Object, Object, Object>> createFunc2) {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -429,7 +367,7 @@ namespace Invio.Extensions.Reflection {
             var constructor = GetConstructor(typeof(Guid), typeof(String));
 
             // Act
-            var createFake = constructor.CreateFunc2();
+            var createFake = createFunc2(constructor);
             var fake = createFake(guid, foo);
 
             // Assert
@@ -448,7 +386,7 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1UL, casted.ULong);
 
             Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc2()),
+                Object.ReferenceEquals(createFake, createFunc2(constructor)),
                 "The created delegate should be cached."
             );
         }
@@ -545,45 +483,20 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
-        [Fact]
-        public void CreateFunc3_Typed() {
-
-            // Arrange
-            var guid = Guid.NewGuid();
-            var foo = "foo";
-            var constructor = GetConstructor(
-                typeof(Guid),
-                typeof(String),
-                typeof(int)
-            );
-
-            // Act
-            var createFake = constructor.CreateFunc3<Fake>();
-            var fake = createFake(guid, foo, 2);
-
-            // Assert
-            Assert.NotNull(fake);
-            Assert.IsType<Fake>(fake);
-
-            var casted = (Fake)fake;
-            Assert.Equal(guid, casted.Guid);
-            Assert.Equal(foo, casted.Foo);
-            Assert.Equal(2, casted.Bar);
-            Assert.Equal(1, casted.Byte);
-            Assert.Equal(1, casted.SByte);
-            Assert.Equal(1, casted.Short);
-            Assert.Equal(1, casted.UShort);
-            Assert.Equal(1L, casted.Long);
-            Assert.Equal(1UL, casted.ULong);
-
-            Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc3<Fake>()),
-                "The created delegate should be cached."
-            );
+        public static IEnumerable<object[]> CreateFunc3_Data {
+            get {
+                return ToMemberData<Func<Object, Object, Object, Object>>(
+                    constructor => constructor.CreateFunc3(),
+                    constructor => constructor.CreateFunc3<Fake>(),
+                    constructor => constructor.CreateFunc3<IFake>()
+                );
+            }
         }
 
-        [Fact]
-        public void CreateFunc3_Untyped() {
+        [Theory]
+        [MemberData(nameof(CreateFunc3_Data))]
+        public void CreateFunc3(
+            Func<ConstructorInfo, Func<Object, Object, Object, Object>> createFunc3) {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -595,7 +508,7 @@ namespace Invio.Extensions.Reflection {
             );
 
             // Act
-            var createFake = constructor.CreateFunc3();
+            var createFake = createFunc3(constructor);
             var fake = createFake(guid, foo, 2);
 
             // Assert
@@ -614,7 +527,7 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1UL, casted.ULong);
 
             Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc3()),
+                Object.ReferenceEquals(createFake, createFunc3(constructor)),
                 "The created delegate should be cached."
             );
         }
@@ -711,46 +624,20 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
-        [Fact]
-        public void CreateFunc4_Typed() {
-
-            // Arrange
-            var guid = Guid.NewGuid();
-            var foo = "foo";
-            var constructor = GetConstructor(
-                typeof(Guid),
-                typeof(String),
-                typeof(int),
-                typeof(byte)
-            );
-
-            // Act
-            var createFake = constructor.CreateFunc4<Fake>();
-            var fake = createFake(guid, foo, 2, (byte)2);
-
-            // Assert
-            Assert.NotNull(fake);
-            Assert.IsType<Fake>(fake);
-
-            var casted = (Fake)fake;
-            Assert.Equal(guid, casted.Guid);
-            Assert.Equal(foo, casted.Foo);
-            Assert.Equal(2, casted.Bar);
-            Assert.Equal(2, casted.Byte);
-            Assert.Equal(1, casted.SByte);
-            Assert.Equal(1, casted.Short);
-            Assert.Equal(1, casted.UShort);
-            Assert.Equal(1L, casted.Long);
-            Assert.Equal(1UL, casted.ULong);
-
-            Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc4<Fake>()),
-                "The created delegate should be cached."
-            );
+        public static IEnumerable<object[]> CreateFunc4_Data {
+            get {
+                return ToMemberData<Func<Object, Object, Object, Object, Object>>(
+                    constructor => constructor.CreateFunc4(),
+                    constructor => constructor.CreateFunc4<Fake>(),
+                    constructor => constructor.CreateFunc4<IFake>()
+                );
+            }
         }
 
-        [Fact]
-        public void CreateFunc4_Untyped() {
+        [Theory]
+        [MemberData(nameof(CreateFunc4_Data))]
+        public void CreateFunc4(
+            Func<ConstructorInfo, Func<Object, Object, Object, Object, Object>> createFunc4) {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -763,7 +650,7 @@ namespace Invio.Extensions.Reflection {
             );
 
             // Act
-            var createFake = constructor.CreateFunc4();
+            var createFake = createFunc4(constructor);
             var fake = createFake(guid, foo, 2, (byte)2);
 
             // Assert
@@ -782,7 +669,7 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1UL, casted.ULong);
 
             Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc4()),
+                Object.ReferenceEquals(createFake, createFunc4(constructor)),
                 "The created delegate should be cached."
             );
         }
@@ -879,48 +766,21 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
-
-        [Fact]
-        public void CreateFunc5_Typed() {
-
-            // Arrange
-            var guid = Guid.NewGuid();
-            var foo = "foo";
-            var constructor = GetConstructor(
-                typeof(Guid),
-                typeof(String),
-                typeof(int),
-                typeof(byte),
-                typeof(sbyte)
-            );
-
-            // Act
-            var createFake = constructor.CreateFunc5<Fake>();
-            var fake = createFake(guid, foo, 2, (byte)2, (sbyte)2);
-
-            // Assert
-            Assert.NotNull(fake);
-            Assert.IsType<Fake>(fake);
-
-            var casted = (Fake)fake;
-            Assert.Equal(guid, casted.Guid);
-            Assert.Equal(foo, casted.Foo);
-            Assert.Equal(2, casted.Bar);
-            Assert.Equal(2, casted.Byte);
-            Assert.Equal(2, casted.SByte);
-            Assert.Equal(1, casted.Short);
-            Assert.Equal(1, casted.UShort);
-            Assert.Equal(1L, casted.Long);
-            Assert.Equal(1UL, casted.ULong);
-
-            Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc5<Fake>()),
-                "The created delegate should be cached."
-            );
+        public static IEnumerable<object[]> CreateFunc5_Data {
+            get {
+                return ToMemberData<Func<Object, Object, Object, Object, Object, Object>>(
+                    constructor => constructor.CreateFunc5(),
+                    constructor => constructor.CreateFunc5<Fake>(),
+                    constructor => constructor.CreateFunc5<IFake>()
+                );
+            }
         }
 
-        [Fact]
-        public void CreateFunc5_Untyped() {
+        [Theory]
+        [MemberData(nameof(CreateFunc5_Data))]
+        public void CreateFunc5(
+            Func<ConstructorInfo,
+                Func<Object, Object, Object, Object, Object, Object>> createFunc5) {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -934,7 +794,7 @@ namespace Invio.Extensions.Reflection {
             );
 
             // Act
-            var createFake = constructor.CreateFunc5();
+            var createFake = createFunc5(constructor);
             var fake = createFake(guid, foo, 2, (byte)2, (sbyte)2);
 
             // Assert
@@ -953,7 +813,7 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1UL, casted.ULong);
 
             Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc5()),
+                Object.ReferenceEquals(createFake, createFunc5(constructor)),
                 "The created delegate should be cached."
             );
         }
@@ -1050,48 +910,21 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
-        [Fact]
-        public void CreateFunc6_Typed() {
-
-            // Arrange
-            var guid = Guid.NewGuid();
-            var foo = "foo";
-            var constructor = GetConstructor(
-                typeof(Guid),
-                typeof(String),
-                typeof(int),
-                typeof(byte),
-                typeof(sbyte),
-                typeof(short)
-            );
-
-            // Act
-            var createFake = constructor.CreateFunc6<Fake>();
-            var fake = createFake(guid, foo, 2, (byte)2, (sbyte)2, (short)2);
-
-            // Assert
-            Assert.NotNull(fake);
-            Assert.IsType<Fake>(fake);
-
-            var casted = (Fake)fake;
-            Assert.Equal(guid, casted.Guid);
-            Assert.Equal(foo, casted.Foo);
-            Assert.Equal(2, casted.Bar);
-            Assert.Equal(2, casted.Byte);
-            Assert.Equal(2, casted.SByte);
-            Assert.Equal(2, casted.Short);
-            Assert.Equal(1, casted.UShort);
-            Assert.Equal(1L, casted.Long);
-            Assert.Equal(1UL, casted.ULong);
-
-            Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc6<Fake>()),
-                "The created delegate should be cached."
-            );
+        public static IEnumerable<object[]> CreateFunc6_Data {
+            get {
+                return ToMemberData<Func<Object, Object, Object, Object, Object, Object, Object>>(
+                    constructor => constructor.CreateFunc6(),
+                    constructor => constructor.CreateFunc6<Fake>(),
+                    constructor => constructor.CreateFunc6<IFake>()
+                );
+            }
         }
 
-        [Fact]
-        public void CreateFunc6_Untyped() {
+        [Theory]
+        [MemberData(nameof(CreateFunc6_Data))]
+        public void CreateFunc6(
+            Func<ConstructorInfo,
+                Func<Object, Object, Object, Object, Object, Object, Object>> createFunc6) {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -1106,7 +939,7 @@ namespace Invio.Extensions.Reflection {
             );
 
             // Act
-            var createFake = constructor.CreateFunc6();
+            var createFake = createFunc6(constructor);
             var fake = createFake(guid, foo, 2, (byte)2, (sbyte)2, (short)2);
 
             // Assert
@@ -1125,7 +958,7 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1UL, casted.ULong);
 
             Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc6()),
+                Object.ReferenceEquals(createFake, createFunc6(constructor)),
                 "The created delegate should be cached."
             );
         }
@@ -1222,49 +1055,21 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
-        [Fact]
-        public void CreateFunc7_Typed() {
-
-            // Arrange
-            var guid = Guid.NewGuid();
-            var foo = "foo";
-            var constructor = GetConstructor(
-                typeof(Guid),
-                typeof(String),
-                typeof(int),
-                typeof(byte),
-                typeof(sbyte),
-                typeof(short),
-                typeof(ushort)
-            );
-
-            // Act
-            var createFake = constructor.CreateFunc7<Fake>();
-            var fake = createFake(guid, foo, 2, (byte)2, (sbyte)2, (short)2, (ushort)2);
-
-            // Assert
-            Assert.NotNull(fake);
-            Assert.IsType<Fake>(fake);
-
-            var casted = (Fake)fake;
-            Assert.Equal(guid, casted.Guid);
-            Assert.Equal(foo, casted.Foo);
-            Assert.Equal(2, casted.Bar);
-            Assert.Equal(2, casted.Byte);
-            Assert.Equal(2, casted.SByte);
-            Assert.Equal(2, casted.Short);
-            Assert.Equal(2, casted.UShort);
-            Assert.Equal(1L, casted.Long);
-            Assert.Equal(1UL, casted.ULong);
-
-            Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc7<Fake>()),
-                "The created delegate should be cached."
-            );
+        public static IEnumerable<object[]> CreateFunc7_Data {
+            get {
+                return ToMemberData<Func<Object, Object, Object, Object, Object, Object, Object, Object>>(
+                    constructor => constructor.CreateFunc7(),
+                    constructor => constructor.CreateFunc7<Fake>(),
+                    constructor => constructor.CreateFunc7<IFake>()
+                );
+            }
         }
 
-        [Fact]
-        public void CreateFunc7_Untyped() {
+        [Theory]
+        [MemberData(nameof(CreateFunc7_Data))]
+        public void CreateFunc7(
+            Func<ConstructorInfo,
+                Func<Object, Object, Object, Object, Object, Object, Object, Object>> createFunc7) {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -1280,7 +1085,7 @@ namespace Invio.Extensions.Reflection {
             );
 
             // Act
-            var createFake = constructor.CreateFunc7();
+            var createFake = createFunc7(constructor);
             var fake = createFake(guid, foo, 2, (byte)2, (sbyte)2, (short)2, (ushort)2);
 
             // Assert
@@ -1299,7 +1104,7 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1UL, casted.ULong);
 
             Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc7()),
+                Object.ReferenceEquals(createFake, createFunc7(constructor)),
                 "The created delegate should be cached."
             );
         }
@@ -1396,59 +1201,21 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
-        [Fact]
-        public void CreateFunc8_Typed() {
-
-            // Arrange
-            var guid = Guid.NewGuid();
-            var foo = "foo";
-            var constructor = GetConstructor(
-                typeof(Guid),
-                typeof(String),
-                typeof(int),
-                typeof(byte),
-                typeof(sbyte),
-                typeof(short),
-                typeof(ushort),
-                typeof(long)
-            );
-
-            // Act
-            var createFake = constructor.CreateFunc8<Fake>();
-            var fake = createFake(
-                guid,
-                foo,
-                2,
-                (byte)2,
-                (sbyte)2,
-                (short)2,
-                (ushort)2,
-                (long)2
-            );
-
-            // Assert
-            Assert.NotNull(fake);
-            Assert.IsType<Fake>(fake);
-
-            var casted = (Fake)fake;
-            Assert.Equal(guid, casted.Guid);
-            Assert.Equal(foo, casted.Foo);
-            Assert.Equal(2, casted.Bar);
-            Assert.Equal(2, casted.Byte);
-            Assert.Equal(2, casted.SByte);
-            Assert.Equal(2, casted.Short);
-            Assert.Equal(2, casted.UShort);
-            Assert.Equal(2L, casted.Long);
-            Assert.Equal(1UL, casted.ULong);
-
-            Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc8<Fake>()),
-                "The created delegate should be cached."
-            );
+        public static IEnumerable<object[]> CreateFunc8_Data {
+            get {
+                return ToMemberData<Func<Object, Object, Object, Object, Object, Object, Object, Object, Object>>(
+                    constructor => constructor.CreateFunc8(),
+                    constructor => constructor.CreateFunc8<Fake>(),
+                    constructor => constructor.CreateFunc8<IFake>()
+                );
+            }
         }
 
-        [Fact]
-        public void CreateFunc8_Untyped() {
+        [Theory]
+        [MemberData(nameof(CreateFunc8_Data))]
+        public void CreateFunc8_Typed(
+            Func<ConstructorInfo,
+                Func<Object, Object, Object, Object, Object, Object, Object, Object, Object>> createFunc8) {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -1465,7 +1232,7 @@ namespace Invio.Extensions.Reflection {
             );
 
             // Act
-            var createFake = constructor.CreateFunc8();
+            var createFake = createFunc8(constructor);
             var fake = createFake(
                 guid,
                 foo,
@@ -1493,7 +1260,7 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1UL, casted.ULong);
 
             Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc8()),
+                Object.ReferenceEquals(createFake, createFunc8(constructor)),
                 "The created delegate should be cached."
             );
         }
@@ -1590,61 +1357,21 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
-        [Fact]
-        public void CreateFunc9_Typed() {
-
-            // Arrange
-            var guid = Guid.NewGuid();
-            var foo = "foo";
-            var constructor = GetConstructor(
-                typeof(Guid),
-                typeof(String),
-                typeof(int),
-                typeof(byte),
-                typeof(sbyte),
-                typeof(short),
-                typeof(ushort),
-                typeof(long),
-                typeof(ulong)
-            );
-
-            // Act
-            var createFake = constructor.CreateFunc9<Fake>();
-            var fake = createFake(
-                guid,
-                foo,
-                2,
-                (byte)2,
-                (sbyte)2,
-                (short)2,
-                (ushort)2,
-                (long)2,
-                (ulong)2
-            );
-
-            // Assert
-            Assert.NotNull(fake);
-            Assert.IsType<Fake>(fake);
-
-            var casted = (Fake)fake;
-            Assert.Equal(guid, casted.Guid);
-            Assert.Equal(foo, casted.Foo);
-            Assert.Equal(2, casted.Bar);
-            Assert.Equal(2, casted.Byte);
-            Assert.Equal(2, casted.SByte);
-            Assert.Equal(2, casted.Short);
-            Assert.Equal(2, casted.UShort);
-            Assert.Equal(2L, casted.Long);
-            Assert.Equal(2UL, casted.ULong);
-
-            Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc9<Fake>()),
-                "The created delegate should be cached."
-            );
+        public static IEnumerable<object[]> CreateFunc9_Data {
+            get {
+                return ToMemberData<Func<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>>(
+                    constructor => constructor.CreateFunc9(),
+                    constructor => constructor.CreateFunc9<Fake>(),
+                    constructor => constructor.CreateFunc9<IFake>()
+                );
+            }
         }
 
-        [Fact]
-        public void CreateFunc9_Untyped() {
+        [Theory]
+        [MemberData(nameof(CreateFunc9_Data))]
+        public void CreateFunc9_Typed(
+            Func<ConstructorInfo,
+                Func<Object, Object, Object, Object, Object, Object, Object, Object, Object, Object>> createFunc9) {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -1662,7 +1389,7 @@ namespace Invio.Extensions.Reflection {
             );
 
             // Act
-            var createFake = constructor.CreateFunc9();
+            var createFake = createFunc9(constructor);
             var fake = createFake(
                 guid,
                 foo,
@@ -1691,7 +1418,7 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(2UL, casted.ULong);
 
             Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateFunc9()),
+                Object.ReferenceEquals(createFake, createFunc9(constructor)),
                 "The created delegate should be cached."
             );
         }
@@ -1834,14 +1561,26 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
-        [Fact]
-        public void CreateArrayFunc_Typed_ParameterlessConstructor() {
+        public static IEnumerable<object[]> CreateArrayFunc_Data {
+            get {
+                return ToMemberData<Func<Object[], Object>>(
+                    constructor => constructor.CreateArrayFunc(),
+                    constructor => constructor.CreateArrayFunc<Fake>(),
+                    constructor => constructor.CreateArrayFunc<IFake>()
+                );
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(CreateArrayFunc_Data))]
+        public void CreateArrayFunc_ParameterlessConstructor(
+            Func<ConstructorInfo, Func<Object[], Object>> createArrayFunc) {
 
             // Arrange
             var constructor = GetConstructor();
 
             // Act
-            var createFake = constructor.CreateArrayFunc<Fake>();
+            var createFake = createArrayFunc(constructor);
             var fake = createFake(new object[0]);
 
             // Assert
@@ -1860,51 +1599,22 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1UL, casted.ULong);
 
             Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateArrayFunc<Fake>()),
+                Object.ReferenceEquals(createFake, createArrayFunc(constructor)),
                 "The created delegate should be cached."
             );
         }
 
-        [Fact]
-        public void CreateArrayFunc_Untyped_ParameterlessConstructor() {
-
-            // Arrange
-            var constructor = GetConstructor();
-
-            // Act
-            var createFake = constructor.CreateArrayFunc();
-            var fake = createFake(new object[0]);
-
-            // Assert
-            Assert.NotNull(fake);
-            Assert.IsType<Fake>(fake);
-
-            var casted = (Fake)fake;
-            Assert.Equal(Guid.Empty, casted.Guid);
-            Assert.Equal("Default", casted.Foo);
-            Assert.Equal(1, casted.Bar);
-            Assert.Equal(1, casted.Byte);
-            Assert.Equal(1, casted.SByte);
-            Assert.Equal(1, casted.Short);
-            Assert.Equal(1, casted.UShort);
-            Assert.Equal(1L, casted.Long);
-            Assert.Equal(1UL, casted.ULong);
-
-            Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateArrayFunc()),
-                "The created delegate should be cached."
-            );
-        }
-
-        [Fact]
-        public void CreateArrayFunc_Typed_SingleParameterConstructor() {
+        [Theory]
+        [MemberData(nameof(CreateArrayFunc_Data))]
+        public void CreateArrayFunc_SingleParameterConstructor(
+            Func<ConstructorInfo, Func<Object[], Object>> createArrayFunc) {
 
             // Arrange
             var guid = Guid.NewGuid();
             var constructor = GetConstructor(typeof(Guid));
 
             // Act
-            var createFake = constructor.CreateArrayFunc<Fake>();
+            var createFake = createArrayFunc(constructor);
             var fake = createFake(new object[] { guid });
 
             // Assert
@@ -1923,45 +1633,15 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1UL, casted.ULong);
 
             Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateArrayFunc<Fake>()),
+                Object.ReferenceEquals(createFake, createArrayFunc(constructor)),
                 "The created delegate should be cached."
             );
         }
 
-        [Fact]
-        public void CreateArrayFunc_Untyped_SingleParameterConstructor() {
-
-            // Arrange
-            var guid = Guid.NewGuid();
-            var constructor = GetConstructor(typeof(Guid));
-
-            // Act
-            var createFake = constructor.CreateArrayFunc();
-            var fake = createFake(new object[] { guid });
-
-            // Assert
-            Assert.NotNull(fake);
-            Assert.IsType<Fake>(fake);
-
-            var casted = (Fake)fake;
-            Assert.Equal(guid, casted.Guid);
-            Assert.Equal("Default", casted.Foo);
-            Assert.Equal(1, casted.Bar);
-            Assert.Equal(1, casted.Byte);
-            Assert.Equal(1, casted.SByte);
-            Assert.Equal(1, casted.Short);
-            Assert.Equal(1, casted.UShort);
-            Assert.Equal(1L, casted.Long);
-            Assert.Equal(1UL, casted.ULong);
-
-            Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateArrayFunc()),
-                "The created delegate should be cached."
-            );
-        }
-
-        [Fact]
-        public void CreateArrayFunc_Typed_ManyParameterConstructor() {
+        [Theory]
+        [MemberData(nameof(CreateArrayFunc_Data))]
+        public void CreateArrayFunc_ManyParameterConstructor(
+            Func<ConstructorInfo, Func<Object[], Object>> createArrayFunc) {
 
             // Arrange
             var guid = Guid.NewGuid();
@@ -1970,7 +1650,7 @@ namespace Invio.Extensions.Reflection {
             var constructor = GetConstructor(typeof(Guid), typeof(String), typeof(int));
 
             // Act
-            var createFake = constructor.CreateArrayFunc<Fake>();
+            var createFake = createArrayFunc(constructor);
             var fake = createFake(new object[] { guid, foo, bar });
 
             // Assert
@@ -1989,41 +1669,7 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(1UL, casted.ULong);
 
             Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateArrayFunc<Fake>()),
-                "The created delegate should be cached."
-            );
-        }
-
-        [Fact]
-        public void CreateArrayFunc_Untyped_ManyParameterConstructor() {
-
-            // Arrange
-            var guid = Guid.NewGuid();
-            const string foo = "Foo";
-            const int bar = 5;
-            var constructor = GetConstructor(typeof(Guid), typeof(String), typeof(int));
-
-            // Act
-            var createFake = constructor.CreateArrayFunc();
-            var fake = createFake(new object[] { guid, foo, bar });
-
-            // Assert
-            Assert.NotNull(fake);
-            Assert.IsType<Fake>(fake);
-
-            var casted = (Fake)fake;
-            Assert.Equal(guid, casted.Guid);
-            Assert.Equal(foo, casted.Foo);
-            Assert.Equal(bar, casted.Bar);
-            Assert.Equal(1, casted.Byte);
-            Assert.Equal(1, casted.SByte);
-            Assert.Equal(1, casted.Short);
-            Assert.Equal(1, casted.UShort);
-            Assert.Equal(1L, casted.Long);
-            Assert.Equal(1UL, casted.ULong);
-
-            Assert.True(
-                Object.ReferenceEquals(createFake, constructor.CreateArrayFunc()),
+                Object.ReferenceEquals(createFake, createArrayFunc(constructor)),
                 "The created delegate should be cached."
             );
         }
@@ -2112,7 +1758,7 @@ namespace Invio.Extensions.Reflection {
             return constructor;
         }
 
-        public class Fake {
+        public class Fake : IFake {
 
             public Guid Guid { get; } = Guid.Empty;
             public String Foo { get; } = "Default";
@@ -2275,6 +1921,16 @@ namespace Invio.Extensions.Reflection {
                 this.UInt = uintIn;
             }
 
+        }
+
+        public interface IFake {}
+
+        private static IEnumerable<object[]> ToMemberData<TFunc>(
+            params Func<ConstructorInfo, TFunc>[] createFuncs) {
+
+            foreach (var createFunc in createFuncs) {
+                yield return new object[] { createFunc };
+            }
         }
 
     }
