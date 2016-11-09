@@ -1,12 +1,10 @@
 {
-  "version": "0.6.0",
-
   "buildOptions": {
     "debugType": "portable",
   },
 
   "dependencies": {
-    "Invio.Extensions.Reflection": { "version": "0.5.0", "target": "project" },
+    "Invio.Extensions.Reflection": { "target": "project" },
     "Invio.Xunit" : "0.1.0",
     "Peddler": "0.5.1",
     "dotnet-test-xunit": "2.2.0-*",
