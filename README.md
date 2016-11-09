@@ -5,10 +5,10 @@
 [![NuGet](https://img.shields.io/nuget/v/Invio.Extensions.Reflection.svg)](https://www.nuget.org/packages/Invio.Extensions.Reflection/)
 [![Coverage](https://coveralls.io/repos/github/invio/Invio.Extensions.Reflection/badge.svg?branch=master)](https://coveralls.io/github/invio/Invio.Extensions.Reflection?branch=master)
 
-Invio's extensions to xunit that is based on our coding practices and standards.
+Invio's extensions to the FieldInfo, PropertyInfo, ConstructorInfo, and MethodInfo types in the `System.Reflection` namespace for delegate caching and reuse. Very much a work in progress.
 
 # Installation
-The latest version of this package is available on MyGet. To install include the myget feed in your NuGet.Config at the root of your project, and add the dependency to your project.json.
+The latest version of this package is available on NuGet. To install, run the following command:
 
 ```shell
 PM> Install-Package Invio.Extensions.Reflection
