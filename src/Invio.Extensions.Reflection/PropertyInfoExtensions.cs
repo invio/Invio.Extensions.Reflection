@@ -49,7 +49,7 @@ namespace Invio.Extensions.Reflection {
         /// </exception>
         /// <returns>
         ///   A delegate that can be called to efficiently fetch values normally
-        ///   retreived by calling <see cref="PropertyInfo" /> directly.
+        ///   retreived by calling <see cref="PropertyInfo" /> via reflection.
         /// </returns>
         public static Func<TBase, TProperty> CreateGetter<TBase, TProperty>(
             this PropertyInfo propertyInfo, bool nonPublic = true) where TBase : class {
@@ -100,7 +100,7 @@ namespace Invio.Extensions.Reflection {
         /// </exception>
         /// <returns>
         ///   A delegate that can be called to efficiently set property values on
-        ///   the parent by utilizing <see cref="PropertyInfo" /> directly.
+        ///   the parent by utilizing <see cref="PropertyInfo" /> via reflection.
         /// </returns>
         public static Action<TBase, TProperty> CreateSetter<TBase, TProperty>(
             this PropertyInfo propertyInfo, bool nonPublic = true) where TBase : class {
@@ -147,7 +147,7 @@ namespace Invio.Extensions.Reflection {
         /// </exception>
         /// <returns>
         ///   A delegate that can be called to efficiently fetch values normally
-        ///   retreived by utilizing <see cref="PropertyInfo" /> directly.
+        ///   retreived by utilizing <see cref="PropertyInfo" /> via reflection.
         /// </returns>
         public static Func<TBase, object> CreateGetter<TBase>(
             this PropertyInfo propertyInfo, bool nonPublic = true) where TBase : class {
@@ -194,7 +194,7 @@ namespace Invio.Extensions.Reflection {
         /// </exception>
         /// <returns>
         ///   A delegate that can be called to efficiently set property values on
-        ///   the parent by utilizing <see cref="PropertyInfo" /> directly.
+        ///   the parent by utilizing <see cref="PropertyInfo" /> via reflection.
         /// </returns>
         public static Action<TBase, object> CreateSetter<TBase>(
             this PropertyInfo propertyInfo, bool nonPublic = true) where TBase : class {
@@ -235,7 +235,7 @@ namespace Invio.Extensions.Reflection {
         /// </exception>
         /// <returns>
         ///   A delegate that can be called to efficiently fetch values normally
-        ///   retreived by utilizing <see cref="PropertyInfo" /> directly.
+        ///   retreived by utilizing <see cref="PropertyInfo" /> via reflection.
         /// </returns>
         public static Func<object, object> CreateGetter(
             this PropertyInfo propertyInfo, bool nonPublic = true) {
@@ -278,7 +278,7 @@ namespace Invio.Extensions.Reflection {
         /// </exception>
         /// <returns>
         ///   A delegate that can be called to efficiently fetch values normally
-        ///   retreived by utilizing <see cref="PropertyInfo" /> directly.
+        ///   retreived by utilizing <see cref="PropertyInfo" /> via reflection.
         /// </returns>
         public static Action<object, object> CreateSetter(
             this PropertyInfo propertyInfo, bool nonPublic = true) {
