@@ -44,22 +44,7 @@ namespace Invio.Extensions.Reflection {
         public static Func<TBase, object> CreateGetter<TBase>(this FieldInfo fieldInfo)
             where TBase : class {
 
-            if (fieldInfo == null) {
-                throw new ArgumentNullException("fieldInfo");
-            }
-
-            if (fieldInfo.IsStatic) {
-                throw new NotSupportedException(
-                    "This method does not support static fields."
-                );
-            }
-
-            var delegateBuilder = genericGetBuilder.MakeGenericMethod(
-                typeof(TBase),
-                fieldInfo.FieldType
-            );
-
-            return (Func<TBase, object>)delegateBuilder.Invoke(null, new object[] { fieldInfo });
+            return CreateGetterFuncImpl<TBase, object, Func<TBase, object>>(fieldInfo);
         }
 
         /// <summary>
@@ -93,8 +78,14 @@ namespace Invio.Extensions.Reflection {
         public static Action<TBase, object> CreateSetter<TBase>(this FieldInfo fieldInfo)
             where TBase : class {
 
+            return CreateSetterActionImpl<TBase, object, Action<TBase, object>>(fieldInfo);
+        }
+
+        private static TFunc CreateGetterFuncImpl<TBase, TField, TFunc>(
+            FieldInfo fieldInfo) where TBase : class {
+
             if (fieldInfo == null) {
-                throw new ArgumentNullException("fieldInfo");
+                throw new ArgumentNullException(nameof(fieldInfo));
             }
 
             if (fieldInfo.IsStatic) {
@@ -103,46 +94,36 @@ namespace Invio.Extensions.Reflection {
                 );
             }
 
-            var delegateBuilder = genericSetBuilder.MakeGenericMethod(
-                typeof(TBase),
-                fieldInfo.FieldType
-            );
+            var instance = Expression.Parameter(typeof(TBase));
+            var body = Expression.Field(instance, fieldInfo);
 
-            return (Action<TBase, object>)delegateBuilder.Invoke(null, new object[] { fieldInfo });
+            return Expression.Lambda<TFunc>(body, instance).Compile();
         }
 
-        private static readonly MethodInfo genericGetBuilder =
-            typeof(FieldInfoExtensions).GetMethod(
-                "CreateGetDelegateImpl",
-                BindingFlags.Static | BindingFlags.NonPublic
+        private static TAction CreateSetterActionImpl<TBase, TField, TAction>(
+            FieldInfo fieldInfo) where TBase : class {
+
+            if (fieldInfo == null) {
+                throw new ArgumentNullException(nameof(fieldInfo));
+            }
+
+            if (fieldInfo.IsStatic) {
+                throw new NotSupportedException(
+                    "This method does not support static fields."
+                );
+            }
+
+            var instance = Expression.Parameter(typeof(TBase), "instance");
+            var fieldValue = Expression.Parameter(typeof(TField), "fieldValue");
+
+            var body = Expression.Assign(
+                Expression.Field(instance, fieldInfo),
+                Expression.Convert(fieldValue, fieldInfo.FieldType)
             );
 
-        private static readonly MethodInfo genericSetBuilder =
-            typeof(FieldInfoExtensions).GetMethod(
-                "CreateSetDelegateImpl",
-                BindingFlags.Static | BindingFlags.NonPublic
-            );
-
-        private static Func<S, object> CreateGetDelegateImpl<S, T>(FieldInfo fieldInfo)
-            where S : class {
-
-            var instExp = Expression.Parameter(typeof(S));
-            var fieldExp = Expression.Field(instExp, fieldInfo);
-            var getter = Expression.Lambda<Func<S, T>>(fieldExp, instExp).Compile();
-            return (S s) => (object)getter(s);
+            return Expression.Lambda<TAction>(body, instance, fieldValue).Compile();
         }
 
-        private static Action<S, object> CreateSetDelegateImpl<S, T>(FieldInfo fieldInfo)
-            where S : class {
-
-            var instExp = Expression.Parameter(typeof(S));
-            var fieldExp = Expression.Field(instExp, fieldInfo);
-            var valueExp = Expression.Parameter(typeof(T));
-            var setter = Expression.Lambda<Action<S, T>>(
-                Expression.Assign(fieldExp, valueExp), instExp, valueExp
-            ).Compile();
-
-            return (S s, object t) => { setter(s, (T)t); };
-        }
     }
+
 }
