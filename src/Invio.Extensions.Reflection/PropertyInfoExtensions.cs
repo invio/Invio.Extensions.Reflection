@@ -250,8 +250,6 @@ namespace Invio.Extensions.Reflection {
 
         /// <summary>
         ///   Return an efficient getter delegate for the specified property.
-        ///   The delegate is strongly compile-time typed for the base type
-        ///   on which the property is defined, but not for the property's type.
         /// </summary>
         /// <remarks>
         ///   While use of the returned delegate is efficient, construction
