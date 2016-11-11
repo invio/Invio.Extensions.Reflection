@@ -1,183 +1,798 @@
 using System;
 using System.Reflection;
-
 using Peddler;
-using Xunit;
-
 using Invio.Xunit;
+using Xunit;
 
 namespace Invio.Extensions.Reflection {
 
     [UnitTest]
     public class PropertyInfoExtensionsTests {
-        [Fact]
-        public void CreateGetter() {
-            var readonlyPropertyInfo =
-                sutType.GetProperty("ReadonlyProperty", BindingFlags.Instance | BindingFlags.Public);
 
-            AssertGetterValue(readonlyPropertyInfo, sut => sut.ReadonlyProperty, nonPublic: true);
-        }
+        // CreateGetter<TBase, TProperty>()
 
         [Fact]
-        public void CreateGetter_ArgNull_Check() {
-            PropertyInfo propertyInfo = null;
+        public void CreateGetter_BothTyped_PublicGetter() {
 
-            AssertGetterException<ArgumentNullException>(propertyInfo);
-        }
+            // Arrange
 
-        [Fact]
-        public void CreateGetter_NoGetterProperty() {
-            var propertyInfo =
-                sutType.GetProperty("NoGetter", BindingFlags.Instance | BindingFlags.Public);
+            var instance = new Fake();
+            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
 
-            AssertGetterException<ArgumentException>(propertyInfo);
+            // Act
+
+            var getter = property.CreateGetter<Fake, Int32>();
+            var value = getter(instance);
+
+            // Assert
+
+            Assert.Equal(instance.NormalProperty, value);
         }
 
         [Fact]
-        public void CreateGetter_StaticProperty() {
-            var propertyInfo =
-                sutType.GetProperty("StaticProperty", BindingFlags.Static | BindingFlags.Public);
+        public void CreateGetter_BothTyped_PrivateGetter() {
 
-            AssertGetterException<NotSupportedException>(propertyInfo);
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(Fake).GetProperty(nameof(Fake.PrivateGetter));
+
+            // Act
+
+            var getter = property.CreateGetter<Fake, Int32>();
+            var value = getter(instance);
+
+            // Assert
+
+            Assert.Equal(instance.PrivateGetterValue, value);
         }
 
         [Fact]
-        public void CreateGetter_PrivateGetter() {
-            var propertyInfo =
-                sutType.GetProperty("PrivateGetterProperty", BindingFlags.Instance | BindingFlags.Public);
+        public void CreateGetter_BothTyped_NoGetter() {
 
-            AssertGetterValue(propertyInfo, _ => ClassUnderTest.PrivateGetterPropertyValue, nonPublic: true);
-        }
+            // Arrange
 
-        [Fact]
-        public void CreateGetter_NonPublicGetter() {
-            var propertyInfo =
-                sutType.GetProperty("PrivateGetterProperty", BindingFlags.Instance | BindingFlags.Public);
+            var instance = new Fake();
+            var property = typeof(Fake).GetProperty(nameof(Fake.NoGetter));
 
-            AssertGetterException<ArgumentException>(propertyInfo, nonPublic: false);
-        }
+            // Act
 
-        private void AssertGetterValue(
-            PropertyInfo propertyInfo,
-            Func<ClassUnderTest, Int32> getExpectedValue,
-            bool nonPublic = false) {
-            var sut = new ClassUnderTest();
-
-            var getterReturnType = propertyInfo.CreateGetter<ClassUnderTest, Int32>(nonPublic);
-            Assert.Equal(getExpectedValue(sut), getterReturnType(sut));
-
-            var getterStrongTyped = propertyInfo.CreateGetter<ClassUnderTest>(nonPublic);
-            Assert.Equal(getExpectedValue(sut), getterStrongTyped(sut));
-
-            var propertyGetter = propertyInfo.CreateGetter(nonPublic);
-            Assert.Equal(getExpectedValue(sut), propertyGetter(sut));
-        }
-
-        private void AssertGetterException<TException>(PropertyInfo propertyInfo, bool nonPublic = false)
-            where TException : Exception {
-            Assert.Throws<TException>(
-                () => propertyInfo.CreateGetter<ClassUnderTest, Int32>(nonPublic)
+            var exception = Record.Exception(
+                () => property.CreateGetter<Fake, Int32>()
             );
 
-            Assert.Throws<TException>(
-                () => propertyInfo.CreateGetter<ClassUnderTest>(nonPublic)
-            );
+            // Assert
 
-            Assert.Throws<TException>(
-                () => propertyInfo.CreateGetter(nonPublic)
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal(
+                "The 'NoGetter' property on 'Fake' does not have a get accessor." +
+                Environment.NewLine + "Parameter name: property",
+                exception.Message
             );
         }
 
         [Fact]
-        public void CreateSetter() {
-            var propertyInfo =
-                sutType.GetProperty("NormalProperty", BindingFlags.Instance | BindingFlags.Public);
+        public void CreateGetter_BothTyped_Null() {
 
-            AssertSetterValue(propertyInfo, sut => sut.NormalProperty, nonPublic: true);
-        }
+            // Arrange
 
-        [Fact]
-        public void CreateSetter_ArgNull_Check() {
-            PropertyInfo propertyInfo = null;
+            PropertyInfo property = null;
 
-            AssertSetterException<ArgumentNullException>(propertyInfo, nonPublic: false);
-        }
+            // Act
 
-        [Fact]
-        public void CreateSetter_PrivateSetter() {
-            var propertyInfo =
-                sutType.GetProperty("PrivateSetterProperty", BindingFlags.Instance | BindingFlags.Public);
-
-            AssertSetterValue(propertyInfo, sut => sut.PrivateSetterProperty, nonPublic: true);
-        }
-
-        [Fact]
-        public void CreateSetter_NoSetterProperty() {
-            var propertyInfo =
-                sutType.GetProperty("PrivateSetterProperty", BindingFlags.Instance | BindingFlags.Public);
-
-            AssertSetterException<ArgumentException>(propertyInfo, nonPublic: false);
-        }
-
-        [Fact]
-        public void CreateSetter_StaticProperty() {
-            var propertyInfo =
-                sutType.GetProperty("StaticProperty", BindingFlags.Static | BindingFlags.Public);
-
-            AssertSetterException<NotSupportedException>(propertyInfo);
-        }
-
-        private static Int32Generator intGenerator = new Int32Generator(1, 10001);
-        private void AssertSetterValue(
-            PropertyInfo propertyInfo,
-            Func<ClassUnderTest, Int32> getValue,
-            bool nonPublic = false) {
-            var sut = new ClassUnderTest();
-            var value = PropertyInfoExtensionsTests.intGenerator.Next();
-
-            var setterParameterType = propertyInfo.CreateSetter<ClassUnderTest, Int32>();
-            setterParameterType(sut, value);
-            Assert.Equal(value, getValue(sut));
-
-            var setterStrongTyped = propertyInfo.CreateSetter<ClassUnderTest>();
-            setterStrongTyped(sut, value);
-            Assert.Equal(value, getValue(sut));
-
-            var propertySetter = propertyInfo.CreateSetter();
-            propertySetter(sut, value);
-            Assert.Equal(value, getValue(sut));
-        }
-
-        private void AssertSetterException<TException>(PropertyInfo propertyInfo, bool nonPublic = false)
-            where TException : Exception {
-            Assert.Throws<TException>(
-                () => propertyInfo.CreateSetter<ClassUnderTest, Int32>(nonPublic)
+            var exception = Record.Exception(
+                () => property.CreateGetter<Fake, Int32>()
             );
 
-            Assert.Throws<TException>(
-                () => propertyInfo.CreateSetter<ClassUnderTest>(nonPublic)
+            // Assert
+
+            Assert.IsType<ArgumentNullException>(exception);
+        }
+
+        [Fact]
+        public void CreateGetter_BothTyped_InvalidDeclaringType() {
+
+            // Arrange
+
+            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateGetter<String, Int32>()
             );
 
-            Assert.Throws<TException>(
-                () => propertyInfo.CreateSetter(nonPublic)
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal(
+                "Type parameter 'TBase' was 'String', which is not " +
+                "assignable to the property's declaring type of 'Fake'." +
+                Environment.NewLine + "Parameter name: property",
+                exception.Message
             );
         }
 
-        private static Type sutType = typeof(ClassUnderTest);
-        class ClassUnderTest {
+        [Fact]
+        public void CreateGetter_BothTyped_InvalidPropertyType() {
+
+            // Arrange
+
+            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateGetter<Fake, String>()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal(
+                "Type parameter 'TProperty' was 'String', which is not " +
+                "assignable to the property's value type of 'Int32'." +
+                Environment.NewLine + "Parameter name: property",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateGetter_BothTyped_StaticPropertyType() {
+
+            // Arrange
+
+            var property = typeof(Fake).GetProperty(nameof(Fake.StaticProperty));
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateGetter<Fake, Int32>()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal(
+                "The 'StaticProperty' property is static." +
+                Environment.NewLine + "Parameter name: property",
+                exception.Message
+            );
+        }
+
+        // CreateSetter<TBase, TProperty>()
+
+        [Fact]
+        public void CreateSetter_BothTyped_PublicSetter() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+            var value = 100;
+
+            // Act
+
+            var setter = property.CreateSetter<Fake, Int32>();
+            setter(instance, value);
+
+            // Assert
+
+            Assert.Equal(instance.NormalProperty, value);
+        }
+
+        [Fact]
+        public void CreateSetter_BothTyped_PrivateSetter() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(Fake).GetProperty(nameof(Fake.PrivateSetter));
+            var value = 100;
+
+            // Act
+
+            var setter = property.CreateSetter<Fake, Int32>();
+            setter(instance, value);
+
+            // Assert
+
+            Assert.Equal(instance.PrivateSetter, value);
+        }
+
+        [Fact]
+        public void CreateSetter_BothTyped_NoSetter() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(Fake).GetProperty(nameof(Fake.NoSetter));
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateSetter<Fake, Int32>()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal(
+                "The 'NoSetter' property on 'Fake' does not have a set accessor." +
+                Environment.NewLine + "Parameter name: property",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateSetter_BothTyped_Null() {
+
+            // Arrange
+
+            PropertyInfo property = null;
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateSetter<Fake, Int32>()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentNullException>(exception);
+        }
+
+        [Fact]
+        public void CreateSetter_BothTyped_InvalidDeclaringType() {
+
+            // Arrange
+
+            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateSetter<String, Int32>()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal(
+                "Type parameter 'TBase' was 'String', which is not " +
+                "assignable to the property's declaring type of 'Fake'." +
+                Environment.NewLine + "Parameter name: property",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateSetter_BothTyped_InvalidPropertyType() {
+
+            // Arrange
+
+            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateSetter<Fake, String>()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal(
+                "Type parameter 'TProperty' was 'String', which is not " +
+                "assignable to the property's value type of 'Int32'." +
+                Environment.NewLine + "Parameter name: property",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateSetter_BothTyped_StaticPropertyType() {
+
+            // Arrange
+
+            var property = typeof(Fake).GetProperty(nameof(Fake.StaticProperty));
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateSetter<Fake, Int32>()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal(
+                "The 'StaticProperty' property is static." +
+                Environment.NewLine + "Parameter name: property",
+                exception.Message
+            );
+        }
+
+        // CreateGetter<TBase>()
+
+        [Fact]
+        public void CreateGetter_BaseTyped_PublicGetter() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+
+            // Act
+
+            var getter = property.CreateGetter<Fake>();
+            var value = getter(instance);
+
+            // Assert
+
+            Assert.Equal(instance.NormalProperty, value);
+        }
+
+        [Fact]
+        public void CreateGetter_BaseTyped_PrivateGetter() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(Fake).GetProperty(nameof(Fake.PrivateGetter));
+
+            // Act
+
+            var getter = property.CreateGetter<Fake>();
+            var value = getter(instance);
+
+            // Assert
+
+            Assert.Equal(instance.PrivateGetterValue, value);
+        }
+
+        [Fact]
+        public void CreateGetter_BaseTyped_NoGetter() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(Fake).GetProperty(nameof(Fake.NoGetter));
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateGetter<Fake>()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal(
+                "The 'NoGetter' property on 'Fake' does not have a get accessor." +
+                Environment.NewLine + "Parameter name: property",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateGetter_BaseTyped_Null() {
+
+            // Arrange
+
+            PropertyInfo property = null;
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateGetter<Fake>()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentNullException>(exception);
+        }
+
+        [Fact]
+        public void CreateGetter_BaseTyped_InvalidDeclaringType() {
+
+            // Arrange
+
+            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateGetter<String>()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal(
+                "Type parameter 'TBase' was 'String', which is not " +
+                "assignable to the property's declaring type of 'Fake'." +
+                Environment.NewLine + "Parameter name: property",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateGetter_BaseTyped_StaticPropertyType() {
+
+            // Arrange
+
+            var property = typeof(Fake).GetProperty(nameof(Fake.StaticProperty));
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateGetter<Fake>()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal(
+                "The 'StaticProperty' property is static." +
+                Environment.NewLine + "Parameter name: property",
+                exception.Message
+            );
+        }
+
+        // CreateSetter<TBase>()
+
+        [Fact]
+        public void CreateSetter_BaseTyped_PublicSetter() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+            var value = 100;
+
+            // Act
+
+            var setter = property.CreateSetter<Fake>();
+            setter(instance, value);
+
+            // Assert
+
+            Assert.Equal(instance.NormalProperty, value);
+        }
+
+        [Fact]
+        public void CreateSetter_BaseTyped_PrivateSetter() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(Fake).GetProperty(nameof(Fake.PrivateSetter));
+            var value = 100;
+
+            // Act
+
+            var setter = property.CreateSetter<Fake>();
+            setter(instance, value);
+
+            // Assert
+
+            Assert.Equal(instance.PrivateSetter, value);
+        }
+
+        [Fact]
+        public void CreateSetter_BaseTyped_NoSetter() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(Fake).GetProperty(nameof(Fake.NoSetter));
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateSetter<Fake>()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal(
+                "The 'NoSetter' property on 'Fake' does not have a set accessor." +
+                Environment.NewLine + "Parameter name: property",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateSetter_BaseTyped_Null() {
+
+            // Arrange
+
+            PropertyInfo property = null;
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateSetter<Fake>()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentNullException>(exception);
+        }
+
+        [Fact]
+        public void CreateSetter_BaseTyped_InvalidDeclaringType() {
+
+            // Arrange
+
+            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateSetter<String>()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal(
+                "Type parameter 'TBase' was 'String', which is not " +
+                "assignable to the property's declaring type of 'Fake'." +
+                Environment.NewLine + "Parameter name: property",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateSetter_BaseTyped_StaticPropertyType() {
+
+            // Arrange
+
+            var property = typeof(Fake).GetProperty(nameof(Fake.StaticProperty));
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateSetter<Fake>()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal(
+                "The 'StaticProperty' property is static." +
+                Environment.NewLine + "Parameter name: property",
+                exception.Message
+            );
+        }
+
+        // CreateGetter()
+
+        [Fact]
+        public void CreateGetter_NeitherTyped_PublicGetter() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+
+            // Act
+
+            var getter = property.CreateGetter();
+            var value = getter(instance);
+
+            // Assert
+
+            Assert.Equal(instance.NormalProperty, value);
+        }
+
+        [Fact]
+        public void CreateGetter_NeitherTyped_PrivateGetter() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(Fake).GetProperty(nameof(Fake.PrivateGetter));
+
+            // Act
+
+            var getter = property.CreateGetter();
+            var value = getter(instance);
+
+            // Assert
+
+            Assert.Equal(instance.PrivateGetterValue, value);
+        }
+
+        [Fact]
+        public void CreateGetter_NeitherTyped_NoGetter() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(Fake).GetProperty(nameof(Fake.NoGetter));
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateGetter()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal(
+                "The 'NoGetter' property on 'Fake' does not have a get accessor." +
+                Environment.NewLine + "Parameter name: property",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateGetter_NeitherTyped_Null() {
+
+            // Arrange
+
+            PropertyInfo property = null;
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateGetter()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentNullException>(exception);
+        }
+
+        [Fact]
+        public void CreateGetter_NeitherTyped_StaticPropertyType() {
+
+            // Arrange
+
+            var property = typeof(Fake).GetProperty(nameof(Fake.StaticProperty));
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateGetter()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal(
+                "The 'StaticProperty' property is static." +
+                Environment.NewLine + "Parameter name: property",
+                exception.Message
+            );
+        }
+
+        // CreateSetter()
+
+        [Fact]
+        public void CreateSetter_NeitherTyped_PublicSetter() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+            var value = 100;
+
+            // Act
+
+            var setter = property.CreateSetter();
+            setter(instance, value);
+
+            // Assert
+
+            Assert.Equal(instance.NormalProperty, value);
+        }
+
+        [Fact]
+        public void CreateSetter_NeitherTyped_PrivateSetter() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(Fake).GetProperty(nameof(Fake.PrivateSetter));
+            var value = 100;
+
+            // Act
+
+            var setter = property.CreateSetter();
+            setter(instance, value);
+
+            // Assert
+
+            Assert.Equal(instance.PrivateSetter, value);
+        }
+
+        [Fact]
+        public void CreateSetter_NeitherTyped_NoSetter() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(Fake).GetProperty(nameof(Fake.NoSetter));
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateSetter()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal(
+                "The 'NoSetter' property on 'Fake' does not have a set accessor." +
+                Environment.NewLine + "Parameter name: property",
+                exception.Message
+            );
+        }
+
+        [Fact]
+        public void CreateSetter_NeitherTyped_Null() {
+
+            // Arrange
+
+            PropertyInfo property = null;
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateSetter()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentNullException>(exception);
+        }
+
+        [Fact]
+        public void CreateSetter_NeitherTyped_StaticPropertyType() {
+
+            // Arrange
+
+            var property = typeof(Fake).GetProperty(nameof(Fake.StaticProperty));
+
+            // Act
+
+            var exception = Record.Exception(
+                () => property.CreateSetter()
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal(
+                "The 'StaticProperty' property is static." +
+                Environment.NewLine + "Parameter name: property",
+                exception.Message
+            );
+        }
+
+        private class Fake {
+
             public static Int32 StaticProperty { get; set; }
-            public Int32 ReadonlyProperty { get; } = 1337;
-            public const Int32 PrivateGetterPropertyValue = 7331;
-            public Int32 PrivateGetterProperty { private get;  set; } = PrivateGetterPropertyValue;
-            public Int32 PrivateSetterProperty { get; private set; }
+
             public Int32 NormalProperty { get; set; }
 
-            private Int32 noGetter;
-            public Int32 NoGetter {
-                set {
-                    noGetter = value;
-                }
-            }
+            public Int32 PrivateGetterValue { get { return this.PrivateGetter; } }
+            public Int32 PrivateGetter { private get; set; } = 7331;
+            public Int32 PrivateSetter { get; private set; } = 1337;
+
+            public Int32 NoGetterValue;
+            public Int32 NoGetter { set { this.NoGetterValue = value; } }
+            public Int32 NoSetter { get; } = 1337;
+
         }
+
     }
+
 }

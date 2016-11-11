@@ -269,7 +269,7 @@ namespace Invio.Extensions.Reflection {
             if (!typeof(TBase).IsAssignableFrom(field.DeclaringType)) {
                 throw new ArgumentException(
                     $"Type parameter '{nameof(TBase)}' was '{typeof(TBase).Name}', " +
-                    $"which is not assignable to the the field's declaring type of " +
+                    $"which is not assignable to the field's declaring type of " +
                     $"'{field.DeclaringType.Name}'.",
                     nameof(field)
                 );
@@ -278,7 +278,7 @@ namespace Invio.Extensions.Reflection {
             if (!typeof(TField).IsAssignableFrom(field.FieldType)) {
                 throw new ArgumentException(
                     $"Type parameter '{nameof(TField)}' was '{typeof(TField).Name}', " +
-                    $"which is not assignable to the the field's value type of " +
+                    $"which is not assignable to the field's value type of " +
                     $"'{field.FieldType.Name}'.",
                     nameof(field)
                 );
