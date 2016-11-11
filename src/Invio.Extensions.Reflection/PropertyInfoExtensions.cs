@@ -21,45 +21,41 @@ namespace Invio.Extensions.Reflection {
         ///   is expensive. You should be getting significant re-use out of
         ///   the delegate to justify the expense of its construction.
         /// </remarks>
-        /// <param name="propertyInfo">
+        /// <param name="property">
         ///   The <see cref="PropertyInfo" /> that will have its get accessor
         ///   cached into an efficient delegate for reuse.
         /// </param>
-        /// <param name="nonPublic">
-        ///   Indicates whether a non-public get accessor can be utilized.
-        ///   'true' if a non-public accessor can be returned; otherwise, 'false'.
-        /// </param>
         /// <typeparam name="TBase">
         ///   The <see cref="Type" /> that contains the <see cref="PropertyInfo" />
-        ///   passed in via <paramref name="propertyInfo" />.
+        ///   passed in via <paramref name="property" />.
         /// </typeparam>
         /// <typeparam name="TProperty">
         ///   The <see cref="PropertyInfo.PropertyType" /> on the provided
-        ///   <paramref name="propertyInfo" /> instance.
+        ///   <paramref name="property" /> instance.
         /// </typeparam>
         /// <exception cref="ArgumentNullException">
-        ///   Thrown when <paramref name="propertyInfo" /> is null.
+        ///   Thrown when <paramref name="property" /> is null.
         /// </exception>
         /// <exception cref="ArgumentException">
-        ///   Thrown when <paramref name="propertyInfo" /> does not have a getter,
-        ///   or <paramref name="nonPublic" /> is 'false' and the getter is not public.
-        /// </exception>
-        /// <exception cref="NotSupportedException">
-        ///   Thrown when <paramref name="propertyInfo" /> represents a static property.
+        ///   Thrown when <paramref name="property" /> does not have a getter, or
+        ///   when <paramref name="property" /> references a static property, or
+        ///   the type specified for <typeparamref name="TBase" /> is not assignable
+        ///   to the type specified on the <see cref="MemberInfo.DeclaringType" />
+        ///   property on <paramref name="property" />, or the type specified for
+        ///   <typeparamref name="TProperty" /> is not assignable to the type specified
+        ///   on the <see cref="PropertyInfo.PropertyType" /> property on
+        ///   <paramref name="property" />.
         /// </exception>
         /// <returns>
         ///   A delegate that can be called to efficiently fetch values normally
         ///   retreived by calling <see cref="PropertyInfo" /> via reflection.
         /// </returns>
         public static Func<TBase, TProperty> CreateGetter<TBase, TProperty>(
-            this PropertyInfo propertyInfo, bool nonPublic = true) where TBase : class {
+            this PropertyInfo property) where TBase : class {
 
-            if (propertyInfo == null) {
-                throw new ArgumentNullException("propertyInfo");
-            }
+            var method = GetGetMethodInfo<TBase, TProperty>(property);
 
-            var getMethodInfo = GetGetMethodInfo(propertyInfo, nonPublic);
-            return getMethodInfo.CreateFunc0<TBase, TProperty>();
+            return method.CreateFunc0<TBase, TProperty>();
         }
 
         /// <summary>
@@ -72,45 +68,41 @@ namespace Invio.Extensions.Reflection {
         ///   is expensive. You should be getting significant re-use out of
         ///   the delegate to justify the expense of its construction.
         /// </remarks>
-        /// <param name="propertyInfo">
+        /// <param name="property">
         ///   The <see cref="PropertyInfo" /> that will have its set accessor
         ///   cached into an efficient delegate for reuse.
         /// </param>
-        /// <param name="nonPublic">
-        ///   Indicates whether a non-public set accessor can be utilized.
-        ///   'true' if a non-public accessor can be returned; otherwise, 'false'.
-        /// </param>
         /// <typeparam name="TBase">
         ///   The <see cref="Type" /> that contains the <see cref="PropertyInfo" />
-        ///   passed in via <paramref name="propertyInfo" />.
+        ///   passed in via <paramref name="property" />.
         /// </typeparam>
         /// <typeparam name="TProperty">
         ///   The <see cref="PropertyInfo.PropertyType" /> on the provided
-        ///   <paramref name="propertyInfo" /> instance.
+        ///   <paramref name="property" /> instance.
         /// </typeparam>
         /// <exception cref="ArgumentNullException">
-        ///   Thrown when <paramref name="propertyInfo" /> is null.
+        ///   Thrown when <paramref name="property" /> is null.
         /// </exception>
         /// <exception cref="ArgumentException">
-        ///   Thrown when <paramref name="propertyInfo" /> does not have a setter,
-        ///   or <paramref name="nonPublic" /> is 'false' and the setter is not public.
-        /// </exception>
-        /// <exception cref="NotSupportedException">
-        ///   Thrown when <paramref name="propertyInfo" /> represents a static property.
+        ///   Thrown when <paramref name="property" /> does not have a setter, or
+        ///   when <paramref name="property" /> references a static property, or
+        ///   the type specified for <typeparamref name="TBase" /> is not assignable
+        ///   to the type specified on the <see cref="MemberInfo.DeclaringType" />
+        ///   property on <paramref name="property" />, or the type specified for
+        ///   <typeparamref name="TProperty" /> is not assignable to the type specified
+        ///   on the <see cref="PropertyInfo.PropertyType" /> property on
+        ///   <paramref name="property" />.
         /// </exception>
         /// <returns>
         ///   A delegate that can be called to efficiently set property values on
         ///   the parent by utilizing <see cref="PropertyInfo" /> via reflection.
         /// </returns>
         public static Action<TBase, TProperty> CreateSetter<TBase, TProperty>(
-            this PropertyInfo propertyInfo, bool nonPublic = true) where TBase : class {
+            this PropertyInfo property) where TBase : class {
 
-            if (propertyInfo == null) {
-                throw new ArgumentNullException("propertyInfo");
-            }
+            var method = GetSetMethodInfo<TBase, TProperty>(property);
 
-            var setMethodInfo = GetSetMethodInfo(propertyInfo, nonPublic);
-            return setMethodInfo.CreateAction1<TBase, TProperty>();
+            return method.CreateAction1<TBase, TProperty>();
         }
 
         /// <summary>
@@ -123,41 +115,32 @@ namespace Invio.Extensions.Reflection {
         ///   is expensive. You should be getting significant re-use out of
         ///   the delegate to justify the expense of its construction.
         /// </remarks>
-        /// <param name="propertyInfo">
+        /// <param name="property">
         ///   The <see cref="PropertyInfo" /> that will have its get accessor
         ///   cached into an efficient delegate for reuse.
         /// </param>
-        /// <param name="nonPublic">
-        ///   Indicates whether a non-public get accessor can be utilized.
-        ///   'true' if a non-public accessor can be returned; otherwise, 'false'.
-        /// </param>
         /// <typeparam name="TBase">
         ///   The <see cref="Type" /> that contains the <see cref="PropertyInfo" />
-        ///   passed in via <paramref name="propertyInfo" />.
+        ///   passed in via <paramref name="property" />.
         /// </typeparam>
         /// <exception cref="ArgumentNullException">
-        ///   Thrown when <paramref name="propertyInfo" /> is null.
+        ///   Thrown when <paramref name="property" /> is null.
         /// </exception>
         /// <exception cref="ArgumentException">
-        ///   Thrown when <paramref name="propertyInfo" /> does not have a getter,
-        ///   or <paramref name="nonPublic" /> is 'false' and the getter is not public.
-        /// </exception>
-        /// <exception cref="NotSupportedException">
-        ///   Thrown when <paramref name="propertyInfo" /> represents a static property.
+        ///   Thrown when <paramref name="property" /> does not have a getter, or
+        ///   when <paramref name="property" /> references a static property, or
+        ///   the type specified for <typeparamref name="TBase" /> is not assignable
+        ///   to the type specified on the <see cref="MemberInfo.DeclaringType" />
+        ///   property on <paramref name="property" />.
         /// </exception>
         /// <returns>
         ///   A delegate that can be called to efficiently fetch values normally
         ///   retreived by utilizing <see cref="PropertyInfo" /> via reflection.
         /// </returns>
-        public static Func<TBase, object> CreateGetter<TBase>(
-            this PropertyInfo propertyInfo, bool nonPublic = true) where TBase : class {
+        public static Func<TBase, object> CreateGetter<TBase>(this PropertyInfo property)
+            where TBase : class {
 
-            if (propertyInfo == null) {
-                throw new ArgumentNullException("propertyInfo");
-            }
-
-            var getMethodInfo = GetGetMethodInfo(propertyInfo, nonPublic);
-            return getMethodInfo.CreateFunc0<TBase>();
+            return GetGetMethodInfo<TBase, object>(property).CreateFunc0<TBase>();
         }
 
         /// <summary>
@@ -170,41 +153,32 @@ namespace Invio.Extensions.Reflection {
         ///   is expensive. You should be getting significant re-use out of
         ///   the delegate to justify the expense of its construction.
         /// </remarks>
-        /// <param name="propertyInfo">
+        /// <param name="property">
         ///   The <see cref="PropertyInfo" /> that will have its set accessor
         ///   cached into an efficient delegate for reuse.
         /// </param>
-        /// <param name="nonPublic">
-        ///   Indicates whether a non-public set accessor can be utilized.
-        ///   'true' if a non-public accessor can be returned; otherwise, 'false'.
-        /// </param>
         /// <typeparam name="TBase">
         ///   The <see cref="Type" /> that contains the <see cref="PropertyInfo" />
-        ///   passed in via <paramref name="propertyInfo" />.
+        ///   passed in via <paramref name="property" />.
         /// </typeparam>
         /// <exception cref="ArgumentNullException">
-        ///   Thrown when <paramref name="propertyInfo" /> is null.
+        ///   Thrown when <paramref name="property" /> is null.
         /// </exception>
         /// <exception cref="ArgumentException">
-        ///   Thrown when <paramref name="propertyInfo" /> does not have a setter,
-        ///   or <paramref name="nonPublic" /> is 'false' and the setter is not public.
-        /// </exception>
-        /// <exception cref="NotSupportedException">
-        ///   Thrown when <paramref name="propertyInfo" /> represents a static property.
+        ///   Thrown when <paramref name="property" /> does not have a setter, or
+        ///   when <paramref name="property" /> references a static property, or
+        ///   the type specified for <typeparamref name="TBase" /> is not assignable
+        ///   to the type specified on the <see cref="MemberInfo.DeclaringType" />
+        ///   property on <paramref name="property" />.
         /// </exception>
         /// <returns>
         ///   A delegate that can be called to efficiently set property values on
         ///   the parent by utilizing <see cref="PropertyInfo" /> via reflection.
         /// </returns>
-        public static Action<TBase, object> CreateSetter<TBase>(
-            this PropertyInfo propertyInfo, bool nonPublic = true) where TBase : class {
+        public static Action<TBase, object> CreateSetter<TBase>(this PropertyInfo property)
+            where TBase : class {
 
-            if (propertyInfo == null) {
-                throw new ArgumentNullException("propertyInfo");
-            }
-
-            var setMethodInfo = GetSetMethodInfo(propertyInfo, nonPublic);
-            return setMethodInfo.CreateAction1<TBase>();
+            return GetSetMethodInfo<TBase, object>(property).CreateAction1<TBase>();
         }
 
         /// <summary>
@@ -215,37 +189,23 @@ namespace Invio.Extensions.Reflection {
         ///   is expensive. You should be getting significant re-use out of
         ///   the delegate to justify the expense of its construction.
         /// </remarks>
-        /// <param name="propertyInfo">
+        /// <param name="property">
         ///   The <see cref="PropertyInfo" /> that will have its get accessor
         ///   cached into an efficient delegate for reuse.
         /// </param>
-        /// <param name="nonPublic">
-        ///   Indicates whether a non-public get accessor can be utilized.
-        ///   'true' if a non-public accessor can be returned; otherwise, 'false'.
-        /// </param>
         /// <exception cref="ArgumentNullException">
-        ///   Thrown when <paramref name="propertyInfo" /> is null.
+        ///   Thrown when <paramref name="property" /> is null.
         /// </exception>
         /// <exception cref="ArgumentException">
-        ///   Thrown when <paramref name="propertyInfo" /> does not have a getter,
-        ///   or <paramref name="nonPublic" /> is 'false' and the getter is not public.
-        /// </exception>
-        /// <exception cref="NotSupportedException">
-        ///   Thrown when <paramref name="propertyInfo" /> represents a static property.
+        ///   Thrown when <paramref name="property" /> does not have a getter, or
+        ///   when <paramref name="property" /> references a static property.
         /// </exception>
         /// <returns>
         ///   A delegate that can be called to efficiently fetch values normally
         ///   retreived by utilizing <see cref="PropertyInfo" /> via reflection.
         /// </returns>
-        public static Func<object, object> CreateGetter(
-            this PropertyInfo propertyInfo, bool nonPublic = true) {
-
-            if (propertyInfo == null) {
-                throw new ArgumentNullException("propertyInfo");
-            }
-
-            var getMethodInfo = GetGetMethodInfo(propertyInfo, nonPublic);
-            return getMethodInfo.CreateFunc0();
+        public static Func<object, object> CreateGetter(this PropertyInfo property) {
+            return GetGetMethodInfo<object, object>(property).CreateFunc0();
         }
 
         /// <summary>
@@ -256,87 +216,101 @@ namespace Invio.Extensions.Reflection {
         ///   is expensive. You should be getting significant re-use out of
         ///   the delegate to justify the expense of its construction.
         /// </remarks>
-        /// <param name="propertyInfo">
+        /// <param name="property">
         ///   The <see cref="PropertyInfo" /> that will have its get accessor
         ///   cached into an efficient delegate for reuse.
         /// </param>
-        /// <param name="nonPublic">
-        ///   Indicates whether a non-public get accessor can be utilized.
-        ///   'true' if a non-public accessor can be returned; otherwise, 'false'.
-        /// </param>
         /// <exception cref="ArgumentNullException">
-        ///   Thrown when <paramref name="propertyInfo" /> is null.
+        ///   Thrown when <paramref name="property" /> is null.
         /// </exception>
         /// <exception cref="ArgumentException">
-        ///   Thrown when <paramref name="propertyInfo" /> does not have a getter,
-        ///   or <paramref name="nonPublic" /> is 'false' and the getter is not public.
-        /// </exception>
-        /// <exception cref="NotSupportedException">
-        ///   Thrown when <paramref name="propertyInfo" /> represents a static property.
+        ///   Thrown when <paramref name="property" /> does not have a setter, or
+        ///   when <paramref name="property" /> references a static property.
         /// </exception>
         /// <returns>
         ///   A delegate that can be called to efficiently fetch values normally
         ///   retreived by utilizing <see cref="PropertyInfo" /> via reflection.
         /// </returns>
-        public static Action<object, object> CreateSetter(
-            this PropertyInfo propertyInfo, bool nonPublic = true) {
-
-            if (propertyInfo == null) {
-                throw new ArgumentNullException("propertyInfo");
-            }
-
-            var setMethodInfo = GetSetMethodInfo(propertyInfo, nonPublic);
-            return setMethodInfo.CreateAction1();
+        public static Action<object, object> CreateSetter(this PropertyInfo property) {
+            return GetSetMethodInfo<object, object>(property).CreateAction1();
         }
 
-        private static MethodInfo GetGetMethodInfo(PropertyInfo propertyInfo, bool nonPublic) {
-            var getMethodInfo = propertyInfo.GetGetMethod(nonPublic);
+        private static MethodInfo GetGetMethodInfo<TBase, TProperty>(PropertyInfo property)
+            where TBase : class {
+
+            CheckArguments<TBase, TProperty>(property);
+
+            var getMethodInfo = property.GetGetMethod(nonPublic: true);
 
             if (getMethodInfo == null) {
-                var declaringTypeName =
-                    propertyInfo
-                        .DeclaringType
-                        .GetNameWithGenericParameters();
-
                 throw new ArgumentException(
-                    $"The property '{propertyInfo.Name}' on type '{declaringTypeName}' " +
-                    $"must have a getter in order to create a delegate",
-                    nameof(propertyInfo)
+                    $"The '{property.Name}' property on '{property.DeclaringType.Name}' " +
+                    $"does not have a get accessor.",
+                    nameof(property)
                 );
             }
 
             if (getMethodInfo.IsStatic) {
-                throw new NotSupportedException(
-                    "This method does not support static properties."
+                throw new ArgumentException(
+                    $"The '{property.Name}' property is static.",
+                    nameof(property)
                 );
             }
 
             return getMethodInfo;
         }
 
-        private static MethodInfo GetSetMethodInfo(PropertyInfo propertyInfo, bool nonPublic) {
-            var setMethodInfo = propertyInfo.GetSetMethod(nonPublic);
+        private static MethodInfo GetSetMethodInfo<TBase, TProperty>(PropertyInfo property)
+            where TBase : class {
+
+            CheckArguments<TBase, TProperty>(property);
+
+            var setMethodInfo = property.GetSetMethod(nonPublic: true);
 
             if (setMethodInfo == null) {
-                var declaringTypeName =
-                    propertyInfo
-                        .DeclaringType
-                        .GetNameWithGenericParameters();
-
                 throw new ArgumentException(
-                    $"The property '{propertyInfo.Name}' on type '{declaringTypeName}' " +
-                    $"must have a setter in order to create a delegate",
-                    nameof(propertyInfo)
+                    $"The '{property.Name}' property on '{property.DeclaringType.Name}' " +
+                    $"does not have a set accessor.",
+                    nameof(property)
                 );
             }
 
             if (setMethodInfo.IsStatic) {
-                throw new NotSupportedException(
-                    "This method does not support static properties."
+                throw new ArgumentException(
+                    $"The '{property.Name}' property is static.",
+                    nameof(property)
                 );
             }
 
             return setMethodInfo;
         }
+
+        private static void CheckArguments<TBase, TProperty>(PropertyInfo property)
+            where TBase : class {
+
+            if (property == null) {
+                throw new ArgumentNullException(nameof(property));
+            }
+
+            if (!typeof(TBase).IsAssignableFrom(property.DeclaringType)) {
+                throw new ArgumentException(
+                    $"Type parameter '{nameof(TBase)}' was '{typeof(TBase).Name}', " +
+                    $"which is not assignable to the property's declaring type of " +
+                    $"'{property.DeclaringType.Name}'.",
+                    nameof(property)
+                );
+            }
+
+            if (!typeof(TProperty).IsAssignableFrom(property.PropertyType)) {
+                throw new ArgumentException(
+                    $"Type parameter '{nameof(TProperty)}' was '{typeof(TProperty).Name}', " +
+                    $"which is not assignable to the property's value type of " +
+                    $"'{property.PropertyType.Name}'.",
+                    nameof(property)
+                );
+            }
+        }
+
     }
+
 }
