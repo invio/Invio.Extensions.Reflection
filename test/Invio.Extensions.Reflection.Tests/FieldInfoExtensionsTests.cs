@@ -67,7 +67,7 @@ namespace Invio.Extensions.Reflection {
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal(
                 "Type parameter 'TBase' was 'String', which is not " +
-                "assignable to the the field's declaring type of 'Fake'." +
+                "assignable to the field's declaring type of 'Fake'." +
                 Environment.NewLine + "Parameter name: field",
                 exception.Message
             );
@@ -91,7 +91,7 @@ namespace Invio.Extensions.Reflection {
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal(
                 "Type parameter 'TField' was 'Guid', which is not " +
-                "assignable to the the field's value type of 'String'." +
+                "assignable to the field's value type of 'String'." +
                 Environment.NewLine + "Parameter name: field",
                 exception.Message
             );
@@ -174,12 +174,11 @@ namespace Invio.Extensions.Reflection {
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal(
                 "Type parameter 'TBase' was 'String', which is not " +
-                "assignable to the the field's declaring type of 'Fake'." +
+                "assignable to the field's declaring type of 'Fake'." +
                 Environment.NewLine + "Parameter name: field",
                 exception.Message
             );
         }
-
 
         [Fact]
         public void CreateSetter_BothTyped_InvalidFieldType() {
@@ -199,7 +198,7 @@ namespace Invio.Extensions.Reflection {
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal(
                 "Type parameter 'TField' was 'Guid', which is not " +
-                "assignable to the the field's value type of 'String'." +
+                "assignable to the field's value type of 'String'." +
                 Environment.NewLine + "Parameter name: field",
                 exception.Message
             );
@@ -283,7 +282,7 @@ namespace Invio.Extensions.Reflection {
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal(
                 "Type parameter 'TBase' was 'String', which is not " +
-                "assignable to the the field's declaring type of 'Fake'." +
+                "assignable to the field's declaring type of 'Fake'." +
                 Environment.NewLine + "Parameter name: field",
                 exception.Message
             );
@@ -366,7 +365,7 @@ namespace Invio.Extensions.Reflection {
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal(
                 "Type parameter 'TBase' was 'String', which is not " +
-                "assignable to the the field's declaring type of 'Fake'." +
+                "assignable to the field's declaring type of 'Fake'." +
                 Environment.NewLine + "Parameter name: field",
                 exception.Message
             );
