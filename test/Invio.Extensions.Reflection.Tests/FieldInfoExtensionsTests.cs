@@ -116,6 +116,24 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
+        public void CreateGetter_BothTyped_Caches() {
+
+            // Arrange
+
+            var fieldOne = typeof(Fake).GetField(nameof(Fake.InstanceField));
+            var fieldTwo = typeof(Fake).GetField(nameof(Fake.InstanceField));
+
+            // Act
+
+            var getterOne = fieldOne.CreateGetter<Fake, String>();
+            var getterTwo = fieldTwo.CreateGetter<Fake, String>();
+
+            // Assert
+
+            Assert.True(Object.ReferenceEquals(getterOne, getterTwo));
+        }
+
+        [Fact]
         public void CreateSetter_BothTyped_Null() {
 
             // Arrange
@@ -224,6 +242,24 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
+        public void CreateSetter_BothTyped_Caches() {
+
+            // Arrange
+
+            var fieldOne = typeof(Fake).GetField(nameof(Fake.InstanceField));
+            var fieldTwo = typeof(Fake).GetField(nameof(Fake.InstanceField));
+
+            // Act
+
+            var setterOne = fieldOne.CreateSetter<Fake, String>();
+            var setterTwo = fieldTwo.CreateSetter<Fake, String>();
+
+            // Assert
+
+            Assert.True(Object.ReferenceEquals(setterOne, setterTwo));
+        }
+
+        [Fact]
         public void CreateGetter_BaseTyped_Null() {
 
             // Arrange
@@ -304,6 +340,24 @@ namespace Invio.Extensions.Reflection {
             // Assert
 
             Assert.Equal(instance.InstanceField, value);
+        }
+
+        [Fact]
+        public void CreateGetter_BaseTyped_Caches() {
+
+            // Arrange
+
+            var fieldOne = typeof(Fake).GetField(nameof(Fake.InstanceField));
+            var fieldTwo = typeof(Fake).GetField(nameof(Fake.InstanceField));
+
+            // Act
+
+            var getterOne = fieldOne.CreateGetter<Fake>();
+            var getterTwo = fieldTwo.CreateGetter<Fake>();
+
+            // Assert
+
+            Assert.True(Object.ReferenceEquals(getterOne, getterTwo));
         }
 
         [Fact]
@@ -391,6 +445,24 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
+        public void CreateSetter_BaseTyped_Caches() {
+
+            // Arrange
+
+            var fieldOne = typeof(Fake).GetField(nameof(Fake.InstanceField));
+            var fieldTwo = typeof(Fake).GetField(nameof(Fake.InstanceField));
+
+            // Act
+
+            var setterOne = fieldOne.CreateSetter<Fake>();
+            var setterTwo = fieldTwo.CreateSetter<Fake>();
+
+            // Assert
+
+            Assert.True(Object.ReferenceEquals(setterOne, setterTwo));
+        }
+
+        [Fact]
         public void CreateGetter_NeitherTyped_Null() {
 
             // Arrange
@@ -447,6 +519,24 @@ namespace Invio.Extensions.Reflection {
             // Assert
 
             Assert.Equal(instance.InstanceField, value);
+        }
+
+        [Fact]
+        public void CreateGetter_NeitherTyped_Caches() {
+
+            // Arrange
+
+            var fieldOne = typeof(Fake).GetField(nameof(Fake.InstanceField));
+            var fieldTwo = typeof(Fake).GetField(nameof(Fake.InstanceField));
+
+            // Act
+
+            var getterOne = fieldOne.CreateGetter();
+            var getterTwo = fieldTwo.CreateGetter();
+
+            // Assert
+
+            Assert.True(Object.ReferenceEquals(getterOne, getterTwo));
         }
 
         [Fact]
@@ -507,6 +597,24 @@ namespace Invio.Extensions.Reflection {
             // Assert
 
             Assert.Equal(value, instance.InstanceField);
+        }
+
+        [Fact]
+        public void CreateSetter_NeitherTyped_Caches() {
+
+            // Arrange
+
+            var fieldOne = typeof(Fake).GetField(nameof(Fake.InstanceField));
+            var fieldTwo = typeof(Fake).GetField(nameof(Fake.InstanceField));
+
+            // Act
+
+            var setterOne = fieldOne.CreateSetter();
+            var setterTwo = fieldTwo.CreateSetter();
+
+            // Assert
+
+            Assert.True(Object.ReferenceEquals(setterOne, setterTwo));
         }
 
         private class Fake {

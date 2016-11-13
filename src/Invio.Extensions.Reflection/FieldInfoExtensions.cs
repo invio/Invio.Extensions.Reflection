@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -12,6 +13,14 @@ namespace Invio.Extensions.Reflection {
     ///   in these fields from the extended <see cref="FieldInfo" />.
     /// </summary>
     public static class FieldInfoExtensions {
+
+        private static ConcurrentDictionary<Tuple<Type, Type, object>, object> setters { get; }
+        private static ConcurrentDictionary<Tuple<Type, Type, object>, object> getters { get; }
+
+        static FieldInfoExtensions() {
+            setters = new ConcurrentDictionary<Tuple<Type, Type, object>, object>();
+            getters = new ConcurrentDictionary<Tuple<Type, Type, object>, object>();
+        }
 
         /// <summary>
         ///   Return an efficient getter delegate for the specified field.
@@ -53,7 +62,7 @@ namespace Invio.Extensions.Reflection {
         public static Func<TBase, TField> CreateGetter<TBase, TField>(this FieldInfo field)
             where TBase : class {
 
-            return CreateGetterFuncImpl<TBase, TField, Func<TBase, TField>>(field);
+            return GetOrCreateGetter<TBase, TField>(field);
         }
 
         /// <summary>
@@ -90,7 +99,7 @@ namespace Invio.Extensions.Reflection {
         public static Func<TBase, object> CreateGetter<TBase>(this FieldInfo field)
             where TBase : class {
 
-            return CreateGetterFuncImpl<TBase, object, Func<TBase, object>>(field);
+            return GetOrCreateGetter<TBase, object>(field);
         }
 
         /// <summary>
@@ -116,7 +125,7 @@ namespace Invio.Extensions.Reflection {
         ///   retreived by utilizing <see cref="FieldInfo" /> via reflection.
         /// </returns>
         public static Func<object, object> CreateGetter(this FieldInfo field) {
-            return CreateGetterFuncImpl<object, object, Func<object, object>>(field);
+            return GetOrCreateGetter<object, object>(field);
         }
 
         /// <summary>
@@ -159,7 +168,7 @@ namespace Invio.Extensions.Reflection {
         public static Action<TBase, TField> CreateSetter<TBase, TField>(this FieldInfo field)
             where TBase : class {
 
-            return CreateSetterActionImpl<TBase, TField, Action<TBase, TField>>(field);
+            return GetOrCreateSetter<TBase, TField>(field);
         }
 
         /// <summary>
@@ -196,7 +205,7 @@ namespace Invio.Extensions.Reflection {
         public static Action<TBase, object> CreateSetter<TBase>(this FieldInfo field)
             where TBase : class {
 
-            return CreateSetterActionImpl<TBase, object, Action<TBase, object>>(field);
+            return GetOrCreateSetter<TBase, object>(field);
         }
 
         /// <summary>
@@ -222,31 +231,53 @@ namespace Invio.Extensions.Reflection {
         ///   the parent by utilizing <see cref="FieldInfo" /> via reflection.
         /// </returns>
         public static Action<object, object> CreateSetter(this FieldInfo field) {
-            return CreateSetterActionImpl<object, object, Action<object, object>>(field);
+            return GetOrCreateSetter<object, object>(field);
         }
 
-        private static TFunc CreateGetterFuncImpl<TBase, TField, TFunc>(
+        private static Func<TBase, TField> GetOrCreateGetter<TBase, TField>(
+            FieldInfo field) where TBase : class {
+
+            return (Func<TBase, TField>)getters.GetOrAdd(
+                new Tuple<Type, Type, object>(typeof(TBase), typeof(TField), field),
+                _ => CreateGetterImpl<TBase, TField>(field)
+            );
+        }
+
+        private static Func<TBase, TField> CreateGetterImpl<TBase, TField>(
             FieldInfo field) where TBase : class {
 
             CheckArguments<TBase, TField>(field);
 
-            var instance = Expression.Parameter(typeof(TBase), "instance");
+            var parameter = Expression.Parameter(typeof(TBase), "instance");
 
-            var body = Expression.Field(
-                Expression.Convert(instance, field.DeclaringType),
-                field
+            var body = Expression.Convert(
+                Expression.Field(
+                    Expression.Convert(parameter, field.DeclaringType),
+                    field
+                ),
+                typeof(TField)
             );
 
-            return Expression.Lambda<TFunc>(body, instance).Compile();
+            return Expression.Lambda<Func<TBase, TField>>(body, parameter).Compile();
         }
 
-        private static TAction CreateSetterActionImpl<TBase, TField, TAction>(
+        private static Action<TBase, TField> GetOrCreateSetter<TBase, TField>(
+            FieldInfo field) where TBase : class {
+
+            return (Action<TBase, TField>)setters.GetOrAdd(
+                new Tuple<Type, Type, object>(typeof(TBase), typeof(TField), field),
+                _ => CreateSetterImpl<TBase, TField>(field)
+            );
+        }
+
+        private static Action<TBase, TField> CreateSetterImpl<TBase, TField>(
             FieldInfo field) where TBase : class {
 
             CheckArguments<TBase, TField>(field);
 
             var instance = Expression.Parameter(typeof(TBase), "instance");
             var fieldValue = Expression.Parameter(typeof(TField), "fieldValue");
+            var parameters = new ParameterExpression[] { instance, fieldValue };
 
             var body = Expression.Assign(
                  Expression.Field(
@@ -256,7 +287,7 @@ namespace Invio.Extensions.Reflection {
                  Expression.Convert(fieldValue, field.FieldType)
             );
 
-            return Expression.Lambda<TAction>(body, instance, fieldValue).Compile();
+            return Expression.Lambda<Action<TBase, TField>>(body, parameters).Compile();
         }
 
         private static void CheckArguments<TBase, TField>(FieldInfo field)
