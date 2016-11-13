@@ -48,6 +48,23 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
+        public void CreateGetter_BothTyped_Caches() {
+
+            // Arrange
+
+            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+
+            // Act
+
+            var getterOne = property.CreateGetter<Fake, Int32>();
+            var getterTwo = property.CreateGetter<Fake, Int32>();
+
+            // Assert
+
+            Assert.True(Object.ReferenceEquals(getterOne, getterTwo));
+        }
+
+        [Fact]
         public void CreateGetter_BothTyped_NoGetter() {
 
             // Arrange
@@ -198,6 +215,23 @@ namespace Invio.Extensions.Reflection {
             // Assert
 
             Assert.Equal(instance.PrivateSetter, value);
+        }
+
+        [Fact]
+        public void CreateSetter_BothTyped_Caches() {
+
+            // Arrange
+
+            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+
+            // Act
+
+            var setterOne = property.CreateSetter<Fake, Int32>();
+            var setterTwo = property.CreateSetter<Fake, Int32>();
+
+            // Assert
+
+            Assert.True(Object.ReferenceEquals(setterOne, setterTwo));
         }
 
         [Fact]
@@ -352,6 +386,23 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
+        public void CreateGetter_BaseTyped_Caches() {
+
+            // Arrange
+
+            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+
+            // Act
+
+            var getterOne = property.CreateGetter<Fake>();
+            var getterTwo = property.CreateGetter<Fake>();
+
+            // Assert
+
+            Assert.True(Object.ReferenceEquals(getterOne, getterTwo));
+        }
+
+        [Fact]
         public void CreateGetter_BaseTyped_NoGetter() {
 
             // Arrange
@@ -478,6 +529,23 @@ namespace Invio.Extensions.Reflection {
             // Assert
 
             Assert.Equal(instance.PrivateSetter, value);
+        }
+
+        [Fact]
+        public void CreateSetter_BaseTyped_Caches() {
+
+            // Arrange
+
+            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+
+            // Act
+
+            var setterOne = property.CreateSetter<Fake>();
+            var setterTwo = property.CreateSetter<Fake>();
+
+            // Assert
+
+            Assert.True(Object.ReferenceEquals(setterOne, setterTwo));
         }
 
         [Fact]
@@ -608,6 +676,23 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
+        public void CreateGetter_NeitherTyped_Caches() {
+
+            // Arrange
+
+            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+
+            // Act
+
+            var getterOne = property.CreateGetter();
+            var getterTwo = property.CreateGetter();
+
+            // Assert
+
+            Assert.True(Object.ReferenceEquals(getterOne, getterTwo));
+        }
+
+        [Fact]
         public void CreateGetter_NeitherTyped_NoGetter() {
 
             // Arrange
@@ -710,6 +795,23 @@ namespace Invio.Extensions.Reflection {
             // Assert
 
             Assert.Equal(instance.PrivateSetter, value);
+        }
+
+        [Fact]
+        public void CreateSetter_NeitherTyped_Caches() {
+
+            // Arrange
+
+            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+
+            // Act
+
+            var setterOne = property.CreateSetter();
+            var setterTwo = property.CreateSetter();
+
+            // Assert
+
+            Assert.True(Object.ReferenceEquals(setterOne, setterTwo));
         }
 
         [Fact]

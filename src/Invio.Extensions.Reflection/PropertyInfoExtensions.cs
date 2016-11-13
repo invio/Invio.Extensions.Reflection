@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Concurrent;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Invio.Extensions.Reflection {
@@ -10,6 +12,14 @@ namespace Invio.Extensions.Reflection {
     ///   in these properties from the extended <see cref="PropertyInfo" />.
     /// </summary>
     public static class PropertyInfoExtensions {
+
+        private static ConcurrentDictionary<Tuple<Type, Type, object>, object> setters { get; }
+        private static ConcurrentDictionary<Tuple<Type, Type, object>, object> getters { get; }
+
+        static PropertyInfoExtensions() {
+            setters = new ConcurrentDictionary<Tuple<Type, Type, object>, object>();
+            getters = new ConcurrentDictionary<Tuple<Type, Type, object>, object>();
+        }
 
         /// <summary>
         ///   Return an efficient getter delegate for the specified property.
@@ -53,9 +63,7 @@ namespace Invio.Extensions.Reflection {
         public static Func<TBase, TProperty> CreateGetter<TBase, TProperty>(
             this PropertyInfo property) where TBase : class {
 
-            var method = GetGetMethodInfo<TBase, TProperty>(property);
-
-            return method.CreateFunc0<TBase, TProperty>();
+            return GetOrCreateGetter<TBase, TProperty>(property);
         }
 
         /// <summary>
@@ -100,9 +108,7 @@ namespace Invio.Extensions.Reflection {
         public static Action<TBase, TProperty> CreateSetter<TBase, TProperty>(
             this PropertyInfo property) where TBase : class {
 
-            var method = GetSetMethodInfo<TBase, TProperty>(property);
-
-            return method.CreateAction1<TBase, TProperty>();
+            return GetOrCreateSetter<TBase, TProperty>(property);
         }
 
         /// <summary>
@@ -140,7 +146,7 @@ namespace Invio.Extensions.Reflection {
         public static Func<TBase, object> CreateGetter<TBase>(this PropertyInfo property)
             where TBase : class {
 
-            return GetGetMethodInfo<TBase, object>(property).CreateFunc0<TBase>();
+            return GetOrCreateGetter<TBase, object>(property);
         }
 
         /// <summary>
@@ -178,7 +184,7 @@ namespace Invio.Extensions.Reflection {
         public static Action<TBase, object> CreateSetter<TBase>(this PropertyInfo property)
             where TBase : class {
 
-            return GetSetMethodInfo<TBase, object>(property).CreateAction1<TBase>();
+            return GetOrCreateSetter<TBase, object>(property);
         }
 
         /// <summary>
@@ -205,7 +211,7 @@ namespace Invio.Extensions.Reflection {
         ///   retreived by utilizing <see cref="PropertyInfo" /> via reflection.
         /// </returns>
         public static Func<object, object> CreateGetter(this PropertyInfo property) {
-            return GetGetMethodInfo<object, object>(property).CreateFunc0();
+            return GetOrCreateGetter<object, object>(property);
         }
 
         /// <summary>
@@ -232,11 +238,20 @@ namespace Invio.Extensions.Reflection {
         ///   retreived by utilizing <see cref="PropertyInfo" /> via reflection.
         /// </returns>
         public static Action<object, object> CreateSetter(this PropertyInfo property) {
-            return GetSetMethodInfo<object, object>(property).CreateAction1();
+            return GetOrCreateSetter<object, object>(property);
         }
 
-        private static MethodInfo GetGetMethodInfo<TBase, TProperty>(PropertyInfo property)
-            where TBase : class {
+        private static Func<TBase, TProperty> GetOrCreateGetter<TBase, TProperty>(
+            PropertyInfo property) where TBase : class {
+
+            return (Func<TBase, TProperty>)getters.GetOrAdd(
+                new Tuple<Type, Type, object>(typeof(TBase), typeof(TProperty), property),
+                _ => CreateGetterImpl<TBase, TProperty>(property)
+            );
+        }
+
+        private static Func<TBase, TProperty> CreateGetterImpl<TBase, TProperty>(
+            PropertyInfo property) where TBase : class {
 
             CheckArguments<TBase, TProperty>(property);
 
@@ -257,11 +272,30 @@ namespace Invio.Extensions.Reflection {
                 );
             }
 
-            return getMethodInfo;
+            var instance = Expression.Parameter(typeof(TBase), "instance");
+
+            var body = Expression.Convert(
+                Expression.Call(
+                    Expression.Convert(instance, property.DeclaringType),
+                    getMethodInfo
+                ),
+                typeof(TProperty)
+            );
+
+            return Expression.Lambda<Func<TBase, TProperty>>(body, instance).Compile();
         }
 
-        private static MethodInfo GetSetMethodInfo<TBase, TProperty>(PropertyInfo property)
-            where TBase : class {
+        private static Action<TBase, TProperty> GetOrCreateSetter<TBase, TProperty>(
+            PropertyInfo property) where TBase : class {
+
+            return (Action<TBase, TProperty>)setters.GetOrAdd(
+                new Tuple<Type, Type, object>(typeof(TBase), typeof(TProperty), property),
+                _ => CreateSetterImpl<TBase, TProperty>(property)
+            );
+        }
+
+        private static Action<TBase, TProperty> CreateSetterImpl<TBase, TProperty>(
+            PropertyInfo property) where TBase : class {
 
             CheckArguments<TBase, TProperty>(property);
 
@@ -282,7 +316,18 @@ namespace Invio.Extensions.Reflection {
                 );
             }
 
-            return setMethodInfo;
+            var instance = Expression.Parameter(typeof(TBase), "instance");
+            var value = Expression.Parameter(typeof(TProperty), "value");
+
+            var body = Expression.Assign(
+                Expression.Property(
+                    Expression.Convert(instance, property.DeclaringType),
+                    property
+                ),
+                Expression.Convert(value, property.PropertyType)
+            );
+
+            return Expression.Lambda<Action<TBase, TProperty>>(body, instance, value).Compile();
         }
 
         private static void CheckArguments<TBase, TProperty>(PropertyInfo property)
