@@ -48,6 +48,42 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
+        public void CreateGetter_BothTyped_ValidCovariantDeclaringType() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(IFake).GetProperty(nameof(IFake.IFakeProperty));
+
+            // Act
+
+            var getter = property.CreateGetter<Fake, IFakeProperty>();
+            var value = getter(instance);
+
+            // Assert
+
+            Assert.Equal(instance.IFakeProperty, value);
+        }
+
+        [Fact]
+        public void CreateGetter_BothTyped_ValidCovariantPropertyType() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(IFake).GetProperty(nameof(IFake.IFakeProperty));
+
+            // Act
+
+            var getter = property.CreateGetter<IFake, FakeProperty>();
+            var value = getter(instance);
+
+            // Assert
+
+            Assert.Equal(instance.IFakeProperty, value);
+        }
+
+        [Fact]
         public void CreateGetter_BothTyped_Caches() {
 
             // Arrange
@@ -108,7 +144,7 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateGetter_BothTyped_InvalidDeclaringType() {
+        public void CreateGetter_BothTyped_InvalidContravariantDeclaringType() {
 
             // Arrange
 
@@ -117,14 +153,14 @@ namespace Invio.Extensions.Reflection {
             // Act
 
             var exception = Record.Exception(
-                () => property.CreateGetter<String, Int32>()
+                () => property.CreateGetter<IFake, Int32>()
             );
 
             // Assert
 
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal(
-                "Type parameter 'TBase' was 'String', which is not " +
+                "Type parameter 'TBase' was 'IFake', which is not " +
                 "assignable to the property's declaring type of 'Fake'." +
                 Environment.NewLine + "Parameter name: property",
                 exception.Message
@@ -132,24 +168,24 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateGetter_BothTyped_InvalidPropertyType() {
+        public void CreateGetter_BothTyped_InvalidContravariantPropertyType() {
 
             // Arrange
 
-            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+            var property = typeof(Fake).GetProperty(nameof(Fake.FakeProperty));
 
             // Act
 
             var exception = Record.Exception(
-                () => property.CreateGetter<Fake, String>()
+                () => property.CreateGetter<Fake, IFakeProperty>()
             );
 
             // Assert
 
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal(
-                "Type parameter 'TProperty' was 'String', which is not " +
-                "assignable to the property's value type of 'Int32'." +
+                "Type parameter 'TProperty' was 'IFakeProperty', which is not " +
+                "assignable to the property's value type of 'FakeProperty'." +
                 Environment.NewLine + "Parameter name: property",
                 exception.Message
             );
@@ -219,6 +255,44 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
+        public void CreateSetter_BothTyped_ValidCovariantDeclaringType() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(IFake).GetProperty(nameof(IFake.IFakeProperty));
+            var value = new FakeProperty();
+
+            // Act
+
+            var setter = property.CreateSetter<Fake, IFakeProperty>();
+            setter(instance, value);
+
+            // Assert
+
+            Assert.Equal(instance.IFakeProperty, value);
+        }
+
+        [Fact]
+        public void CreateSetter_BothTyped_ValidCovariantPropertyType() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(IFake).GetProperty(nameof(IFake.IFakeProperty));
+            var value = new FakeProperty();
+
+            // Act
+
+            var setter = property.CreateSetter<IFake, FakeProperty>();
+            setter(instance, value);
+
+            // Assert
+
+            Assert.Equal(instance.IFakeProperty, value);
+        }
+
+        [Fact]
         public void CreateSetter_BothTyped_Caches() {
 
             // Arrange
@@ -279,7 +353,7 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateSetter_BothTyped_InvalidDeclaringType() {
+        public void CreateSetter_BothTyped_InvalidContravariantDeclaringType() {
 
             // Arrange
 
@@ -288,14 +362,14 @@ namespace Invio.Extensions.Reflection {
             // Act
 
             var exception = Record.Exception(
-                () => property.CreateSetter<String, Int32>()
+                () => property.CreateSetter<IFake, Int32>()
             );
 
             // Assert
 
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal(
-                "Type parameter 'TBase' was 'String', which is not " +
+                "Type parameter 'TBase' was 'IFake', which is not " +
                 "assignable to the property's declaring type of 'Fake'." +
                 Environment.NewLine + "Parameter name: property",
                 exception.Message
@@ -303,24 +377,24 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateSetter_BothTyped_InvalidPropertyType() {
+        public void CreateSetter_BothTyped_InvalidContravariantPropertyType() {
 
             // Arrange
 
-            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+            var property = typeof(Fake).GetProperty(nameof(Fake.FakeProperty));
 
             // Act
 
             var exception = Record.Exception(
-                () => property.CreateSetter<Fake, String>()
+                () => property.CreateSetter<Fake, IFakeProperty>()
             );
 
             // Assert
 
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal(
-                "Type parameter 'TProperty' was 'String', which is not " +
-                "assignable to the property's value type of 'Int32'." +
+                "Type parameter 'TProperty' was 'IFakeProperty', which is not " +
+                "assignable to the property's value type of 'FakeProperty'." +
                 Environment.NewLine + "Parameter name: property",
                 exception.Message
             );
@@ -387,6 +461,25 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(instance.PrivateGetterValue, value);
         }
 
+
+        [Fact]
+        public void CreateGetter_BaseTyped_ValidCovariantDeclaringType() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(IFake).GetProperty(nameof(IFake.IFakeProperty));
+
+            // Act
+
+            var getter = property.CreateGetter<Fake>();
+            var value = getter(instance);
+
+            // Assert
+
+            Assert.Equal(instance.IFakeProperty, value);
+        }
+
         [Fact]
         public void CreateGetter_BaseTyped_Caches() {
 
@@ -448,7 +541,7 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateGetter_BaseTyped_InvalidDeclaringType() {
+        public void CreateGetter_BaseTyped_InvalidContravariantDeclaringType() {
 
             // Arrange
 
@@ -457,14 +550,14 @@ namespace Invio.Extensions.Reflection {
             // Act
 
             var exception = Record.Exception(
-                () => property.CreateGetter<String>()
+                () => property.CreateGetter<IFake>()
             );
 
             // Assert
 
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal(
-                "Type parameter 'TBase' was 'String', which is not " +
+                "Type parameter 'TBase' was 'IFake', which is not " +
                 "assignable to the property's declaring type of 'Fake'." +
                 Environment.NewLine + "Parameter name: property",
                 exception.Message
@@ -535,6 +628,25 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
+        public void CreateSetter_BaseTyped_ValidCovariantDeclaringType() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var property = typeof(IFake).GetProperty(nameof(IFake.IFakeProperty));
+            var value = new FakeProperty();
+
+            // Act
+
+            var setter = property.CreateSetter<Fake>();
+            setter(instance, value);
+
+            // Assert
+
+            Assert.Equal(instance.IFakeProperty, value);
+        }
+
+        [Fact]
         public void CreateSetter_BaseTyped_Caches() {
 
             // Arrange
@@ -595,7 +707,7 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateSetter_BaseTyped_InvalidDeclaringType() {
+        public void CreateSetter_BaseTyped_InvalidContravariantDeclaringType() {
 
             // Arrange
 
@@ -604,14 +716,14 @@ namespace Invio.Extensions.Reflection {
             // Act
 
             var exception = Record.Exception(
-                () => property.CreateSetter<String>()
+                () => property.CreateSetter<IFake>()
             );
 
             // Assert
 
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal(
-                "Type parameter 'TBase' was 'String', which is not " +
+                "Type parameter 'TBase' was 'IFake', which is not " +
                 "assignable to the property's declaring type of 'Fake'." +
                 Environment.NewLine + "Parameter name: property",
                 exception.Message
@@ -885,7 +997,7 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
-        private class Fake {
+        private class Fake : IFake {
 
             public static Int32 StaticProperty { get; set; }
 
@@ -899,7 +1011,19 @@ namespace Invio.Extensions.Reflection {
             public Int32 NoGetter { set { this.NoGetterValue = value; } }
             public Int32 NoSetter { get; } = 1337;
 
+            public FakeProperty FakeProperty { get; set; } = new FakeProperty();
+            public IFakeProperty IFakeProperty { get; set; } = new FakeProperty();
         }
+
+        private interface IFake {
+
+            IFakeProperty IFakeProperty { get; set; }
+
+        }
+
+        private class FakeProperty : IFakeProperty {}
+
+        private interface IFakeProperty {}
 
     }
 
