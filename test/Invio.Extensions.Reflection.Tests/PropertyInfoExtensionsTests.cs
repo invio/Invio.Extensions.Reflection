@@ -52,12 +52,13 @@ namespace Invio.Extensions.Reflection {
 
             // Arrange
 
-            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+            var propertyOne = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+            var propertyTwo = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
 
             // Act
 
-            var getterOne = property.CreateGetter<Fake, Int32>();
-            var getterTwo = property.CreateGetter<Fake, Int32>();
+            var getterOne = propertyOne.CreateGetter<Fake, Int32>();
+            var getterTwo = propertyTwo.CreateGetter<Fake, Int32>();
 
             // Assert
 
@@ -222,12 +223,13 @@ namespace Invio.Extensions.Reflection {
 
             // Arrange
 
-            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+            var propertyOne = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+            var propertyTwo = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
 
             // Act
 
-            var setterOne = property.CreateSetter<Fake, Int32>();
-            var setterTwo = property.CreateSetter<Fake, Int32>();
+            var setterOne = propertyOne.CreateSetter<Fake, Int32>();
+            var setterTwo = propertyTwo.CreateSetter<Fake, Int32>();
 
             // Assert
 
@@ -390,12 +392,13 @@ namespace Invio.Extensions.Reflection {
 
             // Arrange
 
-            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+            var propertyOne = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+            var propertyTwo = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
 
             // Act
 
-            var getterOne = property.CreateGetter<Fake>();
-            var getterTwo = property.CreateGetter<Fake>();
+            var getterOne = propertyOne.CreateGetter<Fake>();
+            var getterTwo = propertyTwo.CreateGetter<Fake>();
 
             // Assert
 
@@ -536,12 +539,13 @@ namespace Invio.Extensions.Reflection {
 
             // Arrange
 
-            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+            var propertyOne = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+            var propertyTwo = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
 
             // Act
 
-            var setterOne = property.CreateSetter<Fake>();
-            var setterTwo = property.CreateSetter<Fake>();
+            var setterOne = propertyOne.CreateSetter<Fake>();
+            var setterTwo = propertyTwo.CreateSetter<Fake>();
 
             // Assert
 
@@ -680,12 +684,13 @@ namespace Invio.Extensions.Reflection {
 
             // Arrange
 
-            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+            var propertyOne = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+            var propertyTwo = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
 
             // Act
 
-            var getterOne = property.CreateGetter();
-            var getterTwo = property.CreateGetter();
+            var getterOne = propertyOne.CreateGetter();
+            var getterTwo = propertyTwo.CreateGetter();
 
             // Assert
 
@@ -802,12 +807,13 @@ namespace Invio.Extensions.Reflection {
 
             // Arrange
 
-            var property = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+            var propertyOne = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
+            var propertyTwo = typeof(Fake).GetProperty(nameof(Fake.NormalProperty));
 
             // Act
 
-            var setterOne = property.CreateSetter();
-            var setterTwo = property.CreateSetter();
+            var setterOne = propertyOne.CreateSetter();
+            var setterTwo = propertyTwo.CreateSetter();
 
             // Assert
 
