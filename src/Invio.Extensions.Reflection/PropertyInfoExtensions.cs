@@ -146,7 +146,7 @@ namespace Invio.Extensions.Reflection {
         public static Func<TBase, object> CreateGetter<TBase>(this PropertyInfo property)
             where TBase : class {
 
-            return GetOrCreateGetter<TBase, object>(property);
+            return GetOrCreateGetter<TBase, object>(property, skipPropertyTypeCheck: true);
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace Invio.Extensions.Reflection {
         public static Action<TBase, object> CreateSetter<TBase>(this PropertyInfo property)
             where TBase : class {
 
-            return GetOrCreateSetter<TBase, object>(property);
+            return GetOrCreateSetter<TBase, object>(property, skipPropertyTypeCheck: true);
         }
 
         /// <summary>
@@ -211,7 +211,11 @@ namespace Invio.Extensions.Reflection {
         ///   retreived by utilizing <see cref="PropertyInfo" /> via reflection.
         /// </returns>
         public static Func<object, object> CreateGetter(this PropertyInfo property) {
-            return GetOrCreateGetter<object, object>(property);
+            return GetOrCreateGetter<object, object>(
+                property,
+                skipDeclaringTypeCheck: true,
+                skipPropertyTypeCheck: true
+            );
         }
 
         /// <summary>
@@ -238,22 +242,38 @@ namespace Invio.Extensions.Reflection {
         ///   retreived by utilizing <see cref="PropertyInfo" /> via reflection.
         /// </returns>
         public static Action<object, object> CreateSetter(this PropertyInfo property) {
-            return GetOrCreateSetter<object, object>(property);
+            return GetOrCreateSetter<object, object>(
+                property,
+                skipDeclaringTypeCheck: true,
+                skipPropertyTypeCheck: true
+            );
         }
 
         private static Func<TBase, TProperty> GetOrCreateGetter<TBase, TProperty>(
-            PropertyInfo property) where TBase : class {
+            PropertyInfo property,
+            bool skipDeclaringTypeCheck = false,
+            bool skipPropertyTypeCheck = false) where TBase : class {
 
             return (Func<TBase, TProperty>)getters.GetOrAdd(
                 new Tuple<Type, Type, object>(typeof(TBase), typeof(TProperty), property),
-                _ => CreateGetterImpl<TBase, TProperty>(property)
+                _ => CreateGetterImpl<TBase, TProperty>(
+                    property,
+                    skipDeclaringTypeCheck,
+                    skipPropertyTypeCheck
+                )
             );
         }
 
         private static Func<TBase, TProperty> CreateGetterImpl<TBase, TProperty>(
-            PropertyInfo property) where TBase : class {
+            PropertyInfo property,
+            bool skipDeclaringTypeCheck,
+            bool skipPropertyTypeCheck) where TBase : class {
 
-            CheckArguments<TBase, TProperty>(property);
+            CheckArguments<TBase, TProperty>(
+                property,
+                skipDeclaringTypeCheck,
+                skipPropertyTypeCheck
+            );
 
             var getMethodInfo = property.GetGetMethod(nonPublic: true);
 
@@ -286,18 +306,30 @@ namespace Invio.Extensions.Reflection {
         }
 
         private static Action<TBase, TProperty> GetOrCreateSetter<TBase, TProperty>(
-            PropertyInfo property) where TBase : class {
+            PropertyInfo property,
+            bool skipDeclaringTypeCheck = false,
+            bool skipPropertyTypeCheck = false) where TBase : class {
 
             return (Action<TBase, TProperty>)setters.GetOrAdd(
                 new Tuple<Type, Type, object>(typeof(TBase), typeof(TProperty), property),
-                _ => CreateSetterImpl<TBase, TProperty>(property)
+                _ => CreateSetterImpl<TBase, TProperty>(
+                    property,
+                    skipDeclaringTypeCheck,
+                    skipPropertyTypeCheck
+                )
             );
         }
 
         private static Action<TBase, TProperty> CreateSetterImpl<TBase, TProperty>(
-            PropertyInfo property) where TBase : class {
+            PropertyInfo property,
+            bool skipDeclaringTypeCheck,
+            bool skipPropertyTypeCheck) where TBase : class {
 
-            CheckArguments<TBase, TProperty>(property);
+            CheckArguments<TBase, TProperty>(
+                property,
+                skipDeclaringTypeCheck,
+                skipPropertyTypeCheck
+            );
 
             var setMethodInfo = property.GetSetMethod(nonPublic: true);
 
@@ -330,14 +362,18 @@ namespace Invio.Extensions.Reflection {
             return Expression.Lambda<Action<TBase, TProperty>>(body, instance, value).Compile();
         }
 
-        private static void CheckArguments<TBase, TProperty>(PropertyInfo property)
-            where TBase : class {
+        private static void CheckArguments<TBase, TProperty>(
+            PropertyInfo property,
+            bool skipDeclaringTypeCheck,
+            bool skipPropertyTypeCheck) where TBase : class {
 
             if (property == null) {
                 throw new ArgumentNullException(nameof(property));
             }
 
-            if (!typeof(TBase).IsAssignableFrom(property.DeclaringType)) {
+            if (!skipDeclaringTypeCheck &&
+                !property.DeclaringType.IsAssignableFrom(typeof(TBase))) {
+
                 throw new ArgumentException(
                     $"Type parameter '{nameof(TBase)}' was '{typeof(TBase).Name}', " +
                     $"which is not assignable to the property's declaring type of " +
@@ -346,7 +382,9 @@ namespace Invio.Extensions.Reflection {
                 );
             }
 
-            if (!typeof(TProperty).IsAssignableFrom(property.PropertyType)) {
+            if (!skipPropertyTypeCheck &&
+                !property.PropertyType.IsAssignableFrom(typeof(TProperty))) {
+
                 throw new ArgumentException(
                     $"Type parameter '{nameof(TProperty)}' was '{typeof(TProperty).Name}', " +
                     $"which is not assignable to the property's value type of " +
@@ -354,6 +392,7 @@ namespace Invio.Extensions.Reflection {
                     nameof(property)
                 );
             }
+
         }
 
     }

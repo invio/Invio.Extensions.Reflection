@@ -50,23 +50,23 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateGetter_BothTyped_InvalidDeclaringType() {
+        public void CreateGetter_BothTyped_InvalidContravariantDeclaringType() {
 
             // Arrange
 
-            var field = typeof(Fake).GetField(nameof(Fake.StaticField));
+            var field = typeof(Fake).GetField(nameof(Fake.InstanceField));
 
             // Act
 
             var exception = Record.Exception(
-                () => field.CreateGetter<String, String>()
+                () => field.CreateGetter<FakeBase, String>()
             );
 
             // Assert
 
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal(
-                "Type parameter 'TBase' was 'String', which is not " +
+                "Type parameter 'TBase' was 'FakeBase', which is not " +
                 "assignable to the field's declaring type of 'Fake'." +
                 Environment.NewLine + "Parameter name: field",
                 exception.Message
@@ -74,24 +74,24 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateGetter_BothTyped_InvalidFieldType() {
+        public void CreateGetter_BothTyped_InvalidContravariantFieldType() {
 
             // Arrange
 
-            var field = typeof(Fake).GetField(nameof(Fake.StaticField));
+            var field = typeof(Fake).GetField(nameof(Fake.FakeField));
 
             // Act
 
             var exception = Record.Exception(
-                () => field.CreateGetter<Fake, Guid>()
+                () => field.CreateGetter<Fake, FakeBaseField>()
             );
 
             // Assert
 
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal(
-                "Type parameter 'TField' was 'Guid', which is not " +
-                "assignable to the field's value type of 'String'." +
+                "Type parameter 'TField' was 'FakeBaseField', which is not " +
+                "assignable to the field's value type of 'FakeField'." +
                 Environment.NewLine + "Parameter name: field",
                 exception.Message
             );
@@ -113,6 +113,42 @@ namespace Invio.Extensions.Reflection {
             // Assert
 
             Assert.Equal(instance.InstanceField, value);
+        }
+
+        [Fact]
+        public void CreateGetter_BothTyped_ValidCovariantDeclaringType() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var field = typeof(FakeBase).GetField(nameof(FakeBase.FakeBaseField));
+
+            // Act
+
+            var getter = field.CreateGetter<Fake, FakeBaseField>();
+            var value = getter(instance);
+
+            // Assert
+
+            Assert.Equal(instance.FakeBaseField, value);
+        }
+
+        [Fact]
+        public void CreateGetter_BothTyped_ValidCovariantFieldType() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var field = typeof(FakeBase).GetField(nameof(FakeBase.FakeBaseField));
+
+            // Act
+
+            var getter = field.CreateGetter<FakeBase, FakeField>();
+            var value = getter(instance);
+
+            // Assert
+
+            Assert.Equal(instance.FakeBaseField, value);
         }
 
         [Fact]
@@ -175,23 +211,23 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateSetter_BothTyped_InvalidDeclaringType() {
+        public void CreateSetter_BothTyped_InvalidContravariantDeclaringType() {
 
-            // Arrange
+            // Arrangen
 
-            var field = typeof(Fake).GetField(nameof(Fake.StaticField));
+            var field = typeof(Fake).GetField(nameof(Fake.InstanceField));
 
             // Act
 
             var exception = Record.Exception(
-                () => field.CreateSetter<String, String>()
+                () => field.CreateSetter<FakeBase, String>()
             );
 
             // Assert
 
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal(
-                "Type parameter 'TBase' was 'String', which is not " +
+                "Type parameter 'TBase' was 'FakeBase', which is not " +
                 "assignable to the field's declaring type of 'Fake'." +
                 Environment.NewLine + "Parameter name: field",
                 exception.Message
@@ -199,24 +235,24 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateSetter_BothTyped_InvalidFieldType() {
+        public void CreateSetter_BothTyped_InvalidContravariantFieldType() {
 
             // Arrange
 
-            var field = typeof(Fake).GetField(nameof(Fake.StaticField));
+            var field = typeof(Fake).GetField(nameof(Fake.FakeField));
 
             // Act
 
             var exception = Record.Exception(
-                () => field.CreateSetter<Fake, Guid>()
+                () => field.CreateSetter<Fake, FakeBaseField>()
             );
 
             // Assert
 
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal(
-                "Type parameter 'TField' was 'Guid', which is not " +
-                "assignable to the field's value type of 'String'." +
+                "Type parameter 'TField' was 'FakeBaseField', which is not " +
+                "assignable to the field's value type of 'FakeField'." +
                 Environment.NewLine + "Parameter name: field",
                 exception.Message
             );
@@ -239,6 +275,44 @@ namespace Invio.Extensions.Reflection {
             // Assert
 
             Assert.Equal(value, instance.InstanceField);
+        }
+
+        [Fact]
+        public void CreateSetter_BothTyped_ValidCovariantDeclaringType() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var field = typeof(FakeBase).GetField(nameof(FakeBase.FakeBaseField));
+            var value = new FakeField();
+
+            // Act
+
+            var setter = field.CreateSetter<Fake, FakeBaseField>();
+            setter(instance, value);
+
+            // Assert
+
+            Assert.Equal(instance.FakeBaseField, value);
+        }
+
+        [Fact]
+        public void CreateSetter_BothTyped_ValidCovariantFieldType() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var field = typeof(FakeBase).GetField(nameof(FakeBase.FakeBaseField));
+            var value = new FakeField();
+
+            // Act
+
+            var setter = field.CreateSetter<FakeBase, FakeField>();
+            setter(instance, value);
+
+            // Assert
+
+            Assert.Equal(instance.FakeBaseField, value);
         }
 
         [Fact]
@@ -301,23 +375,23 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateGetter_BaseTyped_InvalidDeclaringType() {
+        public void CreateGetter_BaseTyped_InvalidContravariantDeclaringType() {
 
             // Arrange
 
-            var field = typeof(Fake).GetField(nameof(Fake.StaticField));
+            var field = typeof(Fake).GetField(nameof(Fake.InstanceField));
 
             // Act
 
             var exception = Record.Exception(
-                () => field.CreateGetter<String>()
+                () => field.CreateGetter<FakeBase>()
             );
 
             // Assert
 
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal(
-                "Type parameter 'TBase' was 'String', which is not " +
+                "Type parameter 'TBase' was 'FakeBase', which is not " +
                 "assignable to the field's declaring type of 'Fake'." +
                 Environment.NewLine + "Parameter name: field",
                 exception.Message
@@ -340,6 +414,24 @@ namespace Invio.Extensions.Reflection {
             // Assert
 
             Assert.Equal(instance.InstanceField, value);
+        }
+
+        [Fact]
+        public void CreateGetter_BaseTyped_ValidCovariantDeclaringType() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var field = typeof(FakeBase).GetField(nameof(FakeBase.FakeBaseField));
+
+            // Act
+
+            var getter = field.CreateGetter<Fake>();
+            var value = getter(instance);
+
+            // Assert
+
+            Assert.Equal(instance.FakeBaseField, value);
         }
 
         [Fact]
@@ -402,23 +494,23 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Fact]
-        public void CreateSetter_BaseTyped_InvalidDeclaringType() {
+        public void CreateSetter_BaseTyped_InvalidContravariantDeclaringType() {
 
             // Arrange
 
-            var field = typeof(Fake).GetField(nameof(Fake.StaticField));
+            var field = typeof(Fake).GetField(nameof(Fake.InstanceField));
 
             // Act
 
             var exception = Record.Exception(
-                () => field.CreateSetter<String>()
+                () => field.CreateSetter<FakeBase>()
             );
 
             // Assert
 
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal(
-                "Type parameter 'TBase' was 'String', which is not " +
+                "Type parameter 'TBase' was 'FakeBase', which is not " +
                 "assignable to the field's declaring type of 'Fake'." +
                 Environment.NewLine + "Parameter name: field",
                 exception.Message
@@ -442,6 +534,25 @@ namespace Invio.Extensions.Reflection {
             // Assert
 
             Assert.Equal(value, instance.InstanceField);
+        }
+
+        [Fact]
+        public void CreateSetter_BaseTyped_ValidCovariantDeclaringType() {
+
+            // Arrange
+
+            var instance = new Fake();
+            var field = typeof(FakeBase).GetField(nameof(FakeBase.FakeBaseField));
+            var value = new FakeField();
+
+            // Act
+
+            var setter = field.CreateSetter<Fake>();
+            setter(instance, value);
+
+            // Assert
+
+            Assert.Equal(instance.FakeBaseField, value);
         }
 
         [Fact]
@@ -617,12 +728,24 @@ namespace Invio.Extensions.Reflection {
             Assert.True(Object.ReferenceEquals(setterOne, setterTwo));
         }
 
-        private class Fake {
+        private class Fake : FakeBase {
 
             public static String StaticField = "NotSupported";
             public String InstanceField = "Supported";
 
+            public FakeField FakeField = new FakeField();
+
         }
+
+        public abstract class FakeBase {
+
+            public FakeBaseField FakeBaseField;
+
+        }
+
+        private class FakeField : FakeBaseField {}
+
+        public abstract class FakeBaseField {}
 
     }
 

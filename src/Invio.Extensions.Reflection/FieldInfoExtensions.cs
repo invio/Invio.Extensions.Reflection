@@ -99,7 +99,7 @@ namespace Invio.Extensions.Reflection {
         public static Func<TBase, object> CreateGetter<TBase>(this FieldInfo field)
             where TBase : class {
 
-            return GetOrCreateGetter<TBase, object>(field);
+            return GetOrCreateGetter<TBase, object>(field, skipFieldTypeCheck: true);
         }
 
         /// <summary>
@@ -125,7 +125,11 @@ namespace Invio.Extensions.Reflection {
         ///   retreived by utilizing <see cref="FieldInfo" /> via reflection.
         /// </returns>
         public static Func<object, object> CreateGetter(this FieldInfo field) {
-            return GetOrCreateGetter<object, object>(field);
+            return GetOrCreateGetter<object, object>(
+                field,
+                skipDeclaringTypeCheck: true,
+                skipFieldTypeCheck: true
+            );
         }
 
         /// <summary>
@@ -205,7 +209,7 @@ namespace Invio.Extensions.Reflection {
         public static Action<TBase, object> CreateSetter<TBase>(this FieldInfo field)
             where TBase : class {
 
-            return GetOrCreateSetter<TBase, object>(field);
+            return GetOrCreateSetter<TBase, object>(field, skipFieldTypeCheck: true);
         }
 
         /// <summary>
@@ -231,22 +235,38 @@ namespace Invio.Extensions.Reflection {
         ///   the parent by utilizing <see cref="FieldInfo" /> via reflection.
         /// </returns>
         public static Action<object, object> CreateSetter(this FieldInfo field) {
-            return GetOrCreateSetter<object, object>(field);
+            return GetOrCreateSetter<object, object>(
+                field,
+                skipDeclaringTypeCheck: true,
+                skipFieldTypeCheck: true
+            );
         }
 
         private static Func<TBase, TField> GetOrCreateGetter<TBase, TField>(
-            FieldInfo field) where TBase : class {
+            FieldInfo field,
+            bool skipDeclaringTypeCheck = false,
+            bool skipFieldTypeCheck = false) where TBase : class {
 
             return (Func<TBase, TField>)getters.GetOrAdd(
                 new Tuple<Type, Type, object>(typeof(TBase), typeof(TField), field),
-                _ => CreateGetterImpl<TBase, TField>(field)
+                _ => CreateGetterImpl<TBase, TField>(
+                    field,
+                    skipDeclaringTypeCheck,
+                    skipFieldTypeCheck
+                )
             );
         }
 
         private static Func<TBase, TField> CreateGetterImpl<TBase, TField>(
-            FieldInfo field) where TBase : class {
+            FieldInfo field,
+            bool skipDeclaringTypeCheck,
+            bool skipFieldTypeCheck) where TBase : class {
 
-            CheckArguments<TBase, TField>(field);
+            CheckArguments<TBase, TField>(
+                field,
+                skipDeclaringTypeCheck,
+                skipFieldTypeCheck
+            );
 
             var parameter = Expression.Parameter(typeof(TBase), "instance");
 
@@ -262,18 +282,30 @@ namespace Invio.Extensions.Reflection {
         }
 
         private static Action<TBase, TField> GetOrCreateSetter<TBase, TField>(
-            FieldInfo field) where TBase : class {
+            FieldInfo field,
+            bool skipDeclaringTypeCheck = false,
+            bool skipFieldTypeCheck = false) where TBase : class {
 
             return (Action<TBase, TField>)setters.GetOrAdd(
                 new Tuple<Type, Type, object>(typeof(TBase), typeof(TField), field),
-                _ => CreateSetterImpl<TBase, TField>(field)
+                _ => CreateSetterImpl<TBase, TField>(
+                    field,
+                    skipDeclaringTypeCheck,
+                    skipFieldTypeCheck
+                )
             );
         }
 
         private static Action<TBase, TField> CreateSetterImpl<TBase, TField>(
-            FieldInfo field) where TBase : class {
+            FieldInfo field,
+            bool skipDeclaringTypeCheck,
+            bool skipFieldTypeCheck) where TBase : class {
 
-            CheckArguments<TBase, TField>(field);
+            CheckArguments<TBase, TField>(
+                field,
+                skipDeclaringTypeCheck,
+                skipFieldTypeCheck
+            );
 
             var instance = Expression.Parameter(typeof(TBase), "instance");
             var fieldValue = Expression.Parameter(typeof(TField), "fieldValue");
@@ -290,14 +322,18 @@ namespace Invio.Extensions.Reflection {
             return Expression.Lambda<Action<TBase, TField>>(body, parameters).Compile();
         }
 
-        private static void CheckArguments<TBase, TField>(FieldInfo field)
-            where TBase : class {
+        private static void CheckArguments<TBase, TField>(
+            FieldInfo field,
+            bool skipDeclaringTypeCheck,
+            bool skipFieldTypeCheck) where TBase : class {
 
             if (field == null) {
                 throw new ArgumentNullException(nameof(field));
             }
 
-            if (!typeof(TBase).IsAssignableFrom(field.DeclaringType)) {
+            if (!skipDeclaringTypeCheck &&
+                !field.DeclaringType.IsAssignableFrom(typeof(TBase))) {
+
                 throw new ArgumentException(
                     $"Type parameter '{nameof(TBase)}' was '{typeof(TBase).Name}', " +
                     $"which is not assignable to the field's declaring type of " +
@@ -306,7 +342,9 @@ namespace Invio.Extensions.Reflection {
                 );
             }
 
-            if (!typeof(TField).IsAssignableFrom(field.FieldType)) {
+            if (!skipFieldTypeCheck &&
+                !field.FieldType.IsAssignableFrom(typeof(TField))) {
+
                 throw new ArgumentException(
                     $"Type parameter '{nameof(TField)}' was '{typeof(TField).Name}', " +
                     $"which is not assignable to the field's value type of " +
