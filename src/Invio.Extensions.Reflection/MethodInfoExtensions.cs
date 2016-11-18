@@ -320,19 +320,17 @@ namespace Invio.Extensions.Reflection {
             Func<ParameterInfo, ParameterExpression, Expression> convert =
                 (info, expression) => Expression.Convert(expression, info.ParameterType);
 
-            var body = Expression.Convert(
-                Expression.Call(
-                    Expression.Convert(instance, method.DeclaringType),
-                    method,
-                    parameters
-                        .Zip(arguments, convert)
-                        .ToArray()
-                ),
-                typeof(TResult)
-            );
-
             var lambda = Expression.Lambda<TFunc>(
-                body,
+                Expression.Convert(
+                    Expression.Call(
+                        Expression.Convert(instance, method.DeclaringType),
+                        method,
+                        parameters
+                            .Zip(arguments, convert)
+                            .ToArray()
+                    ),
+                    typeof(TResult)
+                ),
                 new ParameterExpression[] { instance }
                     .Concat(arguments)
                     .ToArray()
@@ -340,7 +338,6 @@ namespace Invio.Extensions.Reflection {
 
             return lambda.Compile();
         }
-
 
         private static void CheckFunc<TBase>(MethodInfo method) {
             CheckFunc(method);
@@ -364,158 +361,6 @@ namespace Invio.Extensions.Reflection {
             }
         }
 
-        /// <summary>
-        /// Return an efficient action for the specified 0-parameter method.
-        /// The delegate returned is strongly run-time typed.
-        /// </summary>
-        public static Action<object> CreateAction0(this MethodInfo method) {
-
-            CheckParameters(method, expected: 0);
-
-            var delegateBuilder = objectAction0Builder.MakeGenericMethod(
-                method.DeclaringType
-            );
-
-            return (Action<object>)delegateBuilder.Invoke(null, new object[] { method });
-        }
-
-        /// <summary>
-        /// Return an efficient action for the specified 0-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
-        /// </summary>
-        public static Action<T> CreateAction0<T>(this MethodInfo method) where T : class {
-
-            CheckParameters(method, expected: 0);
-
-            var delegateBuilder = genericAction0Builder.MakeGenericMethod(
-                typeof(T)
-            );
-
-            return (Action<T>)delegateBuilder.Invoke(null, new object[] { method });
-        }
-
-        /// <summary>
-        /// Return an efficient action for the specified 1-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
-        /// </summary>
-        public static Action<object, object> CreateAction1(this MethodInfo method) {
-
-            CheckParameters(method, expected: 1);
-
-            var parameters = method.GetParameters();
-
-            var delegateBuilder = objectAction1Builder.MakeGenericMethod(
-                method.DeclaringType,
-                parameters[0].ParameterType
-            );
-
-            return (Action<object, object>)delegateBuilder.Invoke(null, new object[] { method });
-        }
-
-        /// <summary>
-        /// Return an efficient action for the specified 1-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
-        /// </summary>
-        public static Action<T, object> CreateAction1<T>(this MethodInfo method) where T : class {
-
-            CheckParameters(method, expected: 1);
-
-            var parameters = method.GetParameters();
-
-            var delegateBuilder = semiGenericAction1Builder.MakeGenericMethod(
-                typeof(T),
-                parameters[0].ParameterType
-            );
-
-            return (Action<T, object>)delegateBuilder.Invoke(null, new object[] { method });
-        }
-
-        /// <summary>
-        /// Return an efficient action for the specified 1-parameter method.
-        /// Both the target type and the parameter type are strongly typed at
-        /// compile time.
-        /// </summary>
-        public static Action<T1, T2> CreateAction1<T1, T2>(this MethodInfo method) where T1 : class {
-
-            CheckParameters(method, expected: 1);
-
-            var parameters = method.GetParameters();
-
-            if (parameters[0].ParameterType != typeof(T2)) {
-                throw new ArgumentException(
-                    "The method's argument type must exactly match the generic type parameter T2.",
-                    "method"
-                );
-            }
-
-            var delegateBuilder = genericAction1Builder.MakeGenericMethod(
-                typeof(T1),
-                typeof(T2)
-            );
-
-            return (Action<T1, T2>)delegateBuilder.Invoke(null, new object[] { method });
-        }
-
-        private static readonly MethodInfo genericAction0Builder =
-            new Func<MethodInfo, Action<object>>(CreateAction0Impl<object>)
-                .GetMethodInfo()
-                .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo genericAction1Builder =
-            new Func<MethodInfo, Action<object, object>>(CreateAction1Impl<object, object>)
-                .GetMethodInfo()
-                .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo semiGenericAction1Builder =
-            new Func<MethodInfo, Action<object, object>>(CreateSemiGenericAction1Impl<object, object>)
-                .GetMethodInfo()
-                .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo objectAction0Builder =
-            new Func<MethodInfo, Action<object>>(CreateObjectAction0Impl<object>)
-                .GetMethodInfo()
-                .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo objectAction1Builder =
-            new Func<MethodInfo, Action<object, object>>(CreateObjectAction1Impl<object, object>)
-                .GetMethodInfo()
-                .GetGenericMethodDefinition();
-
-        private static Action<object> CreateObjectAction0Impl<S>(MethodInfo methodInfo) {
-            Action<S> action = (Action<S>)methodInfo.CreateDelegate(
-                typeof(Action<S>)
-            );
-            return (object target) => { action((S)target); };
-        }
-
-        private static Action<S> CreateAction0Impl<S>(MethodInfo methodInfo) where S : class {
-            Action<S> action = (Action<S>)methodInfo.CreateDelegate(
-                typeof(Action<S>)
-            );
-            return action;
-        }
-
-        private static Action<S, T> CreateAction1Impl<S, T>(MethodInfo methodInfo) where S : class {
-            return (Action<S, T>)methodInfo.CreateDelegate(
-                typeof(Action<S, T>)
-            );
-        }
-
-        private static Action<S, object> CreateSemiGenericAction1Impl<S, T>(MethodInfo methodInfo) where S : class {
-            var action = CreateAction1Impl<S, T>(methodInfo);
-            return (S target, object param) => { action(target, (T)param); };
-        }
-
-        private static Action<object, object> CreateObjectAction1Impl<S, T>(MethodInfo methodInfo) where S : class {
-            Action<S, T> action = (Action<S, T>)methodInfo.CreateDelegate(
-                typeof(Action<S, T>)
-            );
-            return (object target, object param) => { action((S)target, (T)param); };
-        }
-
         private static void CheckParameters(MethodInfo method, int expected) {
             if (method == null) {
                 throw new ArgumentNullException(nameof(method));
@@ -530,6 +375,129 @@ namespace Invio.Extensions.Reflection {
                     nameof(method)
                 );
             }
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 0-parameter method.
+        /// The delegate returned is strongly run-time typed.
+        /// </summary>
+        public static Action<object> CreateAction0(this MethodInfo method) {
+            CheckParameters(method, expected: 0);
+
+            return CreateAction<Action<object>>(
+                typeof(object),
+                new Type[0],
+                method
+            );
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 0-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Action<TBase> CreateAction0<TBase>(this MethodInfo method)
+            where TBase : class {
+
+            CheckParameters(method, expected: 0);
+
+            return CreateAction<Action<TBase>>(
+                typeof(TBase),
+                new Type[0],
+                method
+            );
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 1-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Action<object, object> CreateAction1(this MethodInfo method) {
+
+            CheckParameters(method, expected: 1);
+
+            return CreateAction<Action<object, object>>(
+                typeof(object),
+                new [] { typeof(object) },
+                method
+            );
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 1-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Action<TBase, object> CreateAction1<TBase>(this MethodInfo method)
+            where TBase : class {
+
+            CheckParameters(method, expected: 1);
+
+            return CreateAction<Action<TBase, object>>(
+                typeof(TBase),
+                new [] { typeof(object) },
+                method
+            );
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 1-parameter method.
+        /// Both the target type and the parameter type are strongly typed at
+        /// compile time.
+        /// </summary>
+        public static Action<TBase, TParameter>
+            CreateAction1<TBase, TParameter>(this MethodInfo method) where TBase : class {
+
+            CheckParameters(method, expected: 1);
+
+            var parameters = method.GetParameters();
+
+            if (parameters[0].ParameterType != typeof(TParameter)) {
+                throw new ArgumentException(
+                    "The method's argument type must exactly match the generic type parameter TParameter.",
+                    "method"
+                );
+            }
+
+            return CreateAction<Action<TBase, TParameter>>(
+                typeof(TBase),
+                new [] { typeof(TParameter) },
+                method
+            );
+        }
+
+        private static TAction CreateAction<TAction>(
+            Type baseType,
+            Type[] parameterTypes,
+            MethodInfo method) {
+
+            var instance = Expression.Parameter(baseType, "instance");
+            var parameters = method.GetParameters();
+
+            Func<ParameterInfo, int, ParameterExpression> toArgument =
+                (info, index) =>
+                    Expression.Parameter(parameterTypes[index], $"argument{index}");
+
+            var arguments = parameters.Select(toArgument).ToArray();
+
+            Func<ParameterInfo, ParameterExpression, Expression> convert =
+                (info, expression) => Expression.Convert(expression, info.ParameterType);
+
+            var lambda = Expression.Lambda<TAction>(
+                Expression.Call(
+                    Expression.Convert(instance, method.DeclaringType),
+                    method,
+                    parameters
+                        .Zip(arguments, convert)
+                        .ToArray()
+                ),
+                new ParameterExpression[] { instance }
+                    .Concat(arguments)
+                    .ToArray()
+            );
+
+            return lambda.Compile();
         }
 
         public static bool IsImplementationOf(this MethodInfo methodInfo, MethodInfo interfaceMethod) {

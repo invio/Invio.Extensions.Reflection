@@ -351,7 +351,7 @@ namespace Invio.Extensions.Reflection {
             var ex = Record.Exception(() => methodInfo.CreateAction1<ClassUnderTest, double>());
             Assert.NotNull(ex);
             Assert.IsType<ArgumentException>(ex);
-            Assert.Contains($"exactly match the generic type parameter T2", ex.Message);
+            Assert.Contains($"exactly match the generic type parameter", ex.Message);
         }
 
         [Theory]
