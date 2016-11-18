@@ -117,7 +117,7 @@ namespace Invio.Extensions.Reflection {
         public void MethodInfoDelegate_Action_NotSupported(String functionName, Action<MethodInfo> createFunc) {
             var methodInfo = sutType.GetMethod("incrementModified", BindingFlags.Instance | BindingFlags.Public);
 
-            Assert.Throws<NotSupportedException>(
+            Assert.Throws<ArgumentException>(
                 () => createFunc(methodInfo)
             );
         }

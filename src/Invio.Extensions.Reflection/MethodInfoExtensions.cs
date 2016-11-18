@@ -5,64 +5,141 @@ using System.Reflection;
 
 namespace Invio.Extensions.Reflection {
 
-    // Credit to Jon Skeet:
-    // http://msmvps.com/blogs/jon_skeet/archive/2008/08/09/making-reflection-fly-and-exploring-delegates.aspx
+    /// <summary>
+    ///   A collections of extension methods on <see cref="MethodInfo" />
+    ///   that allows the caller to cache the reflection-based objects into
+    ///   a delegate. This speeds up the invocation of methods normally
+    ///   performed via the extended <see cref="MethodInfo" />.
+    /// </summary>
     public static class MethodInfoExtensions {
-        #region Funcs
 
         /// <summary>
-        /// Return an efficient functor for the specified 0-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
+        ///   Return an efficient delegate for the specified method which, when called,
+        ///   invokes a 0-parameter method on the provided instance of the class.
         /// </summary>
-        public static Func<T, TResult> CreateFunc0<T, TResult>(this MethodInfo methodInfo) where T : class {
-            CheckMethod<T>(methodInfo);
-            if (methodInfo.ReturnType != typeof(TResult)) {
+        /// <remarks>
+        ///   While use of the returned delegate is efficient, construction
+        ///   is expensive. You should be getting significant re-use out of
+        ///   the delegate to justify the expense of its construction.
+        /// </remarks>
+        /// <param name="method">
+        ///   The <see cref="MethodInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be recalled efficiently.
+        /// </param>
+        /// <typeparam name="TBase">
+        ///   A <see cref="Type" /> that is assignable to one that contains the
+        ///   <see cref="MethodInfo" /> passed in via <paramref name="method" />.
+        /// </typeparam>
+        /// <typeparam name="TResult">
+        ///   A <see cref="Type" /> that is assignable to the one that is returned from the
+        ///   <see cref="MethodInfo" /> passed is via <paramref name="method" />.
+        /// </typeparam>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="method" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="method" /> is not parameterless, or when
+        ///   <paramref name="method" /> references a static property, or the type
+        ///   <typeparamref name="TBase" /> is not assignable to the type specified
+        ///   on the <see cref="MemberInfo.DeclaringType" /> property on
+        ///   <paramref name="method" />, or the type specified for
+        ///   <typeparamref name="TResult" /> is not assignable to the type specified
+        ///   on the <see cref="MethodInfo.ReturnType" /> property on <paramref name="method" />.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently invoke the method normally
+        ///   done by interacting with the <paramref name="method" /> directly.
+        /// </returns>
+        public static Func<TBase, TResult> CreateFunc0<TBase, TResult>(this MethodInfo method)
+            where TBase : class {
+
+            CheckMethod<TBase>(method);
+            CheckParameters(method.GetParameters(), 0);
+
+            if (!method.ReturnType.IsAssignableFrom(typeof(TResult))) {
                 throw new ArgumentException(
-                    "The methods return type did not match the generic type " +
-                    "parameter TResult.",
-                    "methodInfo"
+                    $"Type parameter '{nameof(TResult)}' was '{typeof(TResult).Name}', " +
+                    $"which is not assignable to the method's return type of " +
+                    $"{method.ReturnType.Name}.",
+                    nameof(method)
                 );
             }
-            CheckParameters(methodInfo.GetParameters(), 0);
-            var delegateBuilder = genericFunc0Builder.MakeGenericMethod(
-                typeof(T),
+
+            return CreateFunc<TBase, TResult, Func<TBase, TResult>>(method);
+        }
+
+        private static TFunc CreateFunc<TBase, TResult, TFunc>(MethodInfo method) {
+            var instance = Expression.Parameter(typeof(TBase), "instance");
+            var parameters = method.GetParameters();
+
+            Func<ParameterInfo, int, ParameterExpression> toArgument =
+                (info, index) => Expression.Parameter(typeof(object), $"argument{index}");
+
+            var arguments = parameters.Select(toArgument).ToArray();
+
+            Func<ParameterInfo, ParameterExpression, Expression> convert =
+                (info, expression) => Expression.Convert(expression, info.ParameterType);
+
+            var body = Expression.Convert(
+                Expression.Call(
+                    Expression.Convert(instance, method.DeclaringType),
+                    method,
+                    parameters
+                        .Zip(arguments, convert)
+                        .ToArray()
+                ),
                 typeof(TResult)
             );
 
-            return (Func<T, TResult>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
-        #region Generic Func Builders & MethodInfos
-
-        private static readonly MethodInfo genericFunc0Builder =
-            new Func<MethodInfo, Func<object, object>>(CreateGenericFunc0Impl<object, object>)
-                .GetMethodInfo()
-                .GetGenericMethodDefinition();
-
-        private static Func<S, T> CreateGenericFunc0Impl<S, T>(MethodInfo methodInfo) where S : class {
-            Func<S, T> func = (Func<S, T>)methodInfo.CreateDelegate(
-                typeof(Func<S, T>)
+            var lambda = Expression.Lambda<TFunc>(
+                body,
+                new ParameterExpression[] { instance }
+                    .Concat(arguments)
+                    .ToArray()
             );
-            return (S target) => func(target);
-        }
 
-        #endregion
+            return lambda.Compile();
+        }
 
         /// <summary>
-        /// Return an efficient functor for the specified 0-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
+        ///   Return an efficient delegate for the specified method which, when called,
+        ///   invokes a 0-parameter method on the provided instance of the class.
         /// </summary>
-        public static Func<T, object> CreateFunc0<T>(this MethodInfo methodInfo) where T : class {
-            CheckMethod<T>(methodInfo);
+        /// <remarks>
+        ///   While use of the returned delegate is efficient, construction
+        ///   is expensive. You should be getting significant re-use out of
+        ///   the delegate to justify the expense of its construction.
+        /// </remarks>
+        /// <param name="method">
+        ///   The <see cref="MethodInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be recalled efficiently.
+        /// </param>
+        /// <typeparam name="TBase">
+        ///   A <see cref="Type" /> that is assignable to one that contains the
+        ///   <see cref="MethodInfo" /> passed in via <paramref name="method" />.
+        /// </typeparam>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="method" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="method" /> isn't parameterless.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently invoke methods normally
+        ///   performed by interacting with the <paramref name="method" /> directly.
+        /// </returns>
+        public static Func<TBase, object> CreateFunc0<TBase>(this MethodInfo methodInfo)
+            where TBase : class {
+
+            CheckMethod<TBase>(methodInfo);
             CheckParameters(methodInfo.GetParameters(), 0);
+
             var delegateBuilder = semiGenericFunc0Builder.MakeGenericMethod(
-                typeof(T),
+                typeof(TBase),
                 methodInfo.ReturnType
             );
 
-            return (Func<T, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
+            return (Func<TBase, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
         }
 
         /// <summary>
@@ -70,7 +147,9 @@ namespace Invio.Extensions.Reflection {
         /// The base entity for the delegate is strongly compile-time typed, the
         /// parameters are strongly run-time typed.
         /// </summary>
-        public static Func<T, object, object> CreateFunc1<T>(this MethodInfo methodInfo) where T : class {
+        public static Func<T, object, object> CreateFunc1<T>(this MethodInfo methodInfo)
+            where T : class {
+
             CheckMethod<T>(methodInfo);
             var parameters = methodInfo.GetParameters();
             CheckParameters(parameters, 1);
@@ -88,7 +167,9 @@ namespace Invio.Extensions.Reflection {
         /// The base entity for the delegate is strongly compile-time typed, the
         /// parameters are strongly run-time typed.
         /// </summary>
-        public static Func<T, object, object, object> CreateFunc2<T>(this MethodInfo methodInfo) where T : class {
+        public static Func<T, object, object, object> CreateFunc2<T>(this MethodInfo methodInfo)
+            where T : class {
+
             CheckMethod<T>(methodInfo);
             var parameters = methodInfo.GetParameters();
             CheckParameters(parameters, 2);
@@ -99,7 +180,10 @@ namespace Invio.Extensions.Reflection {
                 methodInfo.ReturnType
             );
 
-            return (Func<T, object, object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
+            return (Func<T, object, object, object>)delegateBuilder.Invoke(
+                null,
+                new object[] { methodInfo }
+            );
         }
 
         /// <summary>
@@ -107,7 +191,9 @@ namespace Invio.Extensions.Reflection {
         /// The base entity for the delegate is strongly compile-time typed, the
         /// parameters are strongly run-time typed.
         /// </summary>
-        public static Func<T, object, object, object, object> CreateFunc3<T>(this MethodInfo methodInfo) where T : class {
+        public static Func<T, object, object, object, object> CreateFunc3<T>(
+            this MethodInfo methodInfo) where T : class {
+
             CheckMethod<T>(methodInfo);
             var parameters = methodInfo.GetParameters();
             CheckParameters(parameters, 3);
@@ -793,18 +879,17 @@ namespace Invio.Extensions.Reflection {
 
         private static void CheckMethod(MethodInfo methodInfo) {
             if (methodInfo == null) {
-                throw new ArgumentNullException("methodInfo");
+                throw new ArgumentNullException(nameof(methodInfo));
             }
+
             if (methodInfo.ReturnType == typeof(void)) {
-                throw new NotSupportedException(
-                    "You are attempting to create a functor for a method with a " +
-                    "void return type, this is unsupported. Perhaps you meant to " +
-                    "call CreateAction<T>()?"
+                throw new ArgumentException(
+                    "You cannot create a Func delegate for a method with a " +
+                    "void return type.",
+                    nameof(methodInfo)
                 );
             }
         }
-
-        #endregion
 
         #region Actions
 
