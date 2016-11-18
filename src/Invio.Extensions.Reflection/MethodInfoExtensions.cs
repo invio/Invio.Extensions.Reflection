@@ -188,6 +188,126 @@ namespace Invio.Extensions.Reflection {
             return CreateFunc<TBase, object, Func<TBase, object, object, object, object, object, object, object, object, object, object>>(method);
         }
 
+        /// <summary>
+        /// Return an efficient functor for the specified 0-parameter method.
+        /// The delegate returned is strongly run-time typed.
+        /// </summary>
+        public static Func<object, object> CreateFunc0(this MethodInfo method) {
+
+            CheckMethod(method);
+            CheckParameters(method.GetParameters(), 0);
+
+            return CreateFunc<object, object, Func<object, object>>(method);
+        }
+
+        /// <summary>
+        /// Return an efficient functor for the specified 1-parameter method.
+        /// The delegate returned is strongly run-time typed.
+        /// </summary>
+        public static Func<object, object, object> CreateFunc1(this MethodInfo method) {
+
+            CheckMethod(method);
+            CheckParameters(method.GetParameters(), 1);
+
+            return CreateFunc<object, object, Func<object, object, object>>(method);
+        }
+
+        /// <summary>
+        /// Return an efficient functor for the specified 2-parameter method.
+        /// The delegate returned is strongly run-time typed.
+        /// </summary>
+        public static Func<object, object, object, object> CreateFunc2(this MethodInfo method) {
+
+            CheckMethod(method);
+            CheckParameters(method.GetParameters(), 2);
+
+            return CreateFunc<object, object, Func<object, object, object, object>>(method);
+        }
+
+        /// <summary>
+        /// Return an efficient functor for the specified 3-parameter method.
+        /// The delegate returned is strongly run-time typed.
+        /// </summary>
+        public static Func<object, object, object, object, object> CreateFunc3(this MethodInfo method) {
+
+            CheckMethod(method);
+            CheckParameters(method.GetParameters(), 3);
+
+            return CreateFunc<object, object, Func<object, object, object, object, object>>(method);
+        }
+
+        /// <summary>
+        /// Return an efficient functor for the specified 4-parameter method.
+        /// The delegate returned is strongly run-time typed.
+        /// </summary>
+        public static Func<object, object, object, object, object, object> CreateFunc4(this MethodInfo method) {
+
+            CheckMethod(method);
+            CheckParameters(method.GetParameters(), 4);
+
+            return CreateFunc<object, object, Func<object, object, object, object, object, object>>(method);
+        }
+
+        /// <summary>
+        /// Return an efficient functor for the specified 5-parameter method.
+        /// The delegate returned is strongly run-time typed.
+        /// </summary>
+        public static Func<object, object, object, object, object, object, object> CreateFunc5(this MethodInfo method) {
+
+            CheckMethod(method);
+            CheckParameters(method.GetParameters(), 5);
+
+            return CreateFunc<object, object, Func<object, object, object, object, object, object, object>>(method);
+        }
+
+        /// <summary>
+        /// Return an efficient functor for the specified 6-parameter method.
+        /// The delegate returned is strongly run-time typed.
+        /// </summary>
+        public static Func<object, object, object, object, object, object, object, object> CreateFunc6(this MethodInfo method) {
+
+            CheckMethod(method);
+            CheckParameters(method.GetParameters(), 6);
+
+            return CreateFunc<object, object, Func<object, object, object, object, object, object, object, object>>(method);
+        }
+
+        /// <summary>
+        /// Return an efficient functor for the specified 7-parameter method.
+        /// The delegate returned is strongly run-time typed.
+        /// </summary>
+        public static Func<object, object, object, object, object, object, object, object, object> CreateFunc7(this MethodInfo method) {
+
+            CheckMethod(method);
+            CheckParameters(method.GetParameters(), 7);
+
+            return CreateFunc<object, object, Func<object, object, object, object, object, object, object, object, object>>(method);
+        }
+
+        /// <summary>
+        /// Return an efficient functor for the specified 8-parameter method.
+        /// The delegate returned is strongly run-time typed.
+        /// </summary>
+        public static Func<object, object, object, object, object, object, object, object, object, object> CreateFunc8(this MethodInfo method) {
+
+            CheckMethod(method);
+            CheckParameters(method.GetParameters(), 8);
+
+            return CreateFunc<object, object, Func<object, object, object, object, object, object, object, object, object, object>>(method);
+        }
+
+        /// <summary>
+        /// Return an efficient functor for the specified 9-parameter method.
+        /// The delegate returned is strongly run-time typed.
+        /// </summary>
+        public static Func<object, object, object, object, object, object, object, object, object, object, object> CreateFunc9(this MethodInfo method) {
+
+            CheckMethod(method);
+            CheckParameters(method.GetParameters(), 9);
+
+            return CreateFunc<object, object, Func<object, object, object, object, object, object, object, object, object, object, object>>(method);
+        }
+
         private static TFunc CreateFunc<TBase, TResult, TFunc>(MethodInfo method) {
             var instance = Expression.Parameter(typeof(TBase), "instance");
             var parameters = method.GetParameters();
@@ -220,362 +340,6 @@ namespace Invio.Extensions.Reflection {
 
             return lambda.Compile();
         }
-
-        /// <summary>
-        /// Return an efficient functor for the specified 0-parameter method.
-        /// The delegate returned is strongly run-time typed.
-        /// </summary>
-        public static Func<object, object> CreateFunc0(this MethodInfo methodInfo) {
-            CheckMethod(methodInfo);
-            CheckParameters(methodInfo.GetParameters(), 0);
-            var delegateBuilder = objectFunc0Builder.MakeGenericMethod(
-                methodInfo.DeclaringType,
-                methodInfo.ReturnType
-            );
-
-            return (Func<object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
-        /// <summary>
-        /// Return an efficient functor for the specified 1-parameter method.
-        /// The delegate returned is strongly run-time typed.
-        /// </summary>
-        public static Func<object, object, object> CreateFunc1(this MethodInfo methodInfo) {
-            CheckMethod(methodInfo);
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 1);
-            var delegateBuilder = objectFunc1Builder.MakeGenericMethod(
-                methodInfo.DeclaringType,
-                parameters[0].ParameterType,
-                methodInfo.ReturnType
-            );
-
-            return (Func<object, object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
-        /// <summary>
-        /// Return an efficient functor for the specified 2-parameter method.
-        /// The delegate returned is strongly run-time typed.
-        /// </summary>
-        public static Func<object, object, object, object> CreateFunc2(this MethodInfo methodInfo) {
-            CheckMethod(methodInfo);
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 2);
-            var delegateBuilder = objectFunc2Builder.MakeGenericMethod(
-                methodInfo.DeclaringType,
-                parameters[0].ParameterType,
-                parameters[1].ParameterType,
-                methodInfo.ReturnType
-            );
-
-            return (Func<object, object, object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
-        /// <summary>
-        /// Return an efficient functor for the specified 3-parameter method.
-        /// The delegate returned is strongly run-time typed.
-        /// </summary>
-        public static Func<object, object, object, object, object> CreateFunc3(this MethodInfo methodInfo) {
-            CheckMethod(methodInfo);
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 3);
-            var delegateBuilder = objectFunc3Builder.MakeGenericMethod(
-                methodInfo.DeclaringType,
-                parameters[0].ParameterType,
-                parameters[1].ParameterType,
-                parameters[2].ParameterType,
-                methodInfo.ReturnType
-            );
-
-            return (Func<object, object, object, object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
-        /// <summary>
-        /// Return an efficient functor for the specified 4-parameter method.
-        /// The delegate returned is strongly run-time typed.
-        /// </summary>
-        public static Func<object, object, object, object, object, object> CreateFunc4(this MethodInfo methodInfo) {
-            CheckMethod(methodInfo);
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 4);
-            var delegateBuilder = objectFunc4Builder.MakeGenericMethod(
-                methodInfo.DeclaringType,
-                parameters[0].ParameterType,
-                parameters[1].ParameterType,
-                parameters[2].ParameterType,
-                parameters[3].ParameterType,
-                methodInfo.ReturnType
-            );
-
-            return (Func<object, object, object, object, object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
-        /// <summary>
-        /// Return an efficient functor for the specified 5-parameter method.
-        /// The delegate returned is strongly run-time typed.
-        /// </summary>
-        public static Func<object, object, object, object, object, object, object> CreateFunc5(this MethodInfo methodInfo) {
-            CheckMethod(methodInfo);
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 5);
-            var delegateBuilder = objectFunc5Builder.MakeGenericMethod(
-                methodInfo.DeclaringType,
-                parameters[0].ParameterType,
-                parameters[1].ParameterType,
-                parameters[2].ParameterType,
-                parameters[3].ParameterType,
-                parameters[4].ParameterType,
-                methodInfo.ReturnType
-            );
-
-            return (Func<object, object, object, object, object, object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
-        /// <summary>
-        /// Return an efficient functor for the specified 6-parameter method.
-        /// The delegate returned is strongly run-time typed.
-        /// </summary>
-        public static Func<object, object, object, object, object, object, object, object> CreateFunc6(this MethodInfo methodInfo) {
-            CheckMethod(methodInfo);
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 6);
-            var delegateBuilder = objectFunc6Builder.MakeGenericMethod(
-                methodInfo.DeclaringType,
-                parameters[0].ParameterType,
-                parameters[1].ParameterType,
-                parameters[2].ParameterType,
-                parameters[3].ParameterType,
-                parameters[4].ParameterType,
-                parameters[5].ParameterType,
-                methodInfo.ReturnType
-            );
-
-            return (Func<object, object, object, object, object, object, object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
-        /// <summary>
-        /// Return an efficient functor for the specified 7-parameter method.
-        /// The delegate returned is strongly run-time typed.
-        /// </summary>
-        public static Func<object, object, object, object, object, object, object, object, object> CreateFunc7(this MethodInfo methodInfo) {
-            CheckMethod(methodInfo);
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 7);
-            var delegateBuilder = objectFunc7Builder.MakeGenericMethod(
-                methodInfo.DeclaringType,
-                parameters[0].ParameterType,
-                parameters[1].ParameterType,
-                parameters[2].ParameterType,
-                parameters[3].ParameterType,
-                parameters[4].ParameterType,
-                parameters[5].ParameterType,
-                parameters[6].ParameterType,
-                methodInfo.ReturnType
-            );
-
-            return (Func<object, object, object, object, object, object, object, object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
-        /// <summary>
-        /// Return an efficient functor for the specified 8-parameter method.
-        /// The delegate returned is strongly run-time typed.
-        /// </summary>
-        public static Func<object, object, object, object, object, object, object, object, object, object> CreateFunc8(this MethodInfo methodInfo) {
-            CheckMethod(methodInfo);
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 8);
-            var delegateBuilder = objectFunc8Builder.MakeGenericMethod(
-                methodInfo.DeclaringType,
-                parameters[0].ParameterType,
-                parameters[1].ParameterType,
-                parameters[2].ParameterType,
-                parameters[3].ParameterType,
-                parameters[4].ParameterType,
-                parameters[5].ParameterType,
-                parameters[6].ParameterType,
-                parameters[7].ParameterType,
-                methodInfo.ReturnType
-            );
-
-            return (Func<object, object, object, object, object, object, object, object, object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
-        /// <summary>
-        /// Return an efficient functor for the specified 9-parameter method.
-        /// The delegate returned is strongly run-time typed.
-        /// </summary>
-        public static Func<object, object, object, object, object, object, object, object, object, object, object> CreateFunc9(this MethodInfo methodInfo) {
-            CheckMethod(methodInfo);
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 9);
-            var delegateBuilder = objectFunc9Builder.MakeGenericMethod(
-                methodInfo.DeclaringType,
-                parameters[0].ParameterType,
-                parameters[1].ParameterType,
-                parameters[2].ParameterType,
-                parameters[3].ParameterType,
-                parameters[4].ParameterType,
-                parameters[5].ParameterType,
-                parameters[6].ParameterType,
-                parameters[7].ParameterType,
-                parameters[8].ParameterType,
-                methodInfo.ReturnType
-            );
-
-            return (Func<object, object, object, object, object, object, object, object, object, object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
-        #region Non-Generic Func Builders & MethodInfos
-
-        private static readonly MethodInfo objectFunc0Builder =
-            new Func<MethodInfo, Func<object, object>>(CreateObjectFunc0Impl<object, object>)
-                .GetMethodInfo()
-                .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo objectFunc1Builder =
-            new Func<MethodInfo, Func<object, object, object>>(
-                CreateObjectFunc1Impl<object, object, object>
-            )
-            .GetMethodInfo()
-            .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo objectFunc2Builder =
-            new Func<MethodInfo, Func<object, object, object, object>>(
-                CreateObjectFunc2Impl<object, object, object, object>
-            )
-            .GetMethodInfo()
-            .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo objectFunc3Builder =
-            new Func<MethodInfo, Func<object, object, object, object, object>>(
-                CreateObjectFunc3Impl<object, object, object, object, object>
-            )
-            .GetMethodInfo()
-            .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo objectFunc4Builder =
-            new Func<MethodInfo, Func<object, object, object, object, object, object>>(
-                CreateObjectFunc4Impl<object, object, object, object, object, object>
-            )
-            .GetMethodInfo()
-            .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo objectFunc5Builder =
-            new Func<MethodInfo, Func<object, object, object, object, object, object, object>>(
-                CreateObjectFunc5Impl<object, object, object, object, object, object, object>
-            )
-            .GetMethodInfo()
-            .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo objectFunc6Builder =
-            new Func<MethodInfo, Func<object, object, object, object, object, object, object, object>>(
-                CreateObjectFunc6Impl<object, object, object, object, object, object, object, object>
-            )
-            .GetMethodInfo()
-            .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo objectFunc7Builder =
-            new Func<MethodInfo, Func<object, object, object, object, object, object, object, object, object>>(
-                CreateObjectFunc7Impl<object, object, object, object, object, object, object, object, object>
-            )
-            .GetMethodInfo()
-            .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo objectFunc8Builder =
-            new Func<MethodInfo, Func<object, object, object, object, object, object, object, object, object, object>>(
-                CreateObjectFunc8Impl<object, object, object, object, object, object, object, object, object, object>
-            )
-            .GetMethodInfo()
-            .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo objectFunc9Builder =
-            new Func<MethodInfo, Func<object, object, object, object, object, object, object, object, object, object, object>>(
-                CreateObjectFunc9Impl<object, object, object, object, object, object, object, object, object, object, object>
-            )
-            .GetMethodInfo()
-            .GetGenericMethodDefinition();
-
-        private static Func<object, object> CreateObjectFunc0Impl<S, T>(MethodInfo methodInfo) where S : class {
-            Func<S, T> func = (Func<S, T>)methodInfo.CreateDelegate(
-                typeof(Func<S, T>)
-            );
-            Func<object, object> ret = (object target) => func((S)target);
-            return ret;
-        }
-
-        private static Func<object, object, object> CreateObjectFunc1Impl<S, T, U>(MethodInfo methodInfo) where S : class {
-            Func<S, T, U> func = (Func<S, T, U>)methodInfo.CreateDelegate(
-                typeof(Func<S, T, U>)
-            );
-            Func<object, object, object> ret = (object target, object param0) => func((S)target, (T)param0);
-            return ret;
-        }
-
-        private static Func<object, object, object, object> CreateObjectFunc2Impl<S, T, U, V>(MethodInfo methodInfo) where S : class {
-            Func<S, T, U, V> func = (Func<S, T, U, V>)methodInfo.CreateDelegate(
-                typeof(Func<S, T, U, V>)
-            );
-            Func<object, object, object, object> ret = (object target, object param0, object param1) => func((S)target, (T)param0, (U)param1);
-            return ret;
-        }
-
-        private static Func<object, object, object, object, object> CreateObjectFunc3Impl<S, T, U, V, W>(MethodInfo methodInfo) where S : class {
-            Func<S, T, U, V, W> func = (Func<S, T, U, V, W>)methodInfo.CreateDelegate(
-                typeof(Func<S, T, U, V, W>)
-            );
-            Func<object, object, object, object, object> ret = (object target, object param0, object param1, object param2) => func((S)target, (T)param0, (U)param1, (V)param2);
-            return ret;
-        }
-
-        private static Func<object, object, object, object, object, object> CreateObjectFunc4Impl<S, T, U, V, W, X>(MethodInfo methodInfo) where S : class {
-            Func<S, T, U, V, W, X> func = (Func<S, T, U, V, W, X>)methodInfo.CreateDelegate(
-                typeof(Func<S, T, U, V, W, X>)
-            );
-            Func<object, object, object, object, object, object> ret = (object target, object param0, object param1, object param2, object param3) => func((S)target, (T)param0, (U)param1, (V)param2, (W)param3);
-            return ret;
-        }
-
-        private static Func<object, object, object, object, object, object, object> CreateObjectFunc5Impl<S, T, U, V, W, X, Y>(MethodInfo methodInfo) where S : class {
-            Func<S, T, U, V, W, X, Y> func = (Func<S, T, U, V, W, X, Y>)methodInfo.CreateDelegate(
-                typeof(Func<S, T, U, V, W, X, Y>)
-            );
-            Func<object, object, object, object, object, object, object> ret = (object target, object param0, object param1, object param2, object param3, object param4) => func((S)target, (T)param0, (U)param1, (V)param2, (W)param3, (X)param4);
-            return ret;
-        }
-
-        private static Func<object, object, object, object, object, object, object, object> CreateObjectFunc6Impl<S, T, U, V, W, X, Y, Z>(MethodInfo methodInfo) where S : class {
-            Func<S, T, U, V, W, X, Y, Z> func = (Func<S, T, U, V, W, X, Y, Z>)methodInfo.CreateDelegate(
-                typeof(Func<S, T, U, V, W, X, Y, Z>)
-            );
-            Func<object, object, object, object, object, object, object, object> ret = (object target, object param0, object param1, object param2, object param3, object param4, object param5) => func((S)target, (T)param0, (U)param1, (V)param2, (W)param3, (X)param4, (Y)param5);
-            return ret;
-        }
-
-        private static Func<object, object, object, object, object, object, object, object, object> CreateObjectFunc7Impl<S, T, U, V, W, X, Y, Z, A>(MethodInfo methodInfo) where S : class {
-            Func<S, T, U, V, W, X, Y, Z, A> func = (Func<S, T, U, V, W, X, Y, Z, A>)methodInfo.CreateDelegate(
-                typeof(Func<S, T, U, V, W, X, Y, Z, A>)
-            );
-            Func<object, object, object, object, object, object, object, object, object> ret = (object target, object param0, object param1, object param2, object param3, object param4, object param5, object param6) => func((S)target, (T)param0, (U)param1, (V)param2, (W)param3, (X)param4, (Y)param5, (Z)param6);
-            return ret;
-        }
-
-        private static Func<object, object, object, object, object, object, object, object, object, object> CreateObjectFunc8Impl<S, T, U, V, W, X, Y, Z, A, B>(MethodInfo methodInfo) where S : class {
-            Func<S, T, U, V, W, X, Y, Z, A, B> func = (Func<S, T, U, V, W, X, Y, Z, A, B>)methodInfo.CreateDelegate(
-                typeof(Func<S, T, U, V, W, X, Y, Z, A, B>)
-            );
-            Func<object, object, object, object, object, object, object, object, object, object> ret = (object target, object param0, object param1, object param2, object param3, object param4, object param5, object param6, object param7) => func((S)target, (T)param0, (U)param1, (V)param2, (W)param3, (X)param4, (Y)param5, (Z)param6, (A)param7);
-            return ret;
-        }
-
-        private static Func<object, object, object, object, object, object, object, object, object, object, object> CreateObjectFunc9Impl<S, T, U, V, W, X, Y, Z, A, B, C>(MethodInfo methodInfo) where S : class {
-            Func<S, T, U, V, W, X, Y, Z, A, B, C> func = (Func<S, T, U, V, W, X, Y, Z, A, B, C>)methodInfo.CreateDelegate(
-                typeof(Func<S, T, U, V, W, X, Y, Z, A, B, C>)
-            );
-            Func<object, object, object, object, object, object, object, object, object, object, object> ret = (object target, object param0, object param1, object param2, object param3, object param4, object param5, object param6, object param7, object param8) => func((S)target, (T)param0, (U)param1, (V)param2, (W)param3, (X)param4, (Y)param5, (Z)param6, (A)param7, (B)param8);
-            return ret;
-        }
-
-        #endregion
 
         private static void CheckMethod<T>(MethodInfo methodInfo) where T : class {
             CheckMethod(methodInfo);
