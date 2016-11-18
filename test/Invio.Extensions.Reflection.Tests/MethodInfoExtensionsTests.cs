@@ -137,7 +137,7 @@ namespace Invio.Extensions.Reflection {
             var ex = Record.Exception(() => createFunc(methodInfo));
             Assert.NotNull(ex);
             Assert.Equal(typeof(ArgumentException), ex.GetType());
-            Assert.Contains($"exactly {argumentCount} argument", ex.Message);
+            Assert.Contains($"with {argumentCount} parameters", ex.Message);
         }
 
         [Fact]
@@ -341,7 +341,7 @@ namespace Invio.Extensions.Reflection {
             var ex = Record.Exception(() => createAction(methodInfo));
             Assert.NotNull(ex);
             Assert.Equal(typeof(ArgumentException), ex.GetType());
-            Assert.Contains($"exactly {expectedArgCount} argument", ex.Message);
+            Assert.Contains($"with {expectedArgCount} parameters", ex.Message);
         }
 
         [Fact]

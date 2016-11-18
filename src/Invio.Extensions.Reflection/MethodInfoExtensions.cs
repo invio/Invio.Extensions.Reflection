@@ -53,8 +53,8 @@ namespace Invio.Extensions.Reflection {
         public static Func<TBase, TResult> CreateFunc0<TBase, TResult>(this MethodInfo method)
             where TBase : class {
 
-            CheckMethod<TBase>(method);
-            CheckParameters(method.GetParameters(), 0);
+            CheckParameters(method, expected: 0);
+            CheckFunc<TBase>(method);
 
             if (!method.ReturnType.IsAssignableFrom(typeof(TResult))) {
                 throw new ArgumentException(
@@ -71,8 +71,8 @@ namespace Invio.Extensions.Reflection {
         public static Func<TBase, object> CreateFunc0<TBase>(this MethodInfo method)
             where TBase : class {
 
-            CheckMethod<TBase>(method);
-            CheckParameters(method.GetParameters(), 0);
+            CheckParameters(method, expected: 0);
+            CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object>>(method);
         }
@@ -80,8 +80,8 @@ namespace Invio.Extensions.Reflection {
         public static Func<TBase, object, object> CreateFunc1<TBase>(this MethodInfo method)
             where TBase : class {
 
-            CheckMethod<TBase>(method);
-            CheckParameters(method.GetParameters(), 1);
+            CheckParameters(method, expected: 1);
+            CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object, object>>(method);
         }
@@ -89,8 +89,8 @@ namespace Invio.Extensions.Reflection {
         public static Func<TBase, object, object, object> CreateFunc2<TBase>(this MethodInfo method)
             where TBase : class {
 
-            CheckMethod<TBase>(method);
-            CheckParameters(method.GetParameters(), 2);
+            CheckParameters(method, expected: 2);
+            CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object, object, object>>(method);
         }
@@ -98,8 +98,8 @@ namespace Invio.Extensions.Reflection {
         public static Func<TBase, object, object, object, object>
             CreateFunc3<TBase>(this MethodInfo method) where TBase : class {
 
-            CheckMethod<TBase>(method);
-            CheckParameters(method.GetParameters(), 3);
+            CheckParameters(method, expected: 3);
+            CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object, object, object, object>>(method);
         }
@@ -112,8 +112,8 @@ namespace Invio.Extensions.Reflection {
         public static Func<TBase, object, object, object, object, object>
             CreateFunc4<TBase>(this MethodInfo method) where TBase : class {
 
-            CheckMethod<TBase>(method);
-            CheckParameters(method.GetParameters(), 4);
+            CheckParameters(method, expected: 4);
+            CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object, object, object, object, object>>(method);
         }
@@ -126,8 +126,8 @@ namespace Invio.Extensions.Reflection {
         public static Func<TBase, object, object, object, object, object, object>
             CreateFunc5<TBase>(this MethodInfo method) where TBase : class {
 
-            CheckMethod<TBase>(method);
-            CheckParameters(method.GetParameters(), 5);
+            CheckParameters(method, expected: 5);
+            CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object, object, object, object, object, object>>(method);
         }
@@ -140,8 +140,8 @@ namespace Invio.Extensions.Reflection {
         public static Func<TBase, object, object, object, object, object, object, object>
             CreateFunc6<TBase>(this MethodInfo method) where TBase : class {
 
-            CheckMethod<TBase>(method);
-            CheckParameters(method.GetParameters(), 6);
+            CheckParameters(method, expected: 6);
+            CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object, object, object, object, object, object, object>>(method);
         }
@@ -154,8 +154,8 @@ namespace Invio.Extensions.Reflection {
         public static Func<TBase, object, object, object, object, object, object, object, object>
             CreateFunc7<TBase>(this MethodInfo method) where TBase : class {
 
-            CheckMethod<TBase>(method);
-            CheckParameters(method.GetParameters(), 7);
+            CheckParameters(method, expected: 7);
+            CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object, object, object, object, object, object, object, object>>(method);
         }
@@ -168,8 +168,8 @@ namespace Invio.Extensions.Reflection {
         public static Func<TBase, object, object, object, object, object, object, object, object, object>
             CreateFunc8<TBase>(this MethodInfo method) where TBase : class {
 
-            CheckMethod<TBase>(method);
-            CheckParameters(method.GetParameters(), 8);
+            CheckParameters(method, expected: 8);
+            CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object, object, object, object, object, object, object, object, object>>(method);
         }
@@ -182,8 +182,8 @@ namespace Invio.Extensions.Reflection {
         public static Func<TBase, object, object, object, object, object, object, object, object, object, object>
             CreateFunc9<TBase>(this MethodInfo method) where TBase : class {
 
-            CheckMethod<TBase>(method);
-            CheckParameters(method.GetParameters(), 9);
+            CheckParameters(method, expected: 9);
+            CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object, object, object, object, object, object, object, object, object, object>>(method);
         }
@@ -194,8 +194,8 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object> CreateFunc0(this MethodInfo method) {
 
-            CheckMethod(method);
-            CheckParameters(method.GetParameters(), 0);
+            CheckParameters(method, expected: 0);
+            CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object>>(method);
         }
@@ -206,8 +206,8 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object, object> CreateFunc1(this MethodInfo method) {
 
-            CheckMethod(method);
-            CheckParameters(method.GetParameters(), 1);
+            CheckParameters(method, expected: 1);
+            CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object, object>>(method);
         }
@@ -218,8 +218,8 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object, object, object> CreateFunc2(this MethodInfo method) {
 
-            CheckMethod(method);
-            CheckParameters(method.GetParameters(), 2);
+            CheckParameters(method, expected: 2);
+            CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object, object, object>>(method);
         }
@@ -230,8 +230,8 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object, object, object, object> CreateFunc3(this MethodInfo method) {
 
-            CheckMethod(method);
-            CheckParameters(method.GetParameters(), 3);
+            CheckParameters(method, expected: 3);
+            CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object, object, object, object>>(method);
         }
@@ -242,8 +242,8 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object, object, object, object, object> CreateFunc4(this MethodInfo method) {
 
-            CheckMethod(method);
-            CheckParameters(method.GetParameters(), 4);
+            CheckParameters(method, expected: 4);
+            CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object, object, object, object, object>>(method);
         }
@@ -254,8 +254,8 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object, object, object, object, object, object> CreateFunc5(this MethodInfo method) {
 
-            CheckMethod(method);
-            CheckParameters(method.GetParameters(), 5);
+            CheckParameters(method, expected: 5);
+            CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object, object, object, object, object, object>>(method);
         }
@@ -266,8 +266,8 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object, object, object, object, object, object, object> CreateFunc6(this MethodInfo method) {
 
-            CheckMethod(method);
-            CheckParameters(method.GetParameters(), 6);
+            CheckParameters(method, expected: 6);
+            CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object, object, object, object, object, object, object>>(method);
         }
@@ -278,8 +278,8 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object, object, object, object, object, object, object, object> CreateFunc7(this MethodInfo method) {
 
-            CheckMethod(method);
-            CheckParameters(method.GetParameters(), 7);
+            CheckParameters(method, expected: 7);
+            CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object, object, object, object, object, object, object, object>>(method);
         }
@@ -290,8 +290,8 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object, object, object, object, object, object, object, object, object> CreateFunc8(this MethodInfo method) {
 
-            CheckMethod(method);
-            CheckParameters(method.GetParameters(), 8);
+            CheckParameters(method, expected: 8);
+            CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object, object, object, object, object, object, object, object, object>>(method);
         }
@@ -302,8 +302,8 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object, object, object, object, object, object, object, object, object, object> CreateFunc9(this MethodInfo method) {
 
-            CheckMethod(method);
-            CheckParameters(method.GetParameters(), 9);
+            CheckParameters(method, expected: 9);
+            CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object, object, object, object, object, object, object, object, object, object>>(method);
         }
@@ -341,47 +341,42 @@ namespace Invio.Extensions.Reflection {
             return lambda.Compile();
         }
 
-        private static void CheckMethod<T>(MethodInfo methodInfo) where T : class {
-            CheckMethod(methodInfo);
-            if (!methodInfo.DeclaringType.IsAssignableFrom(typeof(T))) {
+
+        private static void CheckFunc<TBase>(MethodInfo method) {
+            CheckFunc(method);
+
+            if (!method.DeclaringType.IsAssignableFrom(typeof(TBase))) {
                 throw new ArgumentException(
                     "The declaring type of the method did not match the generic " +
                     "parameter T.",
-                    "methodInfo"
+                    nameof(method)
                 );
             }
         }
 
-        private static void CheckMethod(MethodInfo methodInfo) {
-            if (methodInfo == null) {
-                throw new ArgumentNullException(nameof(methodInfo));
-            }
-
-            if (methodInfo.ReturnType == typeof(void)) {
+        private static void CheckFunc(MethodInfo method) {
+            if (method.ReturnType == typeof(void)) {
                 throw new ArgumentException(
                     "You cannot create a Func delegate for a method with a " +
                     "void return type.",
-                    nameof(methodInfo)
+                    nameof(method)
                 );
             }
         }
-
-        #region Actions
 
         /// <summary>
         /// Return an efficient action for the specified 0-parameter method.
         /// The delegate returned is strongly run-time typed.
         /// </summary>
-        public static Action<object> CreateAction0(this MethodInfo methodInfo) {
-            if (methodInfo == null) {
-                throw new ArgumentNullException("methodInfo");
-            }
-            CheckParameters(methodInfo.GetParameters(), 0);
+        public static Action<object> CreateAction0(this MethodInfo method) {
+
+            CheckParameters(method, expected: 0);
+
             var delegateBuilder = objectAction0Builder.MakeGenericMethod(
-                methodInfo.DeclaringType
+                method.DeclaringType
             );
 
-            return (Action<object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
+            return (Action<object>)delegateBuilder.Invoke(null, new object[] { method });
         }
 
         /// <summary>
@@ -389,16 +384,15 @@ namespace Invio.Extensions.Reflection {
         /// The base entity for the delegate is strongly compile-time typed, the
         /// parameters are strongly run-time typed.
         /// </summary>
-        public static Action<T> CreateAction0<T>(this MethodInfo methodInfo) where T : class {
-            if (methodInfo == null) {
-                throw new ArgumentNullException("methodInfo");
-            }
-            CheckParameters(methodInfo.GetParameters(), 0);
+        public static Action<T> CreateAction0<T>(this MethodInfo method) where T : class {
+
+            CheckParameters(method, expected: 0);
+
             var delegateBuilder = genericAction0Builder.MakeGenericMethod(
                 typeof(T)
             );
 
-            return (Action<T>)delegateBuilder.Invoke(null, new object[] { methodInfo });
+            return (Action<T>)delegateBuilder.Invoke(null, new object[] { method });
         }
 
         /// <summary>
@@ -406,18 +400,18 @@ namespace Invio.Extensions.Reflection {
         /// The base entity for the delegate is strongly compile-time typed, the
         /// parameters are strongly run-time typed.
         /// </summary>
-        public static Action<object, object> CreateAction1(this MethodInfo methodInfo) {
-            if (methodInfo == null) {
-                throw new ArgumentNullException("methodInfo");
-            }
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 1);
+        public static Action<object, object> CreateAction1(this MethodInfo method) {
+
+            CheckParameters(method, expected: 1);
+
+            var parameters = method.GetParameters();
+
             var delegateBuilder = objectAction1Builder.MakeGenericMethod(
-                methodInfo.DeclaringType,
+                method.DeclaringType,
                 parameters[0].ParameterType
             );
 
-            return (Action<object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
+            return (Action<object, object>)delegateBuilder.Invoke(null, new object[] { method });
         }
 
         /// <summary>
@@ -425,18 +419,18 @@ namespace Invio.Extensions.Reflection {
         /// The base entity for the delegate is strongly compile-time typed, the
         /// parameters are strongly run-time typed.
         /// </summary>
-        public static Action<T, object> CreateAction1<T>(this MethodInfo methodInfo) where T : class {
-            if (methodInfo == null) {
-                throw new ArgumentNullException("methodInfo");
-            }
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 1);
+        public static Action<T, object> CreateAction1<T>(this MethodInfo method) where T : class {
+
+            CheckParameters(method, expected: 1);
+
+            var parameters = method.GetParameters();
+
             var delegateBuilder = semiGenericAction1Builder.MakeGenericMethod(
                 typeof(T),
                 parameters[0].ParameterType
             );
 
-            return (Action<T, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
+            return (Action<T, object>)delegateBuilder.Invoke(null, new object[] { method });
         }
 
         /// <summary>
@@ -444,27 +438,26 @@ namespace Invio.Extensions.Reflection {
         /// Both the target type and the parameter type are strongly typed at
         /// compile time.
         /// </summary>
-        public static Action<T1, T2> CreateAction1<T1, T2>(this MethodInfo methodInfo) where T1 : class {
-            if (methodInfo == null) {
-                throw new ArgumentNullException("methodInfo");
-            }
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 1);
+        public static Action<T1, T2> CreateAction1<T1, T2>(this MethodInfo method) where T1 : class {
+
+            CheckParameters(method, expected: 1);
+
+            var parameters = method.GetParameters();
+
             if (parameters[0].ParameterType != typeof(T2)) {
                 throw new ArgumentException(
                     "The method's argument type must exactly match the generic type parameter T2.",
-                    "methodInfo"
+                    "method"
                 );
             }
+
             var delegateBuilder = genericAction1Builder.MakeGenericMethod(
                 typeof(T1),
                 typeof(T2)
             );
 
-            return (Action<T1, T2>)delegateBuilder.Invoke(null, new object[] { methodInfo });
+            return (Action<T1, T2>)delegateBuilder.Invoke(null, new object[] { method });
         }
-
-        #region Action Builders & MethodInfos
 
         private static readonly MethodInfo genericAction0Builder =
             new Func<MethodInfo, Action<object>>(CreateAction0Impl<object>)
@@ -523,15 +516,18 @@ namespace Invio.Extensions.Reflection {
             return (object target, object param) => { action((S)target, (T)param); };
         }
 
-        #endregion
+        private static void CheckParameters(MethodInfo method, int expected) {
+            if (method == null) {
+                throw new ArgumentNullException(nameof(method));
+            }
 
-        #endregion
+            var parameters = method.GetParameters();
 
-        private static void CheckParameters(ParameterInfo[] parameters, int parameterCount) {
-            if (parameters.Length != parameterCount) {
+            if (parameters.Length != expected) {
                 throw new ArgumentException(
-                    $"The method must take exactly {parameterCount} argument(s).",
-                    "methodInfo"
+                    $"The '{nameof(method)}' argument must reference a " +
+                    $"{typeof(MethodInfo)} with {expected:N0} parameters.",
+                    nameof(method)
                 );
             }
         }
