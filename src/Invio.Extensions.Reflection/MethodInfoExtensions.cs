@@ -68,6 +68,126 @@ namespace Invio.Extensions.Reflection {
             return CreateFunc<TBase, TResult, Func<TBase, TResult>>(method);
         }
 
+        public static Func<TBase, object> CreateFunc0<TBase>(this MethodInfo method)
+            where TBase : class {
+
+            CheckMethod<TBase>(method);
+            CheckParameters(method.GetParameters(), 0);
+
+            return CreateFunc<TBase, object, Func<TBase, object>>(method);
+        }
+
+        public static Func<TBase, object, object> CreateFunc1<TBase>(this MethodInfo method)
+            where TBase : class {
+
+            CheckMethod<TBase>(method);
+            CheckParameters(method.GetParameters(), 1);
+
+            return CreateFunc<TBase, object, Func<TBase, object, object>>(method);
+        }
+
+        public static Func<TBase, object, object, object> CreateFunc2<TBase>(this MethodInfo method)
+            where TBase : class {
+
+            CheckMethod<TBase>(method);
+            CheckParameters(method.GetParameters(), 2);
+
+            return CreateFunc<TBase, object, Func<TBase, object, object, object>>(method);
+        }
+
+        public static Func<TBase, object, object, object, object>
+            CreateFunc3<TBase>(this MethodInfo method) where TBase : class {
+
+            CheckMethod<TBase>(method);
+            CheckParameters(method.GetParameters(), 3);
+
+            return CreateFunc<TBase, object, Func<TBase, object, object, object, object>>(method);
+        }
+
+        /// <summary>
+        /// Return an efficient functor for the specified 4-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Func<TBase, object, object, object, object, object>
+            CreateFunc4<TBase>(this MethodInfo method) where TBase : class {
+
+            CheckMethod<TBase>(method);
+            CheckParameters(method.GetParameters(), 4);
+
+            return CreateFunc<TBase, object, Func<TBase, object, object, object, object, object>>(method);
+        }
+
+        /// <summary>
+        /// Return an efficient functor for the specified 5-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Func<TBase, object, object, object, object, object, object>
+            CreateFunc5<TBase>(this MethodInfo method) where TBase : class {
+
+            CheckMethod<TBase>(method);
+            CheckParameters(method.GetParameters(), 5);
+
+            return CreateFunc<TBase, object, Func<TBase, object, object, object, object, object, object>>(method);
+        }
+
+        /// <summary>
+        /// Return an efficient functor for the specified 6-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Func<TBase, object, object, object, object, object, object, object>
+            CreateFunc6<TBase>(this MethodInfo method) where TBase : class {
+
+            CheckMethod<TBase>(method);
+            CheckParameters(method.GetParameters(), 6);
+
+            return CreateFunc<TBase, object, Func<TBase, object, object, object, object, object, object, object>>(method);
+        }
+
+        /// <summary>
+        /// Return an efficient functor for the specified 7-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Func<TBase, object, object, object, object, object, object, object, object>
+            CreateFunc7<TBase>(this MethodInfo method) where TBase : class {
+
+            CheckMethod<TBase>(method);
+            CheckParameters(method.GetParameters(), 7);
+
+            return CreateFunc<TBase, object, Func<TBase, object, object, object, object, object, object, object, object>>(method);
+        }
+
+        /// <summary>
+        /// Return an efficient functor for the specified 8-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Func<TBase, object, object, object, object, object, object, object, object, object>
+            CreateFunc8<TBase>(this MethodInfo method) where TBase : class {
+
+            CheckMethod<TBase>(method);
+            CheckParameters(method.GetParameters(), 8);
+
+            return CreateFunc<TBase, object, Func<TBase, object, object, object, object, object, object, object, object, object>>(method);
+        }
+
+        /// <summary>
+        /// Return an efficient functor for the specified 9-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Func<TBase, object, object, object, object, object, object, object, object, object, object>
+            CreateFunc9<TBase>(this MethodInfo method) where TBase : class {
+
+            CheckMethod<TBase>(method);
+            CheckParameters(method.GetParameters(), 9);
+
+            return CreateFunc<TBase, object, Func<TBase, object, object, object, object, object, object, object, object, object, object>>(method);
+        }
+
         private static TFunc CreateFunc<TBase, TResult, TFunc>(MethodInfo method) {
             var instance = Expression.Parameter(typeof(TBase), "instance");
             var parameters = method.GetParameters();
@@ -101,254 +221,6 @@ namespace Invio.Extensions.Reflection {
             return lambda.Compile();
         }
 
-        /// <summary>
-        ///   Return an efficient delegate for the specified method which, when called,
-        ///   invokes a 0-parameter method on the provided instance of the class.
-        /// </summary>
-        /// <remarks>
-        ///   While use of the returned delegate is efficient, construction
-        ///   is expensive. You should be getting significant re-use out of
-        ///   the delegate to justify the expense of its construction.
-        /// </remarks>
-        /// <param name="method">
-        ///   The <see cref="MethodInfo" /> instance the caller wants to turn into
-        ///   a compiled delegate that can be recalled efficiently.
-        /// </param>
-        /// <typeparam name="TBase">
-        ///   A <see cref="Type" /> that is assignable to one that contains the
-        ///   <see cref="MethodInfo" /> passed in via <paramref name="method" />.
-        /// </typeparam>
-        /// <exception cref="ArgumentNullException">
-        ///   Thrown when <paramref name="method" /> is null.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        ///   Thrown when <paramref name="method" /> isn't parameterless.
-        /// </exception>
-        /// <returns>
-        ///   A delegate that can called to efficiently invoke methods normally
-        ///   performed by interacting with the <paramref name="method" /> directly.
-        /// </returns>
-        public static Func<TBase, object> CreateFunc0<TBase>(this MethodInfo methodInfo)
-            where TBase : class {
-
-            CheckMethod<TBase>(methodInfo);
-            CheckParameters(methodInfo.GetParameters(), 0);
-
-            var delegateBuilder = semiGenericFunc0Builder.MakeGenericMethod(
-                typeof(TBase),
-                methodInfo.ReturnType
-            );
-
-            return (Func<TBase, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
-        /// <summary>
-        /// Return an efficient functor for the specified 1-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
-        /// </summary>
-        public static Func<T, object, object> CreateFunc1<T>(this MethodInfo methodInfo)
-            where T : class {
-
-            CheckMethod<T>(methodInfo);
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 1);
-            var delegateBuilder = semiGenericFunc1Builder.MakeGenericMethod(
-                typeof(T),
-                parameters[0].ParameterType,
-                methodInfo.ReturnType
-            );
-
-            return (Func<T, object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
-        /// <summary>
-        /// Return an efficient functor for the specified 2-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
-        /// </summary>
-        public static Func<T, object, object, object> CreateFunc2<T>(this MethodInfo methodInfo)
-            where T : class {
-
-            CheckMethod<T>(methodInfo);
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 2);
-            var delegateBuilder = semiGenericFunc2Builder.MakeGenericMethod(
-                typeof(T),
-                parameters[0].ParameterType,
-                parameters[1].ParameterType,
-                methodInfo.ReturnType
-            );
-
-            return (Func<T, object, object, object>)delegateBuilder.Invoke(
-                null,
-                new object[] { methodInfo }
-            );
-        }
-
-        /// <summary>
-        /// Return an efficient functor for the specified 3-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
-        /// </summary>
-        public static Func<T, object, object, object, object> CreateFunc3<T>(
-            this MethodInfo methodInfo) where T : class {
-
-            CheckMethod<T>(methodInfo);
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 3);
-            var delegateBuilder = semiGenericFunc3Builder.MakeGenericMethod(
-                typeof(T),
-                parameters[0].ParameterType,
-                parameters[1].ParameterType,
-                parameters[2].ParameterType,
-                methodInfo.ReturnType
-            );
-
-            return (Func<T, object, object, object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
-        /// <summary>
-        /// Return an efficient functor for the specified 4-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
-        /// </summary>
-        public static Func<T, object, object, object, object, object> CreateFunc4<T>(this MethodInfo methodInfo) where T : class {
-            CheckMethod<T>(methodInfo);
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 4);
-            var delegateBuilder = semiGenericFunc4Builder.MakeGenericMethod(
-                typeof(T),
-                parameters[0].ParameterType,
-                parameters[1].ParameterType,
-                parameters[2].ParameterType,
-                parameters[3].ParameterType,
-                methodInfo.ReturnType
-            );
-
-            return (Func<T, object, object, object, object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
-        /// <summary>
-        /// Return an efficient functor for the specified 5-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
-        /// </summary>
-        public static Func<T, object, object, object, object, object, object> CreateFunc5<T>(this MethodInfo methodInfo) where T : class {
-            CheckMethod<T>(methodInfo);
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 5);
-            var delegateBuilder = semiGenericFunc5Builder.MakeGenericMethod(
-                typeof(T),
-                parameters[0].ParameterType,
-                parameters[1].ParameterType,
-                parameters[2].ParameterType,
-                parameters[3].ParameterType,
-                parameters[4].ParameterType,
-                methodInfo.ReturnType
-            );
-
-            return (Func<T, object, object, object, object, object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
-        /// <summary>
-        /// Return an efficient functor for the specified 6-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
-        /// </summary>
-        public static Func<T, object, object, object, object, object, object, object> CreateFunc6<T>(this MethodInfo methodInfo) where T : class {
-            CheckMethod<T>(methodInfo);
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 6);
-            var delegateBuilder = semiGenericFunc6Builder.MakeGenericMethod(
-                typeof(T),
-                parameters[0].ParameterType,
-                parameters[1].ParameterType,
-                parameters[2].ParameterType,
-                parameters[3].ParameterType,
-                parameters[4].ParameterType,
-                parameters[5].ParameterType,
-                methodInfo.ReturnType
-            );
-
-            return (Func<T, object, object, object, object, object, object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
-        /// <summary>
-        /// Return an efficient functor for the specified 7-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
-        /// </summary>
-        public static Func<T, object, object, object, object, object, object, object, object> CreateFunc7<T>(this MethodInfo methodInfo) where T : class {
-            CheckMethod<T>(methodInfo);
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 7);
-            var delegateBuilder = semiGenericFunc7Builder.MakeGenericMethod(
-                typeof(T),
-                parameters[0].ParameterType,
-                parameters[1].ParameterType,
-                parameters[2].ParameterType,
-                parameters[3].ParameterType,
-                parameters[4].ParameterType,
-                parameters[5].ParameterType,
-                parameters[6].ParameterType,
-                methodInfo.ReturnType
-            );
-
-            return (Func<T, object, object, object, object, object, object, object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
-        /// <summary>
-        /// Return an efficient functor for the specified 8-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
-        /// </summary>
-        public static Func<T, object, object, object, object, object, object, object, object, object> CreateFunc8<T>(this MethodInfo methodInfo) where T : class {
-            CheckMethod<T>(methodInfo);
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 8);
-            var delegateBuilder = semiGenericFunc8Builder.MakeGenericMethod(
-                typeof(T),
-                parameters[0].ParameterType,
-                parameters[1].ParameterType,
-                parameters[2].ParameterType,
-                parameters[3].ParameterType,
-                parameters[4].ParameterType,
-                parameters[5].ParameterType,
-                parameters[6].ParameterType,
-                parameters[7].ParameterType,
-                methodInfo.ReturnType
-            );
-
-            return (Func<T, object, object, object, object, object, object, object, object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
-        /// <summary>
-        /// Return an efficient functor for the specified 9-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
-        /// </summary>
-        public static Func<T, object, object, object, object, object, object, object, object, object, object> CreateFunc9<T>(this MethodInfo methodInfo) where T : class {
-            CheckMethod<T>(methodInfo);
-            var parameters = methodInfo.GetParameters();
-            CheckParameters(parameters, 9);
-            var delegateBuilder = semiGenericFunc9Builder.MakeGenericMethod(
-                typeof(T),
-                parameters[0].ParameterType,
-                parameters[1].ParameterType,
-                parameters[2].ParameterType,
-                parameters[3].ParameterType,
-                parameters[4].ParameterType,
-                parameters[5].ParameterType,
-                parameters[6].ParameterType,
-                parameters[7].ParameterType,
-                parameters[8].ParameterType,
-                methodInfo.ReturnType
-            );
-
-            return (Func<T, object, object, object, object, object, object, object, object, object, object>)delegateBuilder.Invoke(null, new object[] { methodInfo });
-        }
-
         #region Semi Generic Func Builders & MethodInfos
 
         public static T CreateCompatibleDelegate<T>(Type instanceType, MethodInfo methodInfo) {
@@ -377,135 +249,6 @@ namespace Invio.Extensions.Reflection {
                 methodCall,
                 arguments
                 ).Compile();
-        }
-
-
-        private static readonly MethodInfo semiGenericFunc0Builder =
-            new Func<MethodInfo, Func<object, object>>(CreateSemiGenericFunc0Impl<object, object>)
-                .GetMethodInfo()
-                .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo semiGenericFunc1Builder =
-            new Func<MethodInfo, Func<object, object, object>>(
-                CreateSemiGenericFunc1Impl<object, object, object>
-            )
-            .GetMethodInfo()
-            .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo semiGenericFunc2Builder =
-            new Func<MethodInfo, Func<object, object, object, object>>(
-                CreateSemiGenericFunc2Impl<object, object, object, object>
-            )
-            .GetMethodInfo()
-            .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo semiGenericFunc3Builder =
-            new Func<MethodInfo, Func<object, object, object, object, object>>(
-                CreateSemiGenericFunc3Impl<object, object, object, object, object>
-            )
-            .GetMethodInfo()
-            .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo semiGenericFunc4Builder =
-            new Func<MethodInfo, Func<object, object, object, object, object, object>>(
-                CreateSemiGenericFunc4Impl<object, object, object, object, object, object>
-            )
-            .GetMethodInfo()
-            .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo semiGenericFunc5Builder =
-            new Func<MethodInfo, Func<object, object, object, object, object, object, object>>(
-                CreateSemiGenericFunc5Impl<object, object, object, object, object, object, object>
-            )
-            .GetMethodInfo()
-            .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo semiGenericFunc6Builder =
-            new Func<MethodInfo, Func<object, object, object, object, object, object, object, object>>(
-                CreateSemiGenericFunc6Impl<object, object, object, object, object, object, object, object>
-            )
-            .GetMethodInfo()
-            .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo semiGenericFunc7Builder =
-            new Func<MethodInfo, Func<object, object, object, object, object, object, object, object, object>>(
-                CreateSemiGenericFunc7Impl<object, object, object, object, object, object, object, object, object>
-            )
-            .GetMethodInfo()
-            .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo semiGenericFunc8Builder =
-            new Func<MethodInfo, Func<object, object, object, object, object, object, object, object, object, object>>(
-                CreateSemiGenericFunc8Impl<object, object, object, object, object, object, object, object, object, object>
-            )
-            .GetMethodInfo()
-            .GetGenericMethodDefinition();
-
-        private static readonly MethodInfo semiGenericFunc9Builder =
-            new Func<MethodInfo, Func<object, object, object, object, object, object, object, object, object, object, object>>(
-                CreateSemiGenericFunc9Impl<object, object, object, object, object, object, object, object, object, object, object>
-            )
-            .GetMethodInfo()
-            .GetGenericMethodDefinition();
-
-        private static Func<S, object> CreateSemiGenericFunc0Impl<S, T>(MethodInfo methodInfo) where S : class {
-            Func<S, T> func = CreateCompatibleDelegate<Func<S, T>>(typeof(S), methodInfo);
-            Func<S, object> ret = (S target) => func(target);
-            return ret;
-        }
-
-        private static Func<S, object, object> CreateSemiGenericFunc1Impl<S, T, U>(MethodInfo methodInfo) where S : class {
-            Func<S, T, U> func = CreateCompatibleDelegate<Func<S, T, U>>(typeof(S), methodInfo);
-            Func<S, object, object> ret = (S target, object p0) => func(target, (T)p0);
-            return ret;
-        }
-
-        private static Func<S, object, object, object> CreateSemiGenericFunc2Impl<S, T, U, V>(MethodInfo methodInfo) where S : class {
-            Func<S, T, U, V> func = CreateCompatibleDelegate<Func<S, T, U, V>>(typeof(S), methodInfo);
-            Func<S, object, object, object> ret = (S target, object p0, object p1) => func(target, (T)p0, (U)p1);
-            return ret;
-        }
-
-        private static Func<S, object, object, object, object> CreateSemiGenericFunc3Impl<S, T, U, V, W>(MethodInfo methodInfo) where S : class {
-            Func<S, T, U, V, W> func = CreateCompatibleDelegate<Func<S, T, U, V, W>>(typeof(S), methodInfo);
-            Func<S, object, object, object, object> ret = (S target, object p0, object p1, object p2) => func(target, (T)p0, (U)p1, (V)p2);
-            return ret;
-        }
-
-        private static Func<S, object, object, object, object, object> CreateSemiGenericFunc4Impl<S, T, U, V, W, X>(MethodInfo methodInfo) where S : class {
-            Func<S, T, U, V, W, X> func = CreateCompatibleDelegate<Func<S, T, U, V, W, X>>(typeof(S), methodInfo);
-            Func<S, object, object, object, object, object> ret = (S target, object p0, object p1, object p2, object p3) => func(target, (T)p0, (U)p1, (V)p2, (W)p3);
-            return ret;
-        }
-
-        private static Func<S, object, object, object, object, object, object> CreateSemiGenericFunc5Impl<S, T, U, V, W, X, Y>(MethodInfo methodInfo) where S : class {
-            Func<S, T, U, V, W, X, Y> func = CreateCompatibleDelegate<Func<S, T, U, V, W, X, Y>>(typeof(S), methodInfo);
-            Func<S, object, object, object, object, object, object> ret = (S target, object p0, object p1, object p2, object p3, object p4) => func(target, (T)p0, (U)p1, (V)p2, (W)p3, (X)p4);
-            return ret;
-        }
-
-        private static Func<S, object, object, object, object, object, object, object> CreateSemiGenericFunc6Impl<S, T, U, V, W, X, Y, Z>(MethodInfo methodInfo) where S : class {
-            Func<S, T, U, V, W, X, Y, Z> func = CreateCompatibleDelegate<Func<S, T, U, V, W, X, Y, Z>>(typeof(S), methodInfo);
-            Func<S, object, object, object, object, object, object, object> ret = (S target, object p0, object p1, object p2, object p3, object p4, object p5) => func(target, (T)p0, (U)p1, (V)p2, (W)p3, (X)p4, (Y)p5);
-            return ret;
-        }
-
-        private static Func<S, object, object, object, object, object, object, object, object> CreateSemiGenericFunc7Impl<S, T, U, V, W, X, Y, Z, A>(MethodInfo methodInfo) where S : class {
-            Func<S, T, U, V, W, X, Y, Z, A> func = CreateCompatibleDelegate<Func<S, T, U, V, W, X, Y, Z, A>>(typeof(S), methodInfo);
-            Func<S, object, object, object, object, object, object, object, object> ret = (S target, object p0, object p1, object p2, object p3, object p4, object p5, object p6) => func(target, (T)p0, (U)p1, (V)p2, (W)p3, (X)p4, (Y)p5, (Z)p6);
-            return ret;
-        }
-
-        private static Func<S, object, object, object, object, object, object, object, object, object> CreateSemiGenericFunc8Impl<S, T, U, V, W, X, Y, Z, A, B>(MethodInfo methodInfo) where S : class {
-            Func<S, T, U, V, W, X, Y, Z, A, B> func = CreateCompatibleDelegate<Func<S, T, U, V, W, X, Y, Z, A, B>>(typeof(S), methodInfo);
-            Func<S, object, object, object, object, object, object, object, object, object> ret = (S target, object p0, object p1, object p2, object p3, object p4, object p5, object p6, object p7) => func(target, (T)p0, (U)p1, (V)p2, (W)p3, (X)p4, (Y)p5, (Z)p6, (A)p7);
-            return ret;
-        }
-
-        private static Func<S, object, object, object, object, object, object, object, object, object, object> CreateSemiGenericFunc9Impl<S, T, U, V, W, X, Y, Z, A, B, C>(MethodInfo methodInfo) where S : class {
-            Func<S, T, U, V, W, X, Y, Z, A, B, C> func = CreateCompatibleDelegate<Func<S, T, U, V, W, X, Y, Z, A, B, C>>(typeof(S), methodInfo);
-            Func<S, object, object, object, object, object, object, object, object, object, object> ret = (S target, object p0, object p1, object p2, object p3, object p4, object p5, object p6, object p7, object p8) => func(target, (T)p0, (U)p1, (V)p2, (W)p3, (X)p4, (Y)p5, (Z)p6, (A)p7, (B)p8);
-            return ret;
         }
 
         #endregion
