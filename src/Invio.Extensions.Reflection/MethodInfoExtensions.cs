@@ -221,38 +221,6 @@ namespace Invio.Extensions.Reflection {
             return lambda.Compile();
         }
 
-        #region Semi Generic Func Builders & MethodInfos
-
-        public static T CreateCompatibleDelegate<T>(Type instanceType, MethodInfo methodInfo) {
-            if (instanceType == null) {
-                throw new ArgumentNullException("instanceType");
-            }
-            if (methodInfo == null) {
-                throw new ArgumentNullException("methodInfo");
-            }
-
-            var methodTypes = methodInfo.GetParameters().Select(m => m.ParameterType);
-
-            var arguments = methodTypes.Select(m => Expression.Parameter(m)).ToList();
-
-            var instanceParameter = Expression.Parameter(instanceType);
-
-            // Create method call.;
-            var methodCall = Expression.Call(
-                instanceParameter,
-                methodInfo,
-                arguments
-                );
-
-            arguments.Insert(0, instanceParameter);
-            return Expression.Lambda<T>(
-                methodCall,
-                arguments
-                ).Compile();
-        }
-
-        #endregion
-
         /// <summary>
         /// Return an efficient functor for the specified 0-parameter method.
         /// The delegate returned is strongly run-time typed.

@@ -380,45 +380,34 @@ namespace Invio.Extensions.Reflection {
 
         [Theory]
         [MemberData(nameof(IteratorCount))]
-         public void MethodInfoDelegateAction1(int iterateCount) {
-             var initialValue = MethodInfoExtensionsTests.intGenerator.Next();
-             var sut = new ClassUnderTest(initialValue);
-             var expected = new ClassUnderTest(initialValue);
-             var argsPerIterate = generateIntArray(iterateCount);
+        public void MethodInfoDelegateAction1(int iterateCount) {
+            var initialValue = MethodInfoExtensionsTests.intGenerator.Next();
+            var sut = new ClassUnderTest(initialValue);
+            var expected = new ClassUnderTest(initialValue);
+            var argsPerIterate = generateIntArray(iterateCount);
 
-             var action1MethodInfo =
-                 sutType.GetMethod("addToModified", BindingFlags.Instance | BindingFlags.Public);
-             var argTypeAction1 = action1MethodInfo.CreateAction1<ClassUnderTest, int>();
-             for (int i = 0; i < iterateCount; i++) {
-                 expected.addToModified(argsPerIterate[i]);
-                 argTypeAction1(sut, argsPerIterate[i]);
-             }
-             Assert.Equal(expected.modified, sut.modified);
+            var action1MethodInfo =
+                sutType.GetMethod("addToModified", BindingFlags.Instance | BindingFlags.Public);
+            var argTypeAction1 = action1MethodInfo.CreateAction1<ClassUnderTest, int>();
+            for (int i = 0; i < iterateCount; i++) {
+                expected.addToModified(argsPerIterate[i]);
+                argTypeAction1(sut, argsPerIterate[i]);
+            }
+            Assert.Equal(expected.modified, sut.modified);
 
-             sut = new ClassUnderTest(initialValue);
-             var typeAction1 = action1MethodInfo.CreateAction1<ClassUnderTest>();
-             for (int i = 0; i < iterateCount; i++) {
-                 typeAction1(sut, argsPerIterate[i]);
-             }
-             Assert.Equal(expected.modified, sut.modified);
+            sut = new ClassUnderTest(initialValue);
+            var typeAction1 = action1MethodInfo.CreateAction1<ClassUnderTest>();
+            for (int i = 0; i < iterateCount; i++) {
+                typeAction1(sut, argsPerIterate[i]);
+            }
+            Assert.Equal(expected.modified, sut.modified);
 
-             sut = new ClassUnderTest(initialValue);
-             var action1 = action1MethodInfo.CreateAction1();
-             for (int i = 0; i < iterateCount; i++) {
-                 action1(sut, argsPerIterate[i]);
-             }
-             Assert.Equal(expected.modified, sut.modified);
-         }
-
-        [Fact]
-        public void CreateCompatibleDelegate_ArgNull_Checks() {
-            var methodInfo = sutType.GetMethod("Func0", BindingFlags.Instance | BindingFlags.Public);
-            Assert.Throws<ArgumentNullException>(
-                () => MethodInfoExtensions.CreateCompatibleDelegate<int>(instanceType: null, methodInfo: methodInfo)
-            );
-            Assert.Throws<ArgumentNullException>(
-                () => MethodInfoExtensions.CreateCompatibleDelegate<int>(typeof(ClassUnderTest), methodInfo: null)
-            );
+            sut = new ClassUnderTest(initialValue);
+            var action1 = action1MethodInfo.CreateAction1();
+            for (int i = 0; i < iterateCount; i++) {
+                action1(sut, argsPerIterate[i]);
+            }
+            Assert.Equal(expected.modified, sut.modified);
         }
 
         [Fact]
