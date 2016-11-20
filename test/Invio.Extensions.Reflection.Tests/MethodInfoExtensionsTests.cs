@@ -584,5 +584,191 @@ namespace Invio.Extensions.Reflection {
                 return modifier * a + b / c * d - e * f - g / h + i;
             }
         }
+
+        private static Func<MethodInfo, object> ToFunc<T>(Func<MethodInfo, T> createDelegate) {
+            return new Func<MethodInfo, object>(method => (object)createDelegate(method));
+        }
+
+        public static IEnumerable<object[]> StaticFakeCases {
+            get {
+                return new List<object[]> {
+                    new object[] {
+                        nameof(StaticFake.Func0),
+                        ToFunc(m => m.CreateFunc0<StaticFake, int>())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Func0),
+                        ToFunc(m => m.CreateFunc0<StaticFake>())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Func1),
+                        ToFunc(m => m.CreateFunc1<StaticFake>())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Func1),
+                        ToFunc(m => m.CreateFunc1())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Func2),
+                        ToFunc(m => m.CreateFunc2<StaticFake>())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Func2),
+                        ToFunc(m => m.CreateFunc2())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Func3),
+                        ToFunc(m => m.CreateFunc3<StaticFake>())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Func3),
+                        ToFunc(m => m.CreateFunc3())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Func4),
+                        ToFunc(m => m.CreateFunc4<StaticFake>())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Func4),
+                        ToFunc(m => m.CreateFunc4())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Func5),
+                        ToFunc(m => m.CreateFunc5<StaticFake>())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Func5),
+                        ToFunc(m => m.CreateFunc5())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Func6),
+                        ToFunc(m => m.CreateFunc6<StaticFake>())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Func6),
+                        ToFunc(m => m.CreateFunc6())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Func7),
+                        ToFunc(m => m.CreateFunc7<StaticFake>())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Func7),
+                        ToFunc(m => m.CreateFunc7())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Func8),
+                        ToFunc(m => m.CreateFunc8<StaticFake>())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Func8),
+                        ToFunc(m => m.CreateFunc8())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Func9),
+                        ToFunc(m => m.CreateFunc9<StaticFake>())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Func9),
+                        ToFunc(m => m.CreateFunc9())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Action0),
+                        ToFunc(m => m.CreateAction0())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Action0),
+                        ToFunc(m => m.CreateAction0<StaticFake>())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Action1),
+                        ToFunc(m => m.CreateAction1())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Action1),
+                        ToFunc(m => m.CreateAction1<StaticFake>())
+                    },
+                    new object[] {
+                        nameof(StaticFake.Action1),
+                        ToFunc(m => m.CreateAction1<StaticFake, int>())
+                    }
+                };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(StaticFakeCases))]
+        public void CreateDelegate_StaticMethod(
+            String methodName,
+            Func<MethodInfo, object> createDelegate) {
+
+            // Arrange
+
+            var method = typeof(StaticFake).GetMethod(methodName);
+
+            // Act
+
+            var exception = Record.Exception(
+                () => createDelegate(method)
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal(
+                $"The '{methodName}' method is static." +
+                Environment.NewLine + "Parameter name: method",
+                exception.Message
+            );
+        }
+
+        public class StaticFake {
+
+            public static int Func0() {
+                return 0;
+            }
+
+            public static int Func1(int a) {
+                return a;
+            }
+
+            public static int Func2(int a, int b) {
+                return a + b;
+            }
+
+            public static int Func3(int a, int b, int c) {
+                return a + b + c;
+            }
+
+            public static int Func4(int a, int b, int c, int d) {
+                return a + b + c + d;
+            }
+
+            public static int Func5(int a, int b, int c, int d, int e) {
+                return a + b + c + d + e;
+            }
+
+            public static int Func6(int a, int b, int c, int d, int e, int f) {
+                return a + b + c + d + e + f;
+            }
+
+            public static int Func7(int a, int b, int c, int d, int e, int f, int g) {
+                return a + b + c + d + e + f + g;
+            }
+
+            public static int Func8(int a, int b, int c, int d, int e, int f, int g, int h) {
+                return a + b + c + d + e + f + g + h;
+            }
+
+            public static int Func9(
+                int a, int b, int c, int d, int e, int f, int g, int h, int i) {
+
+                return a + b + c + d + e + f + g + h + i;
+            }
+
+            public static void Action0() {}
+            public static void Action1(int a) {}
+
+        }
     }
 }

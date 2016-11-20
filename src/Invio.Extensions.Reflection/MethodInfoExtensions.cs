@@ -688,6 +688,13 @@ namespace Invio.Extensions.Reflection {
                 throw new ArgumentNullException(nameof(method));
             }
 
+            if (method.IsStatic) {
+                throw new ArgumentException(
+                    $"The '{method.Name}' method is static.",
+                    nameof(method)
+                );
+            }
+
             var parameters = method.GetParameters();
 
             if (parameters.Length != expectedParameters) {
