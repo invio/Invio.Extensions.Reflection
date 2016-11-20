@@ -24,7 +24,7 @@ namespace Invio.Extensions.Reflection {
         /// </remarks>
         /// <param name="method">
         ///   The <see cref="MethodInfo" /> instance the caller wants to turn into
-        ///   a compiled delegate that can be recalled efficiently.
+        ///   a compiled delegate that can be called (and recalled) efficiently.
         /// </param>
         /// <typeparam name="TBase">
         ///   A <see cref="Type" /> that is assignable to one that contains the
@@ -39,12 +39,10 @@ namespace Invio.Extensions.Reflection {
         /// </exception>
         /// <exception cref="ArgumentException">
         ///   Thrown when <paramref name="method" /> is not parameterless, or when
+        ///   <paramref name="method" /> has a return type of void, or when
         ///   <paramref name="method" /> references a static property, or the type
-        ///   <typeparamref name="TBase" /> is not assignable to the type specified
-        ///   on the <see cref="MemberInfo.DeclaringType" /> property on
-        ///   <paramref name="method" />, or the type specified for
-        ///   <typeparamref name="TResult" /> is not assignable to the type specified
-        ///   on the <see cref="MethodInfo.ReturnType" /> property on <paramref name="method" />.
+        ///   <typeparamref name="TBase" /> is not assignable to the type specified on the
+        ///   <see cref="MemberInfo.DeclaringType" /> property on <paramref name="method" />.
         /// </exception>
         /// <returns>
         ///   A delegate that can called to efficiently invoke the method normally
@@ -53,136 +51,447 @@ namespace Invio.Extensions.Reflection {
         public static Func<TBase, TResult> CreateFunc0<TBase, TResult>(this MethodInfo method)
             where TBase : class {
 
-            CheckParameters(method, expected: 0);
-            CheckFunc<TBase>(method);
-
-            if (!method.ReturnType.IsAssignableFrom(typeof(TResult))) {
-                throw new ArgumentException(
-                    $"Type parameter '{nameof(TResult)}' was '{typeof(TResult).Name}', " +
-                    $"which is not assignable to the method's return type of " +
-                    $"{method.ReturnType.Name}.",
-                    nameof(method)
-                );
-            }
+            CheckMethod(method, expectedParameters: 0);
+            CheckFunc<TBase, TResult>(method);
 
             return CreateFunc<TBase, TResult, Func<TBase, TResult>>(method);
         }
 
+        /// <summary>
+        ///   Return an efficient delegate for the specified method which, when called,
+        ///   invokes a 0-parameter method on the provided instance of the class.
+        /// </summary>
+        /// <remarks>
+        ///   While use of the returned delegate is efficient, construction
+        ///   is expensive. You should be getting significant re-use out of
+        ///   the delegate to justify the expense of its construction.
+        /// </remarks>
+        /// <param name="method">
+        ///   The <see cref="MethodInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be called (and recalled) efficiently.
+        /// </param>
+        /// <typeparam name="TBase">
+        ///   A <see cref="Type" /> that is assignable to one that contains the
+        ///   <see cref="MethodInfo" /> passed in via <paramref name="method" />.
+        /// </typeparam>
+        /// <typeparam name="TResult">
+        ///   A <see cref="Type" /> that is assignable to the one that is returned from the
+        ///   <see cref="MethodInfo" /> passed is via <paramref name="method" />.
+        /// </typeparam>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="method" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="method" /> is not parameterless, or when
+        ///   <paramref name="method" /> has a return type of void, or when
+        ///   <paramref name="method" /> references a static property, or the type
+        ///   <typeparamref name="TBase" /> is not assignable to the type specified on the
+        ///   <see cref="MemberInfo.DeclaringType" /> property on <paramref name="method" />.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently invoke the method normally
+        ///   done by interacting with the <paramref name="method" /> directly.
+        /// </returns>
         public static Func<TBase, object> CreateFunc0<TBase>(this MethodInfo method)
             where TBase : class {
 
-            CheckParameters(method, expected: 0);
+            CheckMethod(method, expectedParameters: 0);
             CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object>>(method);
         }
 
+        /// <summary>
+        ///   Return an efficient delegate for the specified method which, when called,
+        ///   invokes a 1-parameter method on the provided instance of the class.
+        /// </summary>
+        /// <remarks>
+        ///   While use of the returned delegate is efficient, construction
+        ///   is expensive. You should be getting significant re-use out of
+        ///   the delegate to justify the expense of its construction.
+        /// </remarks>
+        /// <param name="method">
+        ///   The <see cref="MethodInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be called (and recalled) efficiently.
+        /// </param>
+        /// <typeparam name="TBase">
+        ///   A <see cref="Type" /> that is assignable to one that contains the
+        ///   <see cref="MethodInfo" /> passed in via <paramref name="method" />.
+        /// </typeparam>
+        /// <typeparam name="TResult">
+        ///   A <see cref="Type" /> that is assignable to the one that is returned from the
+        ///   <see cref="MethodInfo" /> passed is via <paramref name="method" />.
+        /// </typeparam>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="method" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="method" /> is not parameterless, or when
+        ///   <paramref name="method" /> has a return type of void, or when
+        ///   <paramref name="method" /> references a static property, or the type
+        ///   <typeparamref name="TBase" /> is not assignable to the type specified on the
+        ///   <see cref="MemberInfo.DeclaringType" /> property on <paramref name="method" />.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently invoke the method normally
+        ///   done by interacting with the <paramref name="method" /> directly.
+        /// </returns>
         public static Func<TBase, object, object> CreateFunc1<TBase>(this MethodInfo method)
             where TBase : class {
 
-            CheckParameters(method, expected: 1);
+            CheckMethod(method, expectedParameters: 1);
             CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object, object>>(method);
         }
 
+        /// <summary>
+        ///   Return an efficient delegate for the specified method which, when called,
+        ///   invokes a 2-parameter method on the provided instance of the class.
+        /// </summary>
+        /// <remarks>
+        ///   While use of the returned delegate is efficient, construction
+        ///   is expensive. You should be getting significant re-use out of
+        ///   the delegate to justify the expense of its construction.
+        /// </remarks>
+        /// <param name="method">
+        ///   The <see cref="MethodInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be called (and recalled) efficiently.
+        /// </param>
+        /// <typeparam name="TBase">
+        ///   A <see cref="Type" /> that is assignable to one that contains the
+        ///   <see cref="MethodInfo" /> passed in via <paramref name="method" />.
+        /// </typeparam>
+        /// <typeparam name="TResult">
+        ///   A <see cref="Type" /> that is assignable to the one that is returned from the
+        ///   <see cref="MethodInfo" /> passed is via <paramref name="method" />.
+        /// </typeparam>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="method" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="method" /> is not parameterless, or when
+        ///   <paramref name="method" /> has a return type of void, or when
+        ///   <paramref name="method" /> references a static property, or the type
+        ///   <typeparamref name="TBase" /> is not assignable to the type specified on the
+        ///   <see cref="MemberInfo.DeclaringType" /> property on <paramref name="method" />.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently invoke the method normally
+        ///   done by interacting with the <paramref name="method" /> directly.
+        /// </returns>
         public static Func<TBase, object, object, object> CreateFunc2<TBase>(this MethodInfo method)
             where TBase : class {
 
-            CheckParameters(method, expected: 2);
+            CheckMethod(method, expectedParameters: 2);
             CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object, object, object>>(method);
         }
 
+        /// <summary>
+        ///   Return an efficient delegate for the specified method which, when called,
+        ///   invokes a 3-parameter method on the provided instance of the class.
+        /// </summary>
+        /// <remarks>
+        ///   While use of the returned delegate is efficient, construction
+        ///   is expensive. You should be getting significant re-use out of
+        ///   the delegate to justify the expense of its construction.
+        /// </remarks>
+        /// <param name="method">
+        ///   The <see cref="MethodInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be called (and recalled) efficiently.
+        /// </param>
+        /// <typeparam name="TBase">
+        ///   A <see cref="Type" /> that is assignable to one that contains the
+        ///   <see cref="MethodInfo" /> passed in via <paramref name="method" />.
+        /// </typeparam>
+        /// <typeparam name="TResult">
+        ///   A <see cref="Type" /> that is assignable to the one that is returned from the
+        ///   <see cref="MethodInfo" /> passed is via <paramref name="method" />.
+        /// </typeparam>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="method" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="method" /> is not parameterless, or when
+        ///   <paramref name="method" /> has a return type of void, or when
+        ///   <paramref name="method" /> references a static property, or the type
+        ///   <typeparamref name="TBase" /> is not assignable to the type specified on the
+        ///   <see cref="MemberInfo.DeclaringType" /> property on <paramref name="method" />.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently invoke the method normally
+        ///   done by interacting with the <paramref name="method" /> directly.
+        /// </returns>
         public static Func<TBase, object, object, object, object>
             CreateFunc3<TBase>(this MethodInfo method) where TBase : class {
 
-            CheckParameters(method, expected: 3);
+            CheckMethod(method, expectedParameters: 3);
             CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object, object, object, object>>(method);
         }
 
         /// <summary>
-        /// Return an efficient functor for the specified 4-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
+        ///   Return an efficient delegate for the specified method which, when called,
+        ///   invokes a 4-parameter method on the provided instance of the class.
         /// </summary>
+        /// <remarks>
+        ///   While use of the returned delegate is efficient, construction
+        ///   is expensive. You should be getting significant re-use out of
+        ///   the delegate to justify the expense of its construction.
+        /// </remarks>
+        /// <param name="method">
+        ///   The <see cref="MethodInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be called (and recalled) efficiently.
+        /// </param>
+        /// <typeparam name="TBase">
+        ///   A <see cref="Type" /> that is assignable to one that contains the
+        ///   <see cref="MethodInfo" /> passed in via <paramref name="method" />.
+        /// </typeparam>
+        /// <typeparam name="TResult">
+        ///   A <see cref="Type" /> that is assignable to the one that is returned from the
+        ///   <see cref="MethodInfo" /> passed is via <paramref name="method" />.
+        /// </typeparam>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="method" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="method" /> is not parameterless, or when
+        ///   <paramref name="method" /> has a return type of void, or when
+        ///   <paramref name="method" /> references a static property, or the type
+        ///   <typeparamref name="TBase" /> is not assignable to the type specified on the
+        ///   <see cref="MemberInfo.DeclaringType" /> property on <paramref name="method" />.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently invoke the method normally
+        ///   done by interacting with the <paramref name="method" /> directly.
+        /// </returns>
         public static Func<TBase, object, object, object, object, object>
             CreateFunc4<TBase>(this MethodInfo method) where TBase : class {
 
-            CheckParameters(method, expected: 4);
+            CheckMethod(method, expectedParameters: 4);
             CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object, object, object, object, object>>(method);
         }
 
         /// <summary>
-        /// Return an efficient functor for the specified 5-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
+        ///   Return an efficient delegate for the specified method which, when called,
+        ///   invokes a 5-parameter method on the provided instance of the class.
         /// </summary>
+        /// <remarks>
+        ///   While use of the returned delegate is efficient, construction
+        ///   is expensive. You should be getting significant re-use out of
+        ///   the delegate to justify the expense of its construction.
+        /// </remarks>
+        /// <param name="method">
+        ///   The <see cref="MethodInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be called (and recalled) efficiently.
+        /// </param>
+        /// <typeparam name="TBase">
+        ///   A <see cref="Type" /> that is assignable to one that contains the
+        ///   <see cref="MethodInfo" /> passed in via <paramref name="method" />.
+        /// </typeparam>
+        /// <typeparam name="TResult">
+        ///   A <see cref="Type" /> that is assignable to the one that is returned from the
+        ///   <see cref="MethodInfo" /> passed is via <paramref name="method" />.
+        /// </typeparam>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="method" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="method" /> is not parameterless, or when
+        ///   <paramref name="method" /> has a return type of void, or when
+        ///   <paramref name="method" /> references a static property, or the type
+        ///   <typeparamref name="TBase" /> is not assignable to the type specified on the
+        ///   <see cref="MemberInfo.DeclaringType" /> property on <paramref name="method" />.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently invoke the method normally
+        ///   done by interacting with the <paramref name="method" /> directly.
+        /// </returns>
         public static Func<TBase, object, object, object, object, object, object>
             CreateFunc5<TBase>(this MethodInfo method) where TBase : class {
 
-            CheckParameters(method, expected: 5);
+            CheckMethod(method, expectedParameters: 5);
             CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object, object, object, object, object, object>>(method);
         }
 
         /// <summary>
-        /// Return an efficient functor for the specified 6-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
+        ///   Return an efficient delegate for the specified method which, when called,
+        ///   invokes a 6-parameter method on the provided instance of the class.
         /// </summary>
+        /// <remarks>
+        ///   While use of the returned delegate is efficient, construction
+        ///   is expensive. You should be getting significant re-use out of
+        ///   the delegate to justify the expense of its construction.
+        /// </remarks>
+        /// <param name="method">
+        ///   The <see cref="MethodInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be called (and recalled) efficiently.
+        /// </param>
+        /// <typeparam name="TBase">
+        ///   A <see cref="Type" /> that is assignable to one that contains the
+        ///   <see cref="MethodInfo" /> passed in via <paramref name="method" />.
+        /// </typeparam>
+        /// <typeparam name="TResult">
+        ///   A <see cref="Type" /> that is assignable to the one that is returned from the
+        ///   <see cref="MethodInfo" /> passed is via <paramref name="method" />.
+        /// </typeparam>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="method" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="method" /> is not parameterless, or when
+        ///   <paramref name="method" /> has a return type of void, or when
+        ///   <paramref name="method" /> references a static property, or the type
+        ///   <typeparamref name="TBase" /> is not assignable to the type specified on the
+        ///   <see cref="MemberInfo.DeclaringType" /> property on <paramref name="method" />.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently invoke the method normally
+        ///   done by interacting with the <paramref name="method" /> directly.
+        /// </returns>
         public static Func<TBase, object, object, object, object, object, object, object>
             CreateFunc6<TBase>(this MethodInfo method) where TBase : class {
 
-            CheckParameters(method, expected: 6);
+            CheckMethod(method, expectedParameters: 6);
             CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object, object, object, object, object, object, object>>(method);
         }
 
         /// <summary>
-        /// Return an efficient functor for the specified 7-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
+        ///   Return an efficient delegate for the specified method which, when called,
+        ///   invokes a 7-parameter method on the provided instance of the class.
         /// </summary>
+        /// <remarks>
+        ///   While use of the returned delegate is efficient, construction
+        ///   is expensive. You should be getting significant re-use out of
+        ///   the delegate to justify the expense of its construction.
+        /// </remarks>
+        /// <param name="method">
+        ///   The <see cref="MethodInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be called (and recalled) efficiently.
+        /// </param>
+        /// <typeparam name="TBase">
+        ///   A <see cref="Type" /> that is assignable to one that contains the
+        ///   <see cref="MethodInfo" /> passed in via <paramref name="method" />.
+        /// </typeparam>
+        /// <typeparam name="TResult">
+        ///   A <see cref="Type" /> that is assignable to the one that is returned from the
+        ///   <see cref="MethodInfo" /> passed is via <paramref name="method" />.
+        /// </typeparam>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="method" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="method" /> is not parameterless, or when
+        ///   <paramref name="method" /> has a return type of void, or when
+        ///   <paramref name="method" /> references a static property, or the type
+        ///   <typeparamref name="TBase" /> is not assignable to the type specified on the
+        ///   <see cref="MemberInfo.DeclaringType" /> property on <paramref name="method" />.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently invoke the method normally
+        ///   done by interacting with the <paramref name="method" /> directly.
+        /// </returns>
         public static Func<TBase, object, object, object, object, object, object, object, object>
             CreateFunc7<TBase>(this MethodInfo method) where TBase : class {
 
-            CheckParameters(method, expected: 7);
+            CheckMethod(method, expectedParameters: 7);
             CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object, object, object, object, object, object, object, object>>(method);
         }
 
         /// <summary>
-        /// Return an efficient functor for the specified 8-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
+        ///   Return an efficient delegate for the specified method which, when called,
+        ///   invokes a 8-parameter method on the provided instance of the class.
         /// </summary>
+        /// <remarks>
+        ///   While use of the returned delegate is efficient, construction
+        ///   is expensive. You should be getting significant re-use out of
+        ///   the delegate to justify the expense of its construction.
+        /// </remarks>
+        /// <param name="method">
+        ///   The <see cref="MethodInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be called (and recalled) efficiently.
+        /// </param>
+        /// <typeparam name="TBase">
+        ///   A <see cref="Type" /> that is assignable to one that contains the
+        ///   <see cref="MethodInfo" /> passed in via <paramref name="method" />.
+        /// </typeparam>
+        /// <typeparam name="TResult">
+        ///   A <see cref="Type" /> that is assignable to the one that is returned from the
+        ///   <see cref="MethodInfo" /> passed is via <paramref name="method" />.
+        /// </typeparam>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="method" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="method" /> is not parameterless, or when
+        ///   <paramref name="method" /> has a return type of void, or when
+        ///   <paramref name="method" /> references a static property, or the type
+        ///   <typeparamref name="TBase" /> is not assignable to the type specified on the
+        ///   <see cref="MemberInfo.DeclaringType" /> property on <paramref name="method" />.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently invoke the method normally
+        ///   done by interacting with the <paramref name="method" /> directly.
+        /// </returns>
         public static Func<TBase, object, object, object, object, object, object, object, object, object>
             CreateFunc8<TBase>(this MethodInfo method) where TBase : class {
 
-            CheckParameters(method, expected: 8);
+            CheckMethod(method, expectedParameters: 8);
             CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object, object, object, object, object, object, object, object, object>>(method);
         }
 
         /// <summary>
-        /// Return an efficient functor for the specified 9-parameter method.
-        /// The base entity for the delegate is strongly compile-time typed, the
-        /// parameters are strongly run-time typed.
+        ///   Return an efficient delegate for the specified method which, when called,
+        ///   invokes a 9-parameter method on the provided instance of the class.
         /// </summary>
+        /// <remarks>
+        ///   While use of the returned delegate is efficient, construction
+        ///   is expensive. You should be getting significant re-use out of
+        ///   the delegate to justify the expense of its construction.
+        /// </remarks>
+        /// <param name="method">
+        ///   The <see cref="MethodInfo" /> instance the caller wants to turn into
+        ///   a compiled delegate that can be called (and recalled) efficiently.
+        /// </param>
+        /// <typeparam name="TBase">
+        ///   A <see cref="Type" /> that is assignable to one that contains the
+        ///   <see cref="MethodInfo" /> passed in via <paramref name="method" />.
+        /// </typeparam>
+        /// <typeparam name="TResult">
+        ///   A <see cref="Type" /> that is assignable to the one that is returned from the
+        ///   <see cref="MethodInfo" /> passed is via <paramref name="method" />.
+        /// </typeparam>
+        /// <exception cref="ArgumentNullException">
+        ///   Thrown when <paramref name="method" /> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///   Thrown when <paramref name="method" /> is not parameterless, or when
+        ///   <paramref name="method" /> has a return type of void, or when
+        ///   <paramref name="method" /> references a static property, or the type
+        ///   <typeparamref name="TBase" /> is not assignable to the type specified on the
+        ///   <see cref="MemberInfo.DeclaringType" /> property on <paramref name="method" />.
+        /// </exception>
+        /// <returns>
+        ///   A delegate that can called to efficiently invoke the method normally
+        ///   done by interacting with the <paramref name="method" /> directly.
+        /// </returns>
         public static Func<TBase, object, object, object, object, object, object, object, object, object, object>
             CreateFunc9<TBase>(this MethodInfo method) where TBase : class {
 
-            CheckParameters(method, expected: 9);
+            CheckMethod(method, expectedParameters: 9);
             CheckFunc<TBase>(method);
 
             return CreateFunc<TBase, object, Func<TBase, object, object, object, object, object, object, object, object, object, object>>(method);
@@ -194,7 +503,7 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object> CreateFunc0(this MethodInfo method) {
 
-            CheckParameters(method, expected: 0);
+            CheckMethod(method, expectedParameters: 0);
             CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object>>(method);
@@ -206,7 +515,7 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object, object> CreateFunc1(this MethodInfo method) {
 
-            CheckParameters(method, expected: 1);
+            CheckMethod(method, expectedParameters: 1);
             CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object, object>>(method);
@@ -218,7 +527,7 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object, object, object> CreateFunc2(this MethodInfo method) {
 
-            CheckParameters(method, expected: 2);
+            CheckMethod(method, expectedParameters: 2);
             CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object, object, object>>(method);
@@ -230,7 +539,7 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object, object, object, object> CreateFunc3(this MethodInfo method) {
 
-            CheckParameters(method, expected: 3);
+            CheckMethod(method, expectedParameters: 3);
             CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object, object, object, object>>(method);
@@ -242,7 +551,7 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object, object, object, object, object> CreateFunc4(this MethodInfo method) {
 
-            CheckParameters(method, expected: 4);
+            CheckMethod(method, expectedParameters: 4);
             CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object, object, object, object, object>>(method);
@@ -254,7 +563,7 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object, object, object, object, object, object> CreateFunc5(this MethodInfo method) {
 
-            CheckParameters(method, expected: 5);
+            CheckMethod(method, expectedParameters: 5);
             CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object, object, object, object, object, object>>(method);
@@ -266,7 +575,7 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object, object, object, object, object, object, object> CreateFunc6(this MethodInfo method) {
 
-            CheckParameters(method, expected: 6);
+            CheckMethod(method, expectedParameters: 6);
             CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object, object, object, object, object, object, object>>(method);
@@ -278,7 +587,7 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object, object, object, object, object, object, object, object> CreateFunc7(this MethodInfo method) {
 
-            CheckParameters(method, expected: 7);
+            CheckMethod(method, expectedParameters: 7);
             CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object, object, object, object, object, object, object, object>>(method);
@@ -290,7 +599,7 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object, object, object, object, object, object, object, object, object> CreateFunc8(this MethodInfo method) {
 
-            CheckParameters(method, expected: 8);
+            CheckMethod(method, expectedParameters: 8);
             CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object, object, object, object, object, object, object, object, object>>(method);
@@ -302,7 +611,7 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Func<object, object, object, object, object, object, object, object, object, object, object> CreateFunc9(this MethodInfo method) {
 
-            CheckParameters(method, expected: 9);
+            CheckMethod(method, expectedParameters: 9);
             CheckFunc(method);
 
             return CreateFunc<object, object, Func<object, object, object, object, object, object, object, object, object, object, object>>(method);
@@ -339,6 +648,19 @@ namespace Invio.Extensions.Reflection {
             return lambda.Compile();
         }
 
+        private static void CheckFunc<TBase, TResult>(MethodInfo method) {
+            CheckFunc<TBase>(method);
+
+            if (!method.ReturnType.IsAssignableFrom(typeof(TResult))) {
+                throw new ArgumentException(
+                    $"Type parameter '{nameof(TResult)}' was '{typeof(TResult).Name}', " +
+                    $"which is not assignable to the method's return type of " +
+                    $"{method.ReturnType.Name}.",
+                    nameof(method)
+                );
+            }
+        }
+
         private static void CheckFunc<TBase>(MethodInfo method) {
             CheckFunc(method);
 
@@ -361,17 +683,17 @@ namespace Invio.Extensions.Reflection {
             }
         }
 
-        private static void CheckParameters(MethodInfo method, int expected) {
+        private static void CheckMethod(MethodInfo method, int expectedParameters) {
             if (method == null) {
                 throw new ArgumentNullException(nameof(method));
             }
 
             var parameters = method.GetParameters();
 
-            if (parameters.Length != expected) {
+            if (parameters.Length != expectedParameters) {
                 throw new ArgumentException(
                     $"The '{nameof(method)}' argument must reference a " +
-                    $"{typeof(MethodInfo)} with {expected:N0} parameters.",
+                    $"{typeof(MethodInfo)} with {expectedParameters:N0} parameters.",
                     nameof(method)
                 );
             }
@@ -382,7 +704,7 @@ namespace Invio.Extensions.Reflection {
         /// The delegate returned is strongly run-time typed.
         /// </summary>
         public static Action<object> CreateAction0(this MethodInfo method) {
-            CheckParameters(method, expected: 0);
+            CheckMethod(method, expectedParameters: 0);
 
             return CreateAction<Action<object>>(
                 typeof(object),
@@ -399,7 +721,7 @@ namespace Invio.Extensions.Reflection {
         public static Action<TBase> CreateAction0<TBase>(this MethodInfo method)
             where TBase : class {
 
-            CheckParameters(method, expected: 0);
+            CheckMethod(method, expectedParameters: 0);
 
             return CreateAction<Action<TBase>>(
                 typeof(TBase),
@@ -415,7 +737,7 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Action<object, object> CreateAction1(this MethodInfo method) {
 
-            CheckParameters(method, expected: 1);
+            CheckMethod(method, expectedParameters: 1);
 
             return CreateAction<Action<object, object>>(
                 typeof(object),
@@ -432,7 +754,7 @@ namespace Invio.Extensions.Reflection {
         public static Action<TBase, object> CreateAction1<TBase>(this MethodInfo method)
             where TBase : class {
 
-            CheckParameters(method, expected: 1);
+            CheckMethod(method, expectedParameters: 1);
 
             return CreateAction<Action<TBase, object>>(
                 typeof(TBase),
@@ -449,7 +771,7 @@ namespace Invio.Extensions.Reflection {
         public static Action<TBase, TParameter>
             CreateAction1<TBase, TParameter>(this MethodInfo method) where TBase : class {
 
-            CheckParameters(method, expected: 1);
+            CheckMethod(method, expectedParameters: 1);
 
             var parameters = method.GetParameters();
 
