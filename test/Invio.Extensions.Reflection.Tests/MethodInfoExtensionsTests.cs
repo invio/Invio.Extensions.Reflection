@@ -106,14 +106,6 @@ namespace Invio.Extensions.Reflection {
 
         [Theory]
         [MemberData(nameof(ClassUnderTestCreateFuncs))]
-        public void MethodInfoDelegate_ArgNull_MethodInfo(String functionName, Action<MethodInfo> createFunc) {
-            Assert.Throws<ArgumentNullException>(
-                () => createFunc(null)
-            );
-        }
-
-        [Theory]
-        [MemberData(nameof(ClassUnderTestCreateFuncs))]
         public void MethodInfoDelegate_Action_NotSupported(String functionName, Action<MethodInfo> createFunc) {
             var methodInfo = sutType.GetMethod("incrementModified", BindingFlags.Instance | BindingFlags.Public);
 
@@ -292,26 +284,6 @@ namespace Invio.Extensions.Reflection {
             Assert.Equal(
                 sut.Func9(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]),
                 func9(sut, args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8])
-            );
-        }
-
-        [Fact]
-        public void MethodInfoCreateAction_ArgNull() {
-            MethodInfo nullMI = null;
-            Assert.Throws<ArgumentNullException>(
-                () => nullMI.CreateAction0()
-            );
-            Assert.Throws<ArgumentNullException>(
-                () => nullMI.CreateAction0<ClassUnderTest>()
-            );
-            Assert.Throws<ArgumentNullException>(
-                () => nullMI.CreateAction1()
-            );
-            Assert.Throws<ArgumentNullException>(
-                () => nullMI.CreateAction1<ClassUnderTest>()
-            );
-            Assert.Throws<ArgumentNullException>(
-                () => nullMI.CreateAction1<ClassUnderTest, int>()
             );
         }
 
@@ -585,11 +557,128 @@ namespace Invio.Extensions.Reflection {
             }
         }
 
+        public static IEnumerable<object[]> ArgumentNullCases {
+            get {
+                return new List<object[]> {
+                    new object[] { ToFunc(m => m.CreateFunc0<Fake, int>()) },
+                    new object[] { ToFunc(m => m.CreateFunc0<Fake>()) },
+                    new object[] { ToFunc(m => m.CreateFunc1<Fake>()) },
+                    new object[] { ToFunc(m => m.CreateFunc1()) },
+                    new object[] { ToFunc(m => m.CreateFunc2<Fake>()) },
+                    new object[] { ToFunc(m => m.CreateFunc2()) },
+                    new object[] { ToFunc(m => m.CreateFunc3<Fake>()) },
+                    new object[] { ToFunc(m => m.CreateFunc3()) },
+                    new object[] { ToFunc(m => m.CreateFunc4<Fake>()) },
+                    new object[] { ToFunc(m => m.CreateFunc4()) },
+                    new object[] { ToFunc(m => m.CreateFunc5<Fake>()) },
+                    new object[] { ToFunc(m => m.CreateFunc5()) },
+                    new object[] { ToFunc(m => m.CreateFunc6<Fake>()) },
+                    new object[] { ToFunc(m => m.CreateFunc6()) },
+                    new object[] { ToFunc(m => m.CreateFunc7<Fake>()) },
+                    new object[] { ToFunc(m => m.CreateFunc7()) },
+                    new object[] { ToFunc(m => m.CreateFunc8<Fake>()) },
+                    new object[] { ToFunc(m => m.CreateFunc8()) },
+                    new object[] { ToFunc(m => m.CreateFunc9<Fake>()) },
+                    new object[] { ToFunc(m => m.CreateFunc9()) },
+                    new object[] { ToFunc(m => m.CreateAction0()) },
+                    new object[] { ToFunc(m => m.CreateAction0<Fake>()) },
+                    new object[] { ToFunc(m => m.CreateAction1()) },
+                    new object[] { ToFunc(m => m.CreateAction1<Fake>()) },
+                    new object[] { ToFunc(m => m.CreateAction1<Fake, int>()) }
+                };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ArgumentNullCases))]
+        public void CreateDelegate_NullMethodInfo(Func<MethodInfo, object> createDelegate) {
+
+            // Arrange
+
+            MethodInfo method = null;
+
+            // Act
+
+            var exception = Record.Exception(
+                () => createDelegate(method)
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentNullException>(exception);
+        }
+
+        public interface IFake {
+
+            int Func0();
+            int Func1(int a);
+            int Func2(int a, int b);
+            int Func3(int a, int b, int c);
+            int Func4(int a, int b, int c, int d);
+            int Func5(int a, int b, int c, int d, int e);
+            int Func6(int a, int b, int c, int d, int e, int f);
+            int Func7(int a, int b, int c, int d, int e, int f, int g);
+            int Func8(int a, int b, int c, int d, int e, int f, int g, int h);
+            int Func9(int a, int b, int c, int d, int e, int f, int g, int h, int i);
+            void Action0();
+            void Action1(int a);
+
+        }
+
+        public class Fake : IFake {
+
+            public int Func0() {
+                return 0;
+            }
+
+            public int Func1(int a) {
+                return a;
+            }
+
+            public int Func2(int a, int b) {
+                return a + b;
+            }
+
+            public int Func3(int a, int b, int c) {
+                return a + b + c;
+            }
+
+            public int Func4(int a, int b, int c, int d) {
+                return a + b + c + d;
+            }
+
+            public int Func5(int a, int b, int c, int d, int e) {
+                return a + b + c + d + e;
+            }
+
+            public int Func6(int a, int b, int c, int d, int e, int f) {
+                return a + b + c + d + e + f;
+            }
+
+            public int Func7(int a, int b, int c, int d, int e, int f, int g) {
+                return a + b + c + d + e + f + g;
+            }
+
+            public int Func8(int a, int b, int c, int d, int e, int f, int g, int h) {
+                return a + b + c + d + e + f + g + h;
+            }
+
+            public int Func9(
+                int a, int b, int c, int d, int e, int f, int g, int h, int i) {
+
+                return a + b + c + d + e + f + g + h + i;
+            }
+
+            public void Action0() {}
+            public void Action1(int a) {}
+
+        }
+
         private static Func<MethodInfo, object> ToFunc<T>(Func<MethodInfo, T> createDelegate) {
             return new Func<MethodInfo, object>(method => (object)createDelegate(method));
         }
 
-        public static IEnumerable<object[]> StaticFakeCases {
+        public static IEnumerable<object[]> StaticMethodCases {
             get {
                 return new List<object[]> {
                     new object[] {
@@ -697,7 +786,7 @@ namespace Invio.Extensions.Reflection {
         }
 
         [Theory]
-        [MemberData(nameof(StaticFakeCases))]
+        [MemberData(nameof(StaticMethodCases))]
         public void CreateDelegate_StaticMethod(
             String methodName,
             Func<MethodInfo, object> createDelegate) {
@@ -770,5 +859,7 @@ namespace Invio.Extensions.Reflection {
             public static void Action1(int a) {}
 
         }
+
     }
+
 }
