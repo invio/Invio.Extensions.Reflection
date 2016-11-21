@@ -667,7 +667,7 @@ namespace Invio.Extensions.Reflection {
             if (parameters.Length != expectedParameters) {
                 throw new ArgumentException(
                     $"The '{nameof(method)}' argument must reference a " +
-                    $"{typeof(MethodInfo)} with {expectedParameters:N0} parameters.",
+                    $"{typeof(MethodInfo).Name} with {expectedParameters:N0} parameters.",
                     nameof(method)
                 );
             }

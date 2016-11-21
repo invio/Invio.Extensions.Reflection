@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using Peddler;
 using Xunit;
 
 using Invio.Xunit;
@@ -29,19 +28,6 @@ namespace Invio.Extensions.Reflection {
                 var actions = MakeCreateFuncActions<MethodInfoExtensionsTests>();
                 foreach (var action in actions) {
                     theoryData.Add(action.Key, action.Value);
-                }
-
-                return theoryData;
-            }
-        }
-
-        public static TheoryData ArgumentCountCreateFuncs {
-            get {
-                var theoryData = new TheoryData<Int32, Int32, String, Action<MethodInfo>>();
-                var actions = MakeCreateFuncActions<ClassUnderTest>();
-                for (var i = 0; i < actions.Count; i++) {
-                    var action = actions.ElementAt(i);
-                    theoryData.Add(i, actions.Count, action.Key, action.Value);
                 }
 
                 return theoryData;
@@ -87,52 +73,6 @@ namespace Invio.Extensions.Reflection {
             Assert.Throws<ArgumentException>(
                 () => createFunc(methodInfo)
             );
-        }
-
-        [Theory]
-        [MemberData(nameof(ArgumentCountCreateFuncs))]
-        public void MethodInfoDelegate_ArgumentCount(
-            int argumentCount,
-            int totalFunctions,
-            String functionName,
-            Action<MethodInfo> createFunc) {
-            var argumentCountGenerator = new Int32Generator(0, totalFunctions);
-            var selectedFunctionName =
-                ClassUnderTest.FunctionPrefix + argumentCountGenerator.NextDistinct(argumentCount);
-            var methodInfo = sutType.GetMethod(selectedFunctionName, BindingFlags.Instance | BindingFlags.Public);
-
-            var ex = Record.Exception(() => createFunc(methodInfo));
-            Assert.NotNull(ex);
-            Assert.Equal(typeof(ArgumentException), ex.GetType());
-            Assert.Contains($"with {argumentCount} parameters", ex.Message);
-        }
-
-        public static TheoryData WrongArgumentCountCreateActionData {
-            get {
-                var incrementMethodName = "incrementModified";
-                var addMethodName = "addToModified";
-
-                return new TheoryData<Int32, String, Action<MethodInfo>> {
-                    { 0, addMethodName, m => { m.CreateAction0<ClassUnderTest>(); } },
-                    { 0, addMethodName, m => { m.CreateAction0(); } },
-                    { 1, incrementMethodName, m => { m.CreateAction1<ClassUnderTest>(); } },
-                    { 1, incrementMethodName, m => { m.CreateAction1(); } }
-                };
-            }
-        }
-
-        [Theory]
-        [MemberData(nameof(WrongArgumentCountCreateActionData))]
-        public void MethodInfoDelegateAction0_WrongArgumentCount(
-            int expectedArgCount,
-            String methodName,
-            Action<MethodInfo> createAction) {
-            var methodInfo = sutType.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
-
-            var ex = Record.Exception(() => createAction(methodInfo));
-            Assert.NotNull(ex);
-            Assert.Equal(typeof(ArgumentException), ex.GetType());
-            Assert.Contains($"with {expectedArgCount} parameters", ex.Message);
         }
 
         private static readonly Type isutType = typeof(IClassUnderTest);
@@ -213,6 +153,156 @@ namespace Invio.Extensions.Reflection {
             public int Func9(int a, int b, int c, int d, int e, int f, int g, int h, int i) {
                 return modifier * a + b / c * d - e * f - g / h + i;
             }
+        }
+
+        public static IEnumerable<object[]> TooFewArgumentsCases {
+            get {
+                return new List<object[]> {
+                    new object[] { nameof(Fake.Func0), TypedTestCases<Fake>.Func1, 1 },
+                    new object[] { nameof(Fake.Func0), TestCases<Fake>.Func1, 1 },
+                    new object[] { nameof(Fake.Func1), TypedTestCases<Fake>.Func2, 2 },
+                    new object[] { nameof(Fake.Func1), TestCases<Fake>.Func2, 2 },
+                    new object[] { nameof(Fake.Func2), TypedTestCases<Fake>.Func3, 3 },
+                    new object[] { nameof(Fake.Func2), TestCases<Fake>.Func3, 3 },
+                    new object[] { nameof(Fake.Func3), TypedTestCases<Fake>.Func4, 4 },
+                    new object[] { nameof(Fake.Func3), TestCases<Fake>.Func4, 4 },
+                    new object[] { nameof(Fake.Func4), TypedTestCases<Fake>.Func5, 5 },
+                    new object[] { nameof(Fake.Func4), TestCases<Fake>.Func5, 5 },
+                    new object[] { nameof(Fake.Func5), TypedTestCases<Fake>.Func6, 6 },
+                    new object[] { nameof(Fake.Func5), TestCases<Fake>.Func6, 6 },
+                    new object[] { nameof(Fake.Func6), TypedTestCases<Fake>.Func7, 7 },
+                    new object[] { nameof(Fake.Func6), TestCases<Fake>.Func7, 7 },
+                    new object[] { nameof(Fake.Func7), TypedTestCases<Fake>.Func8, 8 },
+                    new object[] { nameof(Fake.Func7), TestCases<Fake>.Func8, 8 },
+                    new object[] { nameof(Fake.Func8), TypedTestCases<Fake>.Func9, 9 },
+                    new object[] { nameof(Fake.Func8), TestCases<Fake>.Func9, 9},
+                    new object[] { nameof(Fake.Action0), TypedTestCases<Fake>.Action1, 1 },
+                    new object[] { nameof(Fake.Action0), TestCases<Fake>.Action1, 1 },
+                    new object[] { nameof(Fake.Action1), TypedTestCases<Fake>.Action2, 2 },
+                    new object[] { nameof(Fake.Action1), TestCases<Fake>.Action2, 2 },
+                    new object[] { nameof(Fake.Action2), TypedTestCases<Fake>.Action3, 3 },
+                    new object[] { nameof(Fake.Action2), TestCases<Fake>.Action3, 3 },
+                    new object[] { nameof(Fake.Action3), TypedTestCases<Fake>.Action4, 4 },
+                    new object[] { nameof(Fake.Action3), TestCases<Fake>.Action4, 4 },
+                    new object[] { nameof(Fake.Action4), TypedTestCases<Fake>.Action5, 5 },
+                    new object[] { nameof(Fake.Action4), TestCases<Fake>.Action5, 5 },
+                    new object[] { nameof(Fake.Action5), TypedTestCases<Fake>.Action6, 6 },
+                    new object[] { nameof(Fake.Action5), TestCases<Fake>.Action6, 6 },
+                    new object[] { nameof(Fake.Action6), TypedTestCases<Fake>.Action7, 7 },
+                    new object[] { nameof(Fake.Action6), TestCases<Fake>.Action7, 7 },
+                    new object[] { nameof(Fake.Action7), TypedTestCases<Fake>.Action8, 8 },
+                    new object[] { nameof(Fake.Action7), TestCases<Fake>.Action8, 8 },
+                    new object[] { nameof(Fake.Action8), TypedTestCases<Fake>.Action9, 9 },
+                    new object[] { nameof(Fake.Action8), TestCases<Fake>.Action9, 9 }
+                };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(TooFewArgumentsCases))]
+        public void CreateDelegate_TooFewArguments<TFunc>(
+            String methodName,
+            ITestCase<Fake, TFunc> test,
+            int expectedNumberOfParameters) {
+
+            // Arrange
+
+            var fake = new Fake();
+            var method = typeof(Fake).GetMethod(methodName);
+
+            // Act
+
+            var exception = Record.Exception(
+                () => test.CreateDelegate(method)
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+
+            Assert.Equal(
+                "The 'method' argument must reference a " +
+                "MethodInfo with " + expectedNumberOfParameters + " parameters." +
+                Environment.NewLine + "Parameter name: method",
+                exception.Message
+            );
+        }
+
+        public static IEnumerable<object[]> TooManyArgumentsCases {
+            get {
+                return new List<object[]> {
+                    new object[] { nameof(Fake.Func1), TypedTestCases<Fake>.Func0, 0 },
+                    new object[] { nameof(Fake.Func1), TestCases<Fake>.Func0, 0 },
+                    new object[] { nameof(Fake.Func2), TypedTestCases<Fake>.Func1, 1 },
+                    new object[] { nameof(Fake.Func2), TestCases<Fake>.Func1, 1 },
+                    new object[] { nameof(Fake.Func3), TypedTestCases<Fake>.Func2, 2 },
+                    new object[] { nameof(Fake.Func3), TestCases<Fake>.Func2, 2 },
+                    new object[] { nameof(Fake.Func4), TypedTestCases<Fake>.Func3, 3 },
+                    new object[] { nameof(Fake.Func4), TestCases<Fake>.Func3, 3 },
+                    new object[] { nameof(Fake.Func5), TypedTestCases<Fake>.Func4, 4 },
+                    new object[] { nameof(Fake.Func5), TestCases<Fake>.Func4, 4 },
+                    new object[] { nameof(Fake.Func6), TypedTestCases<Fake>.Func5, 5 },
+                    new object[] { nameof(Fake.Func6), TestCases<Fake>.Func5, 5 },
+                    new object[] { nameof(Fake.Func7), TypedTestCases<Fake>.Func6, 6 },
+                    new object[] { nameof(Fake.Func7), TestCases<Fake>.Func6, 6 },
+                    new object[] { nameof(Fake.Func8), TypedTestCases<Fake>.Func7, 7 },
+                    new object[] { nameof(Fake.Func8), TestCases<Fake>.Func7, 7 },
+                    new object[] { nameof(Fake.Func9), TypedTestCases<Fake>.Func8, 8 },
+                    new object[] { nameof(Fake.Func9), TestCases<Fake>.Func8, 8 },
+                    new object[] { nameof(Fake.Func10), TypedTestCases<Fake>.Func9, 9 },
+                    new object[] { nameof(Fake.Func10), TestCases<Fake>.Func9, 9 },
+                    new object[] { nameof(Fake.Action1), TypedTestCases<Fake>.Action0, 0 },
+                    new object[] { nameof(Fake.Action1), TestCases<Fake>.Action0, 0 },
+                    new object[] { nameof(Fake.Action2), TypedTestCases<Fake>.Action1, 1 },
+                    new object[] { nameof(Fake.Action2), TestCases<Fake>.Action1, 1 },
+                    new object[] { nameof(Fake.Action3), TypedTestCases<Fake>.Action2, 2 },
+                    new object[] { nameof(Fake.Action3), TestCases<Fake>.Action2, 2 },
+                    new object[] { nameof(Fake.Action4), TypedTestCases<Fake>.Action3, 3 },
+                    new object[] { nameof(Fake.Action4), TestCases<Fake>.Action3, 3 },
+                    new object[] { nameof(Fake.Action5), TypedTestCases<Fake>.Action4, 4 },
+                    new object[] { nameof(Fake.Action5), TestCases<Fake>.Action4, 4 },
+                    new object[] { nameof(Fake.Action6), TypedTestCases<Fake>.Action5, 5 },
+                    new object[] { nameof(Fake.Action6), TestCases<Fake>.Action5, 5 },
+                    new object[] { nameof(Fake.Action7), TypedTestCases<Fake>.Action6, 6 },
+                    new object[] { nameof(Fake.Action7), TestCases<Fake>.Action6, 6 },
+                    new object[] { nameof(Fake.Action8), TypedTestCases<Fake>.Action7, 7 },
+                    new object[] { nameof(Fake.Action8), TestCases<Fake>.Action7, 7 },
+                    new object[] { nameof(Fake.Action9), TypedTestCases<Fake>.Action8, 8 },
+                    new object[] { nameof(Fake.Action9), TestCases<Fake>.Action8, 8 },
+                    new object[] { nameof(Fake.Action10), TypedTestCases<Fake>.Action9, 9 },
+                    new object[] { nameof(Fake.Action10), TestCases<Fake>.Action9, 9 }
+                };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(TooManyArgumentsCases))]
+        public void CreateDelegate_TooManyArguments<TFunc>(
+            String methodName,
+            ITestCase<Fake, TFunc> test,
+            int expectedNumberOfParameters) {
+
+            // Arrange
+
+            var fake = new Fake();
+            var method = typeof(Fake).GetMethod(methodName);
+
+            // Act
+
+            var exception = Record.Exception(
+                () => test.CreateDelegate(method)
+            );
+
+            // Assert
+
+            Assert.IsType<ArgumentException>(exception);
+
+            Assert.Equal(
+                "The 'method' argument must reference a " +
+                "MethodInfo with " + expectedNumberOfParameters + " parameters." +
+                Environment.NewLine + "Parameter name: method",
+                exception.Message
+            );
         }
 
         public static IEnumerable<object[]> InvalidBaseTypeCases {
@@ -787,6 +877,12 @@ namespace Invio.Extensions.Reflection {
                 return a + b + c + d + e + f + g + h + i;
             }
 
+            public int Func10(
+                int a, int b, int c, int d, int e, int f, int g, int h, int i, int j) {
+
+                return a + b + c + d + e + f + g + h + i + j;
+            }
+
             public void Action0() {
                 this.Value = 0;
             }
@@ -825,6 +921,12 @@ namespace Invio.Extensions.Reflection {
 
             public void Action9(int a, int b, int c, int d, int e, int f, int g, int h, int i) {
                 this.Value = a + b + c + d + e + f + g + h + i;
+            }
+
+            public void Action10(
+                int a, int b, int c, int d, int e, int f, int g, int h, int i, int j) {
+
+                this.Value = a + b + c + d + e + f + g + h + i + j;
             }
 
         }
