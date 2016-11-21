@@ -230,6 +230,14 @@ namespace Invio.Extensions.Reflection {
                     new object[] { nameof(IFake.Func9), TypedTestCases<IFake>.Func9 },
                     new object[] { nameof(IFake.Action0), TypedTestCases<IFake>.Action0 },
                     new object[] { nameof(IFake.Action1), TypedTestCases<IFake>.Action1 },
+                    new object[] { nameof(IFake.Action2), TypedTestCases<IFake>.Action2 },
+                    new object[] { nameof(IFake.Action3), TypedTestCases<IFake>.Action3 },
+                    new object[] { nameof(IFake.Action4), TypedTestCases<IFake>.Action4 },
+                    new object[] { nameof(IFake.Action5), TypedTestCases<IFake>.Action5 },
+                    new object[] { nameof(IFake.Action6), TypedTestCases<IFake>.Action6 },
+                    new object[] { nameof(IFake.Action7), TypedTestCases<IFake>.Action7 },
+                    new object[] { nameof(IFake.Action8), TypedTestCases<IFake>.Action8 },
+                    new object[] { nameof(IFake.Action9), TypedTestCases<IFake>.Action9 }
                 };
             }
         }
@@ -289,7 +297,23 @@ namespace Invio.Extensions.Reflection {
                     new object[] { nameof(Fake.Action0), TypedTestCases<Fake>.Action0, 0 },
                     new object[] { nameof(Fake.Action0), TestCases<Fake>.Action0, 0 },
                     new object[] { nameof(Fake.Action1), TypedTestCases<Fake>.Action1, 1 },
-                    new object[] { nameof(Fake.Action1), TestCases<Fake>.Action1, 1 }
+                    new object[] { nameof(Fake.Action1), TestCases<Fake>.Action1, 1 },
+                    new object[] { nameof(Fake.Action2), TypedTestCases<Fake>.Action2, 2 },
+                    new object[] { nameof(Fake.Action2), TestCases<Fake>.Action2, 2 },
+                    new object[] { nameof(Fake.Action3), TypedTestCases<Fake>.Action3, 3 },
+                    new object[] { nameof(Fake.Action3), TestCases<Fake>.Action3, 3 },
+                    new object[] { nameof(Fake.Action4), TypedTestCases<Fake>.Action4, 4 },
+                    new object[] { nameof(Fake.Action4), TestCases<Fake>.Action4, 4 },
+                    new object[] { nameof(Fake.Action5), TypedTestCases<Fake>.Action5, 5 },
+                    new object[] { nameof(Fake.Action5), TestCases<Fake>.Action5, 5 },
+                    new object[] { nameof(Fake.Action6), TypedTestCases<Fake>.Action6, 6 },
+                    new object[] { nameof(Fake.Action6), TestCases<Fake>.Action6, 6 },
+                    new object[] { nameof(Fake.Action7), TypedTestCases<Fake>.Action7, 7 },
+                    new object[] { nameof(Fake.Action7), TestCases<Fake>.Action7, 7 },
+                    new object[] { nameof(Fake.Action8), TypedTestCases<Fake>.Action8, 8 },
+                    new object[] { nameof(Fake.Action8), TestCases<Fake>.Action8, 8 },
+                    new object[] { nameof(Fake.Action9), TypedTestCases<Fake>.Action9, 9 },
+                    new object[] { nameof(Fake.Action9), TestCases<Fake>.Action9, 9 }
                 };
             }
         }
@@ -462,6 +486,53 @@ namespace Invio.Extensions.Reflection {
                     (fake, action) => action(fake, 1)
                 );
 
+            public static ITestCase<TBase, Action<TBase, object, object>> Action2 =
+                new ActionTestCase<TBase, Action<TBase, object, object>>(
+                    method => method.CreateAction2<TBase>(),
+                    (fake, action) => action(fake, 1, 1)
+                );
+
+            public static ITestCase<TBase, Action<TBase, object, object, object>> Action3 =
+                new ActionTestCase<TBase, Action<TBase, object, object, object>>(
+                    method => method.CreateAction3<TBase>(),
+                    (fake, action) => action(fake, 1, 1, 1)
+                );
+
+            public static ITestCase<TBase, Action<TBase, object, object, object, object>> Action4 =
+                new ActionTestCase<TBase, Action<TBase, object, object, object, object>>(
+                    method => method.CreateAction4<TBase>(),
+                    (fake, action) => action(fake, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<TBase, Action<TBase, object, object, object, object, object>> Action5 =
+                new ActionTestCase<TBase, Action<TBase, object, object, object, object, object>>(
+                    method => method.CreateAction5<TBase>(),
+                    (fake, action) => action(fake, 1, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<TBase, Action<TBase, object, object, object, object, object, object>> Action6 =
+                new ActionTestCase<TBase, Action<TBase, object, object, object, object, object, object>>(
+                    method => method.CreateAction6<TBase>(),
+                    (fake, action) => action(fake, 1, 1, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<TBase, Action<TBase, object, object, object, object, object, object, object>> Action7 =
+                new ActionTestCase<TBase, Action<TBase, object, object, object, object, object, object, object>>(
+                    method => method.CreateAction7<TBase>(),
+                    (fake, action) => action(fake, 1, 1, 1, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<TBase, Action<TBase, object, object, object, object, object, object, object, object>> Action8 =
+                new ActionTestCase<TBase, Action<TBase, object, object, object, object, object, object, object, object>>(
+                    method => method.CreateAction8<TBase>(),
+                    (fake, action) => action(fake, 1, 1, 1, 1, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<TBase, Action<TBase, object, object, object, object, object, object, object, object, object>> Action9 =
+                new ActionTestCase<TBase, Action<TBase, object, object, object, object, object, object, object, object, object>>(
+                    method => method.CreateAction9<TBase>(),
+                    (fake, action) => action(fake, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+                );
         }
 
         public static class TestCases<TBase> where TBase : class, IFake {
@@ -538,6 +609,54 @@ namespace Invio.Extensions.Reflection {
                     (fake, action) => action(fake, 1)
                 );
 
+            public static ITestCase<TBase, Action<object, object, object>> Action2 =
+                new ActionTestCase<TBase, Action<object, object, object>>(
+                    method => method.CreateAction2(),
+                    (fake, action) => action(fake, 1, 1)
+                );
+
+            public static ITestCase<TBase, Action<object, object, object, object>> Action3 =
+                new ActionTestCase<TBase, Action<object, object, object, object>>(
+                    method => method.CreateAction3(),
+                    (fake, action) => action(fake, 1, 1, 1)
+                );
+
+            public static ITestCase<TBase, Action<object, object, object, object, object>> Action4 =
+                new ActionTestCase<TBase, Action<object, object, object, object, object>>(
+                    method => method.CreateAction4(),
+                    (fake, action) => action(fake, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<TBase, Action<object, object, object, object, object, object>> Action5 =
+                new ActionTestCase<TBase, Action<object, object, object, object, object, object>>(
+                    method => method.CreateAction5(),
+                    (fake, action) => action(fake, 1, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<TBase, Action<object, object, object, object, object, object, object>> Action6 =
+                new ActionTestCase<TBase, Action<object, object, object, object, object, object, object>>(
+                    method => method.CreateAction6(),
+                    (fake, action) => action(fake, 1, 1, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<TBase, Action<object, object, object, object, object, object, object, object>> Action7 =
+                new ActionTestCase<TBase, Action<object, object, object, object, object, object, object, object>>(
+                    method => method.CreateAction7(),
+                    (fake, action) => action(fake, 1, 1, 1, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<TBase, Action<object, object, object, object, object, object, object, object, object>> Action8 =
+                new ActionTestCase<TBase, Action<object, object, object, object, object, object, object, object, object>>(
+                    method => method.CreateAction8(),
+                    (fake, action) => action(fake, 1, 1, 1, 1, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<TBase, Action<object, object, object, object, object, object, object, object, object, object>> Action9 =
+                new ActionTestCase<TBase, Action<object, object, object, object, object, object, object, object, object, object>>(
+                    method => method.CreateAction9(),
+                    (fake, action) => action(fake, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+                );
+
         }
 
         public interface ITestCase<TBase, TFunc> {
@@ -599,7 +718,6 @@ namespace Invio.Extensions.Reflection {
 
         public interface IFake {
 
-            int Value { get; }
             int Func0();
             int Func1(int a);
             int Func2(int a, int b);
@@ -610,8 +728,18 @@ namespace Invio.Extensions.Reflection {
             int Func7(int a, int b, int c, int d, int e, int f, int g);
             int Func8(int a, int b, int c, int d, int e, int f, int g, int h);
             int Func9(int a, int b, int c, int d, int e, int f, int g, int h, int i);
+
+            int Value { get; }
             void Action0();
             void Action1(int a);
+            void Action2(int a, int b);
+            void Action3(int a, int b, int c);
+            void Action4(int a, int b, int c, int d);
+            void Action5(int a, int b, int c, int d, int e);
+            void Action6(int a, int b, int c, int d, int e, int f);
+            void Action7(int a, int b, int c, int d, int e, int f, int g);
+            void Action8(int a, int b, int c, int d, int e, int f, int g, int h);
+            void Action9(int a, int b, int c, int d, int e, int f, int g, int h, int i);
 
         }
 
@@ -655,9 +783,7 @@ namespace Invio.Extensions.Reflection {
                 return a + b + c + d + e + f + g + h;
             }
 
-            public int Func9(
-                int a, int b, int c, int d, int e, int f, int g, int h, int i) {
-
+            public int Func9(int a, int b, int c, int d, int e, int f, int g, int h, int i) {
                 return a + b + c + d + e + f + g + h + i;
             }
 
@@ -667,6 +793,38 @@ namespace Invio.Extensions.Reflection {
 
             public void Action1(int a) {
                 this.Value = a;
+            }
+
+            public void Action2(int a, int b) {
+                this.Value = a + b;
+            }
+
+            public void Action3(int a, int b, int c) {
+                this.Value = a + b + c;
+            }
+
+            public void Action4(int a, int b, int c, int d) {
+                this.Value = a + b + c + d;
+            }
+
+            public void Action5(int a, int b, int c, int d, int e) {
+                this.Value = a + b + c + d + e;
+            }
+
+            public void Action6(int a, int b, int c, int d, int e, int f) {
+                this.Value = a + b + c + d + e + f;
+            }
+
+            public void Action7(int a, int b, int c, int d, int e, int f, int g) {
+                this.Value = a + b + c + d + e + f + g;
+            }
+
+            public void Action8(int a, int b, int c, int d, int e, int f, int g, int h) {
+                this.Value = a + b + c + d + e + f + g + h;
+            }
+
+            public void Action9(int a, int b, int c, int d, int e, int f, int g, int h, int i) {
+                this.Value = a + b + c + d + e + f + g + h + i;
             }
 
         }

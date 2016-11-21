@@ -741,6 +741,373 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
+        /// <summary>
+        /// Return an efficient action for the specified 1-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Action<object, object, object> CreateAction2(this MethodInfo method) {
+
+            CheckMethod(method, expectedParameters: 2);
+            CheckAction(method);
+
+            return CreateAction<Action<object, object, object>>(
+                typeof(object),
+                new [] { typeof(object), typeof(object) },
+                method
+            );
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 1-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Action<TBase, object, object> CreateAction2<TBase>(this MethodInfo method)
+            where TBase : class {
+
+            CheckMethod(method, expectedParameters: 2);
+            CheckAction<TBase>(method);
+
+            return CreateAction<Action<TBase, object, object>>(
+                typeof(TBase),
+                new [] { typeof(object), typeof(object) },
+                method
+            );
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 1-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Action<object, object, object, object>
+            CreateAction3(this MethodInfo method) {
+
+            CheckMethod(method, expectedParameters: 3);
+            CheckAction(method);
+
+            return CreateAction<Action<object, object, object, object>>(
+                typeof(object),
+                new [] { typeof(object), typeof(object), typeof(object) },
+                method
+            );
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 1-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Action<TBase, object, object, object>
+            CreateAction3<TBase>(this MethodInfo method) where TBase : class {
+
+            CheckMethod(method, expectedParameters: 3);
+            CheckAction<TBase>(method);
+
+            return CreateAction<Action<TBase, object, object, object>>(
+                typeof(TBase),
+                new [] { typeof(object), typeof(object), typeof(object) },
+                method
+            );
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 1-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Action<object, object, object, object, object>
+            CreateAction4(this MethodInfo method) {
+
+            CheckMethod(method, expectedParameters: 4);
+            CheckAction(method);
+
+            return CreateAction<Action<object, object, object, object, object>>(
+                typeof(object),
+                new [] { typeof(object), typeof(object), typeof(object), typeof(object) },
+                method
+            );
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 1-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Action<TBase, object, object, object, object>
+            CreateAction4<TBase>(this MethodInfo method) where TBase : class {
+
+            CheckMethod(method, expectedParameters: 4);
+            CheckAction<TBase>(method);
+
+            return CreateAction<Action<TBase, object, object, object, object>>(
+                typeof(TBase),
+                new [] { typeof(object), typeof(object), typeof(object), typeof(object) },
+                method
+            );
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 1-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Action<object, object, object, object, object, object>
+            CreateAction5(this MethodInfo method) {
+
+            CheckMethod(method, expectedParameters: 5);
+            CheckAction(method);
+
+            return CreateAction<Action<object, object, object, object, object, object>>(
+                typeof(object),
+                new [] {
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object)
+                },
+                method
+            );
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 1-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Action<TBase, object, object, object, object, object>
+            CreateAction5<TBase>(this MethodInfo method) where TBase : class {
+
+            CheckMethod(method, expectedParameters: 5);
+            CheckAction<TBase>(method);
+
+            return CreateAction<Action<TBase, object, object, object, object, object>>(
+                typeof(TBase),
+                new [] {
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object)
+                },
+                method
+            );
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 1-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Action<object, object, object, object, object, object, object>
+            CreateAction6(this MethodInfo method) {
+
+            CheckMethod(method, expectedParameters: 6);
+            CheckAction(method);
+
+            return CreateAction<Action<object, object, object, object, object, object, object>>(
+                typeof(object),
+                new [] {
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object)
+                },
+                method
+            );
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 1-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Action<TBase, object, object, object, object, object, object>
+            CreateAction6<TBase>(this MethodInfo method) where TBase : class {
+
+            CheckMethod(method, expectedParameters: 6);
+            CheckAction<TBase>(method);
+
+            return CreateAction<Action<TBase, object, object, object, object, object, object>>(
+                typeof(TBase),
+                new [] {
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object)
+                },
+                method
+            );
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 1-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Action<object, object, object, object, object, object, object, object>
+            CreateAction7(this MethodInfo method) {
+
+            CheckMethod(method, expectedParameters: 7);
+            CheckAction(method);
+
+            return CreateAction<Action<object, object, object, object, object, object, object, object>>(
+                typeof(object),
+                new [] {
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object)
+                },
+                method
+            );
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 1-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Action<TBase, object, object, object, object, object, object, object>
+            CreateAction7<TBase>(this MethodInfo method) where TBase : class {
+
+            CheckMethod(method, expectedParameters: 7);
+            CheckAction<TBase>(method);
+
+            return CreateAction<Action<TBase, object, object, object, object, object, object, object>>(
+                typeof(TBase),
+                new [] {
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object)
+                },
+                method
+            );
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 1-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Action<object, object, object, object, object, object, object, object, object>
+            CreateAction8(this MethodInfo method) {
+
+            CheckMethod(method, expectedParameters: 8);
+            CheckAction(method);
+
+            return CreateAction<Action<object, object, object, object, object, object, object, object, object>>(
+                typeof(object),
+                new [] {
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object)
+                },
+                method
+            );
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 1-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Action<TBase, object, object, object, object, object, object, object, object>
+            CreateAction8<TBase>(this MethodInfo method) where TBase : class {
+
+            CheckMethod(method, expectedParameters: 8);
+            CheckAction<TBase>(method);
+
+            return CreateAction<Action<TBase, object, object, object, object, object, object, object, object>>(
+                typeof(TBase),
+                new [] {
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object)
+                },
+                method
+            );
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 1-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Action<object, object, object, object, object, object, object, object, object, object>
+            CreateAction9(this MethodInfo method) {
+
+            CheckMethod(method, expectedParameters: 9);
+            CheckAction(method);
+
+            return CreateAction<Action<object, object, object, object, object, object, object, object, object, object>>(
+                typeof(object),
+                new [] {
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object)
+                },
+                method
+            );
+        }
+
+        /// <summary>
+        /// Return an efficient action for the specified 1-parameter method.
+        /// The base entity for the delegate is strongly compile-time typed, the
+        /// parameters are strongly run-time typed.
+        /// </summary>
+        public static Action<TBase, object, object, object, object, object, object, object, object, object>
+            CreateAction9<TBase>(this MethodInfo method) where TBase : class {
+
+            CheckMethod(method, expectedParameters: 9);
+            CheckAction<TBase>(method);
+
+            return CreateAction<Action<TBase, object, object, object, object, object, object, object, object, object>>(
+                typeof(TBase),
+                new [] {
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object),
+                    typeof(object)
+                },
+                method
+            );
+        }
+
         private static TAction CreateAction<TAction>(
             Type baseType,
             Type[] parameterTypes,
