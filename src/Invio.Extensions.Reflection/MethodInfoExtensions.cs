@@ -667,7 +667,7 @@ namespace Invio.Extensions.Reflection {
             if (!method.DeclaringType.IsAssignableFrom(typeof(TBase))) {
                 throw new ArgumentException(
                     $"Type parameter '{nameof(TBase)}' was '{typeof(TBase).Name}', " +
-                    $"which is not assignable to the property's declaring type of " +
+                    $"which is not assignable to the method's declaring type of " +
                     $"'{method.DeclaringType.Name}'.",
                     nameof(method)
                 );
@@ -679,6 +679,29 @@ namespace Invio.Extensions.Reflection {
                 throw new ArgumentException(
                     "You cannot create a Func delegate for a method with a " +
                     "void return type.",
+                    nameof(method)
+                );
+            }
+        }
+
+        private static void CheckAction<TBase>(MethodInfo method) {
+            CheckAction(method);
+
+            if (!method.DeclaringType.IsAssignableFrom(typeof(TBase))) {
+                throw new ArgumentException(
+                    $"Type parameter '{nameof(TBase)}' was '{typeof(TBase).Name}', " +
+                    $"which is not assignable to the method's declaring type of " +
+                    $"'{method.DeclaringType.Name}'.",
+                    nameof(method)
+                );
+            }
+        }
+
+        private static void CheckAction(MethodInfo method) {
+            if (method.ReturnType != typeof(void)) {
+                throw new ArgumentException(
+                    "You cannot create an Action delegate for a method with a " +
+                    "non-void return type.",
                     nameof(method)
                 );
             }
@@ -713,6 +736,7 @@ namespace Invio.Extensions.Reflection {
         /// </summary>
         public static Action<object> CreateAction0(this MethodInfo method) {
             CheckMethod(method, expectedParameters: 0);
+            CheckAction(method);
 
             return CreateAction<Action<object>>(
                 typeof(object),
@@ -730,6 +754,7 @@ namespace Invio.Extensions.Reflection {
             where TBase : class {
 
             CheckMethod(method, expectedParameters: 0);
+            CheckAction<TBase>(method);
 
             return CreateAction<Action<TBase>>(
                 typeof(TBase),
@@ -746,6 +771,7 @@ namespace Invio.Extensions.Reflection {
         public static Action<object, object> CreateAction1(this MethodInfo method) {
 
             CheckMethod(method, expectedParameters: 1);
+            CheckAction(method);
 
             return CreateAction<Action<object, object>>(
                 typeof(object),
@@ -763,6 +789,7 @@ namespace Invio.Extensions.Reflection {
             where TBase : class {
 
             CheckMethod(method, expectedParameters: 1);
+            CheckAction<TBase>(method);
 
             return CreateAction<Action<TBase, object>>(
                 typeof(TBase),
@@ -780,6 +807,7 @@ namespace Invio.Extensions.Reflection {
             CreateAction1<TBase, TParameter>(this MethodInfo method) where TBase : class {
 
             CheckMethod(method, expectedParameters: 1);
+            CheckAction<TBase>(method);
 
             var parameters = method.GetParameters();
 
