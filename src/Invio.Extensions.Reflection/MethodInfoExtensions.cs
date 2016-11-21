@@ -48,50 +48,6 @@ namespace Invio.Extensions.Reflection {
         ///   A delegate that can called to efficiently invoke the method normally
         ///   done by interacting with the <paramref name="method" /> directly.
         /// </returns>
-        public static Func<TBase, TResult> CreateFunc0<TBase, TResult>(this MethodInfo method)
-            where TBase : class {
-
-            CheckMethod(method, expectedParameters: 0);
-            CheckFunc<TBase, TResult>(method);
-
-            return CreateFunc<TBase, TResult, Func<TBase, TResult>>(method);
-        }
-
-        /// <summary>
-        ///   Return an efficient delegate for the specified method which, when called,
-        ///   invokes a 0-parameter method on the provided instance of the class.
-        /// </summary>
-        /// <remarks>
-        ///   While use of the returned delegate is efficient, construction
-        ///   is expensive. You should be getting significant re-use out of
-        ///   the delegate to justify the expense of its construction.
-        /// </remarks>
-        /// <param name="method">
-        ///   The <see cref="MethodInfo" /> instance the caller wants to turn into
-        ///   a compiled delegate that can be called (and recalled) efficiently.
-        /// </param>
-        /// <typeparam name="TBase">
-        ///   A <see cref="Type" /> that is assignable to one that contains the
-        ///   <see cref="MethodInfo" /> passed in via <paramref name="method" />.
-        /// </typeparam>
-        /// <typeparam name="TResult">
-        ///   A <see cref="Type" /> that is assignable to the one that is returned from the
-        ///   <see cref="MethodInfo" /> passed is via <paramref name="method" />.
-        /// </typeparam>
-        /// <exception cref="ArgumentNullException">
-        ///   Thrown when <paramref name="method" /> is null.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        ///   Thrown when <paramref name="method" /> is not parameterless, or when
-        ///   <paramref name="method" /> has a return type of void, or when
-        ///   <paramref name="method" /> references a static property, or the type
-        ///   <typeparamref name="TBase" /> is not assignable to the type specified on the
-        ///   <see cref="MemberInfo.DeclaringType" /> property on <paramref name="method" />.
-        /// </exception>
-        /// <returns>
-        ///   A delegate that can called to efficiently invoke the method normally
-        ///   done by interacting with the <paramref name="method" /> directly.
-        /// </returns>
         public static Func<TBase, object> CreateFunc0<TBase>(this MethodInfo method)
             where TBase : class {
 
@@ -648,19 +604,6 @@ namespace Invio.Extensions.Reflection {
             return lambda.Compile();
         }
 
-        private static void CheckFunc<TBase, TResult>(MethodInfo method) {
-            CheckFunc<TBase>(method);
-
-            if (!method.ReturnType.IsAssignableFrom(typeof(TResult))) {
-                throw new ArgumentException(
-                    $"Type parameter '{nameof(TResult)}' was '{typeof(TResult).Name}', " +
-                    $"which is not assignable to the method's return type of " +
-                    $"{method.ReturnType.Name}.",
-                    nameof(method)
-                );
-            }
-        }
-
         private static void CheckFunc<TBase>(MethodInfo method) {
             CheckFunc(method);
 
@@ -794,33 +737,6 @@ namespace Invio.Extensions.Reflection {
             return CreateAction<Action<TBase, object>>(
                 typeof(TBase),
                 new [] { typeof(object) },
-                method
-            );
-        }
-
-        /// <summary>
-        /// Return an efficient action for the specified 1-parameter method.
-        /// Both the target type and the parameter type are strongly typed at
-        /// compile time.
-        /// </summary>
-        public static Action<TBase, TParameter>
-            CreateAction1<TBase, TParameter>(this MethodInfo method) where TBase : class {
-
-            CheckMethod(method, expectedParameters: 1);
-            CheckAction<TBase>(method);
-
-            var parameters = method.GetParameters();
-
-            if (parameters[0].ParameterType != typeof(TParameter)) {
-                throw new ArgumentException(
-                    "The method's argument type must exactly match the generic type parameter TParameter.",
-                    "method"
-                );
-            }
-
-            return CreateAction<Action<TBase, TParameter>>(
-                typeof(TBase),
-                new [] { typeof(TParameter) },
                 method
             );
         }

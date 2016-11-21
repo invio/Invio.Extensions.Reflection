@@ -63,14 +63,6 @@ namespace Invio.Extensions.Reflection {
             };
         }
 
-        [Fact]
-        public void MethodInfoDelegateFunc0_WrongReturnType() {
-            var func0MethodInfo = sutType.GetMethod("Func0", BindingFlags.Instance | BindingFlags.Public);
-            Assert.Throws<ArgumentException>(
-                () => func0MethodInfo.CreateFunc0<ClassUnderTest, double>()
-            );
-        }
-
         [Theory]
         [MemberData(nameof(ClassUnderTestCreateFuncs))]
          public void CreateMethodInfoDelegate(string functionName, Action<MethodInfo> createFunc) {
@@ -123,7 +115,6 @@ namespace Invio.Extensions.Reflection {
                 return new TheoryData<Int32, String, Action<MethodInfo>> {
                     { 0, addMethodName, m => { m.CreateAction0<ClassUnderTest>(); } },
                     { 0, addMethodName, m => { m.CreateAction0(); } },
-                    { 1, incrementMethodName, m => { m.CreateAction1<ClassUnderTest, int>(); } },
                     { 1, incrementMethodName, m => { m.CreateAction1<ClassUnderTest>(); } },
                     { 1, incrementMethodName, m => { m.CreateAction1(); } }
                 };
@@ -142,16 +133,6 @@ namespace Invio.Extensions.Reflection {
             Assert.NotNull(ex);
             Assert.Equal(typeof(ArgumentException), ex.GetType());
             Assert.Contains($"with {expectedArgCount} parameters", ex.Message);
-        }
-
-        [Fact]
-        public void MethodInfoDelegateAction1_MismatchParameterType() {
-            var methodInfo = sutType.GetMethod("addToModified", BindingFlags.Instance | BindingFlags.Public);
-
-            var ex = Record.Exception(() => methodInfo.CreateAction1<ClassUnderTest, double>());
-            Assert.NotNull(ex);
-            Assert.IsType<ArgumentException>(ex);
-            Assert.Contains($"exactly match the generic type parameter", ex.Message);
         }
 
         private static readonly Type isutType = typeof(IClassUnderTest);
@@ -237,13 +218,6 @@ namespace Invio.Extensions.Reflection {
         public static IEnumerable<object[]> InvalidBaseTypeCases {
             get {
                 return new List<object[]> {
-                    new object[] {
-                        nameof(IFake.Func0),
-                        new FuncTestCase<IFake, Func<IFake, int>>(
-                            method => method.CreateFunc0<IFake, int>(),
-                            (fake, func) => func(fake)
-                        )
-                    },
                     new object[] { nameof(IFake.Func0), TypedTestCases<IFake>.Func0 },
                     new object[] { nameof(IFake.Func1), TypedTestCases<IFake>.Func1 },
                     new object[] { nameof(IFake.Func2), TypedTestCases<IFake>.Func2 },
@@ -255,13 +229,6 @@ namespace Invio.Extensions.Reflection {
                     new object[] { nameof(IFake.Func8), TypedTestCases<IFake>.Func8 },
                     new object[] { nameof(IFake.Func9), TypedTestCases<IFake>.Func9 },
                     new object[] { nameof(IFake.Action0), TypedTestCases<IFake>.Action0 },
-                    new object[] {
-                        nameof(IFake.Action1),
-                        new ActionTestCase<IFake, Action<IFake, int>>(
-                            method => method.CreateAction1<IFake, int>(),
-                            (fake, action) => action(fake, 1)
-                        )
-                    },
                     new object[] { nameof(IFake.Action1), TypedTestCases<IFake>.Action1 },
                 };
             }
@@ -299,14 +266,6 @@ namespace Invio.Extensions.Reflection {
         public static IEnumerable<object[]> ValidBaseTypeCases {
             get {
                 return new List<object[]> {
-                    new object[] {
-                        nameof(Fake.Func0),
-                        new FuncTestCase<Fake, Func<Fake, int>>(
-                            method => method.CreateFunc0<Fake, int>(),
-                            (fake, func) => func(fake)
-                        ),
-                        0
-                    },
                     new object[] { nameof(Fake.Func0), TypedTestCases<Fake>.Func0, 0 },
                     new object[] { nameof(Fake.Func0), TestCases<Fake>.Func0, 0 },
                     new object[] { nameof(Fake.Func1), TypedTestCases<Fake>.Func1, 1 },
@@ -329,14 +288,6 @@ namespace Invio.Extensions.Reflection {
                     new object[] { nameof(Fake.Func9), TestCases<Fake>.Func9, 9 },
                     new object[] { nameof(Fake.Action0), TypedTestCases<Fake>.Action0, 0 },
                     new object[] { nameof(Fake.Action0), TestCases<Fake>.Action0, 0 },
-                    new object[] {
-                        nameof(Fake.Action1),
-                        new ActionTestCase<Fake, Action<Fake, int>>(
-                            method => method.CreateAction1<Fake, int>(),
-                            (fake, action) => action(fake, 1)
-                        ),
-                        1
-                    },
                     new object[] { nameof(Fake.Action1), TypedTestCases<Fake>.Action1, 1 },
                     new object[] { nameof(Fake.Action1), TestCases<Fake>.Action1, 1 }
                 };
@@ -390,8 +341,8 @@ namespace Invio.Extensions.Reflection {
         public static IEnumerable<object[]> ArgumentNullCases {
             get {
                 return new List<object[]> {
-                    new object[] { ToFunc(m => m.CreateFunc0<Fake, int>()) },
                     new object[] { ToFunc(m => m.CreateFunc0<Fake>()) },
+                    new object[] { ToFunc(m => m.CreateFunc0()) },
                     new object[] { ToFunc(m => m.CreateFunc1<Fake>()) },
                     new object[] { ToFunc(m => m.CreateFunc1()) },
                     new object[] { ToFunc(m => m.CreateFunc2<Fake>()) },
@@ -413,8 +364,7 @@ namespace Invio.Extensions.Reflection {
                     new object[] { ToFunc(m => m.CreateAction0()) },
                     new object[] { ToFunc(m => m.CreateAction0<Fake>()) },
                     new object[] { ToFunc(m => m.CreateAction1()) },
-                    new object[] { ToFunc(m => m.CreateAction1<Fake>()) },
-                    new object[] { ToFunc(m => m.CreateAction1<Fake, int>()) }
+                    new object[] { ToFunc(m => m.CreateAction1<Fake>()) }
                 };
             }
         }
@@ -730,11 +680,11 @@ namespace Invio.Extensions.Reflection {
                 return new List<object[]> {
                     new object[] {
                         nameof(StaticFake.Func0),
-                        ToFunc(m => m.CreateFunc0<StaticFake, int>())
+                        ToFunc(m => m.CreateFunc0<StaticFake>())
                     },
                     new object[] {
                         nameof(StaticFake.Func0),
-                        ToFunc(m => m.CreateFunc0<StaticFake>())
+                        ToFunc(m => m.CreateFunc0())
                     },
                     new object[] {
                         nameof(StaticFake.Func1),
@@ -823,10 +773,6 @@ namespace Invio.Extensions.Reflection {
                     new object[] {
                         nameof(StaticFake.Action1),
                         ToFunc(m => m.CreateAction1<StaticFake>())
-                    },
-                    new object[] {
-                        nameof(StaticFake.Action1),
-                        ToFunc(m => m.CreateAction1<StaticFake, int>())
                     }
                 };
             }
