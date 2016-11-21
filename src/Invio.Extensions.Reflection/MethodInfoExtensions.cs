@@ -858,29 +858,6 @@ namespace Invio.Extensions.Reflection {
             return lambda.Compile();
         }
 
-        public static bool IsImplementationOf(this MethodInfo methodInfo, MethodInfo interfaceMethod) {
-            if (methodInfo == null) {
-                throw new ArgumentNullException("methodInfo");
-            } else if (interfaceMethod == null) {
-                throw new ArgumentNullException("interfaceMethod");
-            }
-            bool result;
-            if (methodInfo == interfaceMethod) {
-                result = true;
-            } else if (!methodInfo.DeclaringType.GetTypeInfo().IsInterface) {
-                var interfaceType = interfaceMethod.DeclaringType;
-                if (interfaceType.IsAssignableFrom(methodInfo.DeclaringType)) {
-                    var map = methodInfo.DeclaringType.GetTypeInfo().GetRuntimeInterfaceMap(interfaceType);
-                    result = Array.IndexOf(map.InterfaceMethods, interfaceMethod) ==
-                            Array.IndexOf(map.TargetMethods, methodInfo);
-                } else {
-                    result = false;
-                }
-            } else {
-                result = false;
-            }
-            return result;
-        }
-
     }
+
 }
