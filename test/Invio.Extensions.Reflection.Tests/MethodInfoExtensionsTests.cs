@@ -63,29 +63,12 @@ namespace Invio.Extensions.Reflection {
             };
         }
 
-        public static TheoryData IteratorCount {
-            get {
-                return new TheoryData<Int32> { MethodInfoExtensionsTests.intGenerator.Next() };
-            }
-        }
-
-        private static Int32Generator intGenerator { get; } = new Int32Generator(1, 101);
-
         [Fact]
         public void MethodInfoDelegateFunc0_WrongReturnType() {
             var func0MethodInfo = sutType.GetMethod("Func0", BindingFlags.Instance | BindingFlags.Public);
             Assert.Throws<ArgumentException>(
                 () => func0MethodInfo.CreateFunc0<ClassUnderTest, double>()
             );
-        }
-
-        [Fact]
-        public void MethodInfoDelegateFunc0_WithReturnType() {
-            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
-
-            var func0MethodInfo = sutType.GetMethod("Func0", BindingFlags.Instance | BindingFlags.Public);
-            var func0 = (Func<ClassUnderTest, int>)func0MethodInfo.CreateFunc0<ClassUnderTest, int>();
-            Assert.Equal(sut.Func0(), func0(sut));
         }
 
         [Theory]
@@ -132,161 +115,6 @@ namespace Invio.Extensions.Reflection {
             Assert.Contains($"with {argumentCount} parameters", ex.Message);
         }
 
-        [Fact]
-        public void MethodInfoDelegateFunc0() {
-            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
-
-            var func0MethodInfo = sutType.GetMethod("Func0", BindingFlags.Instance | BindingFlags.Public);
-            var typedFunc0 = func0MethodInfo.CreateFunc0<ClassUnderTest>();
-            Assert.Equal(sut.Func0(), typedFunc0(sut));
-            var func0 = func0MethodInfo.CreateFunc0();
-            Assert.Equal(sut.Func0(), func0(sut));
-        }
-
-        [Fact]
-        public void MethodInfoDelegateFunc1() {
-            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
-            var args = generateIntArray(1);
-
-            var func1MethodInfo = sutType.GetMethod("Func1", BindingFlags.Instance | BindingFlags.Public);
-            var typedFunc1 = func1MethodInfo.CreateFunc1<ClassUnderTest>();
-            Assert.Equal(sut.Func1(args[0]), typedFunc1(sut, args[0]));
-            var func1 = func1MethodInfo.CreateFunc1();
-            Assert.Equal(sut.Func1(args[0]), func1(sut, args[0]));
-        }
-
-        [Fact]
-        public void MethodInfoDelegateFunc2() {
-            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
-            var args = generateIntArray(2);
-
-            var func2MethodInfo = sutType.GetMethod("Func2", BindingFlags.Instance | BindingFlags.Public);
-            var typedFunc2 = func2MethodInfo.CreateFunc2<ClassUnderTest>();
-            Assert.Equal(sut.Func2(args[0], args[1]), typedFunc2(sut, args[0], args[1]));
-            var func2 = func2MethodInfo.CreateFunc2();
-            Assert.Equal(sut.Func2(args[0], args[1]), func2(sut, args[0], args[1]));
-        }
-
-        [Fact]
-        public void MethodInfoDelegateFunc3() {
-            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
-            var args = generateIntArray(3);
-
-            var func3MethodInfo = sutType.GetMethod("Func3", BindingFlags.Instance | BindingFlags.Public);
-            var typedFunc3 = func3MethodInfo.CreateFunc3<ClassUnderTest>();
-            Assert.Equal(sut.Func3(args[0], args[1], args[2]), typedFunc3(sut, args[0], args[1], args[2]));
-            var func3 = func3MethodInfo.CreateFunc3();
-            Assert.Equal(sut.Func3(args[0], args[1], args[2]), func3(sut, args[0], args[1], args[2]));
-        }
-
-        [Fact]
-        public void MethodInfoDelegateFunc4() {
-            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
-            var args = generateIntArray(4);
-
-            var func4MethodInfo = sutType.GetMethod("Func4", BindingFlags.Instance | BindingFlags.Public);
-            var typedFunc4 = func4MethodInfo.CreateFunc4<ClassUnderTest>();
-            Assert.Equal(
-                sut.Func4(args[0], args[1], args[2], args[3]),
-                typedFunc4(sut, args[0], args[1], args[2], args[3])
-            );
-            var func4 = func4MethodInfo.CreateFunc4();
-            Assert.Equal(
-                sut.Func4(args[0], args[1], args[2], args[3]),
-                func4(sut, args[0], args[1], args[2], args[3])
-            );
-        }
-
-        [Fact]
-        public void MethodInfoDelegateFunc5() {
-            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
-            var args = generateIntArray(5);
-
-            var func5MethodInfo = sutType.GetMethod("Func5", BindingFlags.Instance | BindingFlags.Public);
-            var typedFunc5 = func5MethodInfo.CreateFunc5<ClassUnderTest>();
-            Assert.Equal(
-                sut.Func5(args[0], args[1], args[2], args[3], args[4]),
-                typedFunc5(sut, args[0], args[1], args[2], args[3], args[4])
-            );
-            var func5 = func5MethodInfo.CreateFunc5();
-            Assert.Equal(
-                sut.Func5(args[0], args[1], args[2], args[3], args[4]),
-                func5(sut, args[0], args[1], args[2], args[3], args[4])
-            );
-        }
-
-        [Fact]
-        public void MethodInfoDelegateFunc6() {
-            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
-            var args = generateIntArray(6);
-
-            var func6MethodInfo = sutType.GetMethod("Func6", BindingFlags.Instance | BindingFlags.Public);
-            var typedFunc6 = func6MethodInfo.CreateFunc6<ClassUnderTest>();
-            Assert.Equal(
-                sut.Func6(args[0], args[1], args[2], args[3], args[4], args[5]),
-                typedFunc6(sut, args[0], args[1], args[2], args[3], args[4], args[5])
-            );
-            var func6 = func6MethodInfo.CreateFunc6();
-            Assert.Equal(
-                sut.Func6(args[0], args[1], args[2], args[3], args[4], args[5]),
-                func6(sut, args[0], args[1], args[2], args[3], args[4], args[5])
-            );
-        }
-
-        [Fact]
-        public void MethodInfoDelegateFunc7() {
-            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
-            var args = generateIntArray(7);
-
-            var func7MethodInfo = sutType.GetMethod("Func7", BindingFlags.Instance | BindingFlags.Public);
-            var typedFunc7 = func7MethodInfo.CreateFunc7<ClassUnderTest>();
-            Assert.Equal(
-                sut.Func7(args[0], args[1], args[2], args[3], args[4], args[5], args[6]),
-                typedFunc7(sut, args[0], args[1], args[2], args[3], args[4], args[5], args[6])
-            );
-            var func7 = func7MethodInfo.CreateFunc7();
-            Assert.Equal(
-                sut.Func7(args[0], args[1], args[2], args[3], args[4], args[5], args[6]),
-                func7(sut, args[0], args[1], args[2], args[3], args[4], args[5], args[6])
-            );
-        }
-
-        [Fact]
-        public void MethodInfoDelegateFunc8() {
-            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
-            var args = generateIntArray(8);
-
-            var func8MethodInfo = sutType.GetMethod("Func8", BindingFlags.Instance | BindingFlags.Public);
-            var typedFunc8 = func8MethodInfo.CreateFunc8<ClassUnderTest>();
-            Assert.Equal(
-                sut.Func8(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]),
-                typedFunc8(sut, args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7])
-            );
-            var func8 = func8MethodInfo.CreateFunc8();
-            Assert.Equal(
-                sut.Func8(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]),
-                func8(sut, args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7])
-            );
-        }
-
-        [Fact]
-        public void MethodInfoDelegateFunc9() {
-            var sut = new ClassUnderTest(MethodInfoExtensionsTests.intGenerator.Next());
-            var args = generateIntArray(9);
-
-            var func9MethodInfo = sutType.GetMethod("Func9", BindingFlags.Instance | BindingFlags.Public);
-            var typedFunc9 = func9MethodInfo.CreateFunc9<ClassUnderTest>();
-            Assert.Equal(
-                sut.Func9(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]),
-                typedFunc9(sut, args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8])
-            );
-            var func9 = func9MethodInfo.CreateFunc9();
-            Assert.Equal(
-                sut.Func9(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]),
-                func9(sut, args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8])
-            );
-        }
-
         public static TheoryData WrongArgumentCountCreateActionData {
             get {
                 var incrementMethodName = "incrementModified";
@@ -324,62 +152,6 @@ namespace Invio.Extensions.Reflection {
             Assert.NotNull(ex);
             Assert.IsType<ArgumentException>(ex);
             Assert.Contains($"exactly match the generic type parameter", ex.Message);
-        }
-
-        [Theory]
-        [MemberData(nameof(IteratorCount))]
-        public void MethodInfoDelegateAction0(int iterateCount) {
-            var initialValue = MethodInfoExtensionsTests.intGenerator.Next();
-            var sut = new ClassUnderTest(initialValue);
-            var expected = new ClassUnderTest(initialValue);
-
-            var action0MethodInfo =
-                sutType.GetMethod("incrementModified", BindingFlags.Instance | BindingFlags.Public);
-            var typedAction0 = action0MethodInfo.CreateAction0<ClassUnderTest>();
-            for (int i = 0; i < iterateCount; i++) {
-                typedAction0(sut);
-                expected.incrementModified();
-            }
-            Assert.Equal(expected.modified, sut.modified);
-
-            sut = new ClassUnderTest(initialValue);
-            var action0 = action0MethodInfo.CreateAction0();
-            for (int i = 0; i < iterateCount; i++) {
-                action0(sut);
-            }
-            Assert.Equal(expected.modified, sut.modified);
-        }
-
-        [Theory]
-        [MemberData(nameof(IteratorCount))]
-        public void MethodInfoDelegateAction1(int iterateCount) {
-            var initialValue = MethodInfoExtensionsTests.intGenerator.Next();
-            var sut = new ClassUnderTest(initialValue);
-            var expected = new ClassUnderTest(initialValue);
-            var argsPerIterate = generateIntArray(iterateCount);
-
-            var action1MethodInfo =
-                sutType.GetMethod("addToModified", BindingFlags.Instance | BindingFlags.Public);
-            var argTypeAction1 = action1MethodInfo.CreateAction1<ClassUnderTest, int>();
-            for (int i = 0; i < iterateCount; i++) {
-                expected.addToModified(argsPerIterate[i]);
-                argTypeAction1(sut, argsPerIterate[i]);
-            }
-            Assert.Equal(expected.modified, sut.modified);
-
-            sut = new ClassUnderTest(initialValue);
-            var typeAction1 = action1MethodInfo.CreateAction1<ClassUnderTest>();
-            for (int i = 0; i < iterateCount; i++) {
-                typeAction1(sut, argsPerIterate[i]);
-            }
-            Assert.Equal(expected.modified, sut.modified);
-
-            sut = new ClassUnderTest(initialValue);
-            var action1 = action1MethodInfo.CreateAction1();
-            for (int i = 0; i < iterateCount; i++) {
-                action1(sut, argsPerIterate[i]);
-            }
-            Assert.Equal(expected.modified, sut.modified);
         }
 
         [Fact]
@@ -466,17 +238,6 @@ namespace Invio.Extensions.Reflection {
             Assert.False(methodInfo.IsImplementationOf(classMethodInfo));
         }
 
-        /// <summary>
-        /// Creates a random arguments for the count of args supplied.
-        /// </summary>
-        private int[] generateIntArray(int argCount) {
-            var args = new int[argCount];
-            for (int i = 0; i < argCount; i++) {
-                args[i] = MethodInfoExtensionsTests.intGenerator.Next();
-            }
-            return args;
-        }
-
         private static readonly Type isutType = typeof(IClassUnderTest);
         interface IClassUnderTest : IBaseClassUnderTest {
             void interfaceAction();
@@ -557,6 +318,298 @@ namespace Invio.Extensions.Reflection {
             }
         }
 
+        public interface ITestCase<TFunc> {
+
+            TFunc CreateDelegate(MethodInfo method);
+            int InvokeDelegate(Fake fake, TFunc func);
+
+        }
+
+        private class FuncTestCase<TFunc> : ITestCase<TFunc> {
+
+            private Func<MethodInfo, TFunc> createDelegate { get; }
+            private Func<Fake, TFunc, object> invokeDelegate { get; }
+
+            public FuncTestCase(
+                Func<MethodInfo, TFunc> createDelegate,
+                Func<Fake, TFunc, object> invokeDelegate) {
+
+                this.createDelegate = createDelegate;
+                this.invokeDelegate = invokeDelegate;
+            }
+
+            public TFunc CreateDelegate(MethodInfo method) {
+                return this.createDelegate(method);
+            }
+
+            public int InvokeDelegate(Fake fake, TFunc action) {
+                return (int)this.invokeDelegate(fake, action);
+            }
+
+        }
+
+        private class ActionTestCase<TAction> : ITestCase<TAction> {
+
+            private Func<MethodInfo, TAction> createDelegate { get; }
+            private Action<Fake, TAction> invokeDelegate { get; }
+
+            public ActionTestCase(
+                Func<MethodInfo, TAction> createDelegate,
+                Action<Fake, TAction> invokeDelegate) {
+
+                this.createDelegate = createDelegate;
+                this.invokeDelegate = invokeDelegate;
+            }
+
+            public TAction CreateDelegate(MethodInfo method) {
+                return this.createDelegate(method);
+            }
+
+            public int InvokeDelegate(Fake fake, TAction action) {
+                this.invokeDelegate(fake, action);
+
+                return fake.Value;
+            }
+
+        }
+
+        public static IEnumerable<object[]> AssignableBaseTypeCases {
+            get {
+                return new List<object[]> {
+                    new object[] {
+                        nameof(Fake.Func0),
+                        new FuncTestCase<Func<Fake, int>>(
+                            method => method.CreateFunc0<Fake, int>(),
+                            (fake, func) => func(fake)
+                        ),
+                        0
+                    },
+                    new object[] {
+                        nameof(Fake.Func0),
+                        new FuncTestCase<Func<Fake, object>>(
+                            method => method.CreateFunc0<Fake>(),
+                            (fake, func) => func(fake)
+                        ),
+                        0
+                    },
+                    new object[] {
+                        nameof(Fake.Func0),
+                        new FuncTestCase<Func<object, object>>(
+                            method => method.CreateFunc0(),
+                            (fake, func) => func(fake)
+                        ),
+                        0
+                    },
+                    new object[] {
+                        nameof(Fake.Func1),
+                        new FuncTestCase<Func<Fake, object, object>>(
+                            method => method.CreateFunc1<Fake>(),
+                            (fake, func) => func(fake, 1)
+                        ),
+                        1
+                    },
+                    new object[] {
+                        nameof(Fake.Func1),
+                        new FuncTestCase<Func<object, object, object>>(
+                            method => method.CreateFunc1(),
+                            (fake, func) => func(fake, 1)
+                        ),
+                        1
+                    },
+                    new object[] {
+                        nameof(Fake.Func2),
+                        new FuncTestCase<Func<Fake, object, object, object>>(
+                            method => method.CreateFunc2<Fake>(),
+                            (fake, func) => func(fake, 1, 1)
+                        ),
+                        2
+                    },
+                    new object[] {
+                        nameof(Fake.Func2),
+                        new FuncTestCase<Func<object, object, object, object>>(
+                            method => method.CreateFunc2(),
+                            (fake, func) => func(fake, 1, 1)
+                        ),
+                        2
+                    },
+                    new object[] {
+                        nameof(Fake.Func3),
+                        new FuncTestCase<Func<Fake, object, object, object, object>>(
+                            method => method.CreateFunc3<Fake>(),
+                            (fake, func) => func(fake, 1, 1, 1)
+                        ),
+                        3
+                    },
+                    new object[] {
+                        nameof(Fake.Func3),
+                        new FuncTestCase<Func<object, object, object, object, object>>(
+                            method => method.CreateFunc3(),
+                            (fake, func) => func(fake, 1, 1, 1)
+                        ),
+                        3
+                    },
+                    new object[] {
+                        nameof(Fake.Func4),
+                        new FuncTestCase<Func<Fake, object, object, object, object, object>>(
+                            method => method.CreateFunc4<Fake>(),
+                            (fake, func) => func(fake, 1, 1, 1, 1)
+                        ),
+                        4
+                    },
+                    new object[] {
+                        nameof(Fake.Func4),
+                        new FuncTestCase<Func<object, object, object, object, object, object>>(
+                            method => method.CreateFunc4(),
+                            (fake, func) => func(fake, 1, 1, 1, 1)
+                        ),
+                        4
+                    },
+                    new object[] {
+                        nameof(Fake.Func5),
+                        new FuncTestCase<Func<Fake, object, object, object, object, object, object>>(
+                            method => method.CreateFunc5<Fake>(),
+                            (fake, func) => func(fake, 1, 1, 1, 1, 1)
+                        ),
+                        5
+                    },
+                    new object[] {
+                        nameof(Fake.Func5),
+                        new FuncTestCase<Func<object, object, object, object, object, object, object>>(
+                            method => method.CreateFunc5(),
+                            (fake, func) => func(fake, 1, 1, 1, 1, 1)
+                        ),
+                        5
+                    },
+                    new object[] {
+                        nameof(Fake.Func6),
+                        new FuncTestCase<Func<Fake, object, object, object, object, object, object, object>>(
+                            method => method.CreateFunc6<Fake>(),
+                            (fake, func) => func(fake, 1, 1, 1, 1, 1, 1)
+                        ),
+                        6
+                    },
+                    new object[] {
+                        nameof(Fake.Func6),
+                        new FuncTestCase<Func<object, object, object, object, object, object, object, object>>(
+                            method => method.CreateFunc6(),
+                            (fake, func) => func(fake, 1, 1, 1, 1, 1, 1)
+                        ),
+                        6
+                    },
+                    new object[] {
+                        nameof(Fake.Func7),
+                        new FuncTestCase<Func<Fake, object, object, object, object, object, object, object, object>>(
+                            method => method.CreateFunc7<Fake>(),
+                            (fake, func) => func(fake, 1, 1, 1, 1, 1, 1, 1)
+                        ),
+                        7
+                    },
+                    new object[] {
+                        nameof(Fake.Func7),
+                        new FuncTestCase<Func<object, object, object, object, object, object, object, object, object>>(
+                            method => method.CreateFunc7(),
+                            (fake, func) => func(fake, 1, 1, 1, 1, 1, 1, 1)
+                        ),
+                        7
+                    },
+                    new object[] {
+                        nameof(Fake.Func8),
+                        new FuncTestCase<Func<Fake, object, object, object, object, object, object, object, object, object>>(
+                            method => method.CreateFunc8<Fake>(),
+                            (fake, func) => func(fake, 1, 1, 1, 1, 1, 1, 1, 1)
+                        ),
+                        8
+                    },
+                    new object[] {
+                        nameof(Fake.Func8),
+                        new FuncTestCase<Func<object, object, object, object, object, object, object, object, object, object>>(
+                            method => method.CreateFunc8(),
+                            (fake, func) => func(fake, 1, 1, 1, 1, 1, 1, 1, 1)
+                        ),
+                        8
+                    },
+                    new object[] {
+                        nameof(Fake.Func9),
+                        new FuncTestCase<Func<Fake, object, object, object, object, object, object, object, object, object, object>>(
+                            method => method.CreateFunc9<Fake>(),
+                            (fake, func) => func(fake, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+                        ),
+                        9
+                    },
+                    new object[] {
+                        nameof(Fake.Func9),
+                        new FuncTestCase<Func<object, object, object, object, object, object, object, object, object, object, object>>(
+                            method => method.CreateFunc9(),
+                            (fake, func) => func(fake, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+                        ),
+                        9
+                    },
+                    new object[] {
+                        nameof(Fake.Action0),
+                        new ActionTestCase<Action<Fake>>(
+                            method => method.CreateAction0<Fake>(),
+                            (fake, action) => action(fake)
+                        ),
+                        0
+                    },
+                    new object[] {
+                        nameof(Fake.Action0),
+                        new ActionTestCase<Action<object>>(
+                            method => method.CreateAction0(),
+                            (fake, action) => action(fake)
+                        ),
+                        0
+                    },
+                    new object[] {
+                        nameof(Fake.Action1),
+                        new ActionTestCase<Action<Fake, int>>(
+                            method => method.CreateAction1<Fake, int>(),
+                            (fake, action) => action(fake, 1)
+                        ),
+                        1
+                    },
+                    new object[] {
+                        nameof(Fake.Action1),
+                        new ActionTestCase<Action<Fake, object>>(
+                            method => method.CreateAction1<Fake>(),
+                            (fake, action) => action(fake, 1)
+                        ),
+                        1
+                    },
+                    new object[] {
+                        nameof(Fake.Action1),
+                        new ActionTestCase<Action<object, object>>(
+                            method => method.CreateAction1(),
+                            (fake, action) => action(fake, 1)
+                        ),
+                        1
+                    }
+                };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(AssignableBaseTypeCases))]
+        public void CreateDelegate_AssignableBaseTypeImpl<TAction>(
+            String methodName,
+            ITestCase<TAction> test,
+            int expectedValue) {
+
+            // Arrange
+
+            var fake = new Fake();
+            var method = typeof(Fake).GetMethod(methodName);
+
+            // Act
+
+            var methodDelegate = test.CreateDelegate(method);
+            var actualValue = test.InvokeDelegate(fake, methodDelegate);
+
+            // Assert
+
+            Assert.Equal(expectedValue, actualValue);
+        }
+
         public static IEnumerable<object[]> ArgumentNullCases {
             get {
                 return new List<object[]> {
@@ -627,6 +680,8 @@ namespace Invio.Extensions.Reflection {
 
         public class Fake : IFake {
 
+            public int Value { get; private set; }
+
             public int Func0() {
                 return 0;
             }
@@ -669,8 +724,13 @@ namespace Invio.Extensions.Reflection {
                 return a + b + c + d + e + f + g + h + i;
             }
 
-            public void Action0() {}
-            public void Action1(int a) {}
+            public void Action0() {
+                this.Value = 0;
+            }
+
+            public void Action1(int a) {
+                this.Value = a;
+            }
 
         }
 
