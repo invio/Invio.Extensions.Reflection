@@ -318,279 +318,56 @@ namespace Invio.Extensions.Reflection {
             }
         }
 
-        public interface ITestCase<TFunc> {
-
-            TFunc CreateDelegate(MethodInfo method);
-            int InvokeDelegate(Fake fake, TFunc func);
-
-        }
-
-        private class FuncTestCase<TFunc> : ITestCase<TFunc> {
-
-            private Func<MethodInfo, TFunc> createDelegate { get; }
-            private Func<Fake, TFunc, object> invokeDelegate { get; }
-
-            public FuncTestCase(
-                Func<MethodInfo, TFunc> createDelegate,
-                Func<Fake, TFunc, object> invokeDelegate) {
-
-                this.createDelegate = createDelegate;
-                this.invokeDelegate = invokeDelegate;
-            }
-
-            public TFunc CreateDelegate(MethodInfo method) {
-                return this.createDelegate(method);
-            }
-
-            public int InvokeDelegate(Fake fake, TFunc action) {
-                return (int)this.invokeDelegate(fake, action);
-            }
-
-        }
-
-        private class ActionTestCase<TAction> : ITestCase<TAction> {
-
-            private Func<MethodInfo, TAction> createDelegate { get; }
-            private Action<Fake, TAction> invokeDelegate { get; }
-
-            public ActionTestCase(
-                Func<MethodInfo, TAction> createDelegate,
-                Action<Fake, TAction> invokeDelegate) {
-
-                this.createDelegate = createDelegate;
-                this.invokeDelegate = invokeDelegate;
-            }
-
-            public TAction CreateDelegate(MethodInfo method) {
-                return this.createDelegate(method);
-            }
-
-            public int InvokeDelegate(Fake fake, TAction action) {
-                this.invokeDelegate(fake, action);
-
-                return fake.Value;
-            }
-
-        }
-
         public static IEnumerable<object[]> AssignableBaseTypeCases {
             get {
                 return new List<object[]> {
                     new object[] {
                         nameof(Fake.Func0),
-                        new FuncTestCase<Func<Fake, int>>(
-                            method => method.CreateFunc0<Fake, int>(),
+                        new FuncTestCase<Func<IFake, int>>(
+                            method => method.CreateFunc0<IFake, int>(),
                             (fake, func) => func(fake)
                         ),
                         0
                     },
-                    new object[] {
-                        nameof(Fake.Func0),
-                        new FuncTestCase<Func<Fake, object>>(
-                            method => method.CreateFunc0<Fake>(),
-                            (fake, func) => func(fake)
-                        ),
-                        0
-                    },
-                    new object[] {
-                        nameof(Fake.Func0),
-                        new FuncTestCase<Func<object, object>>(
-                            method => method.CreateFunc0(),
-                            (fake, func) => func(fake)
-                        ),
-                        0
-                    },
-                    new object[] {
-                        nameof(Fake.Func1),
-                        new FuncTestCase<Func<Fake, object, object>>(
-                            method => method.CreateFunc1<Fake>(),
-                            (fake, func) => func(fake, 1)
-                        ),
-                        1
-                    },
-                    new object[] {
-                        nameof(Fake.Func1),
-                        new FuncTestCase<Func<object, object, object>>(
-                            method => method.CreateFunc1(),
-                            (fake, func) => func(fake, 1)
-                        ),
-                        1
-                    },
-                    new object[] {
-                        nameof(Fake.Func2),
-                        new FuncTestCase<Func<Fake, object, object, object>>(
-                            method => method.CreateFunc2<Fake>(),
-                            (fake, func) => func(fake, 1, 1)
-                        ),
-                        2
-                    },
-                    new object[] {
-                        nameof(Fake.Func2),
-                        new FuncTestCase<Func<object, object, object, object>>(
-                            method => method.CreateFunc2(),
-                            (fake, func) => func(fake, 1, 1)
-                        ),
-                        2
-                    },
-                    new object[] {
-                        nameof(Fake.Func3),
-                        new FuncTestCase<Func<Fake, object, object, object, object>>(
-                            method => method.CreateFunc3<Fake>(),
-                            (fake, func) => func(fake, 1, 1, 1)
-                        ),
-                        3
-                    },
-                    new object[] {
-                        nameof(Fake.Func3),
-                        new FuncTestCase<Func<object, object, object, object, object>>(
-                            method => method.CreateFunc3(),
-                            (fake, func) => func(fake, 1, 1, 1)
-                        ),
-                        3
-                    },
-                    new object[] {
-                        nameof(Fake.Func4),
-                        new FuncTestCase<Func<Fake, object, object, object, object, object>>(
-                            method => method.CreateFunc4<Fake>(),
-                            (fake, func) => func(fake, 1, 1, 1, 1)
-                        ),
-                        4
-                    },
-                    new object[] {
-                        nameof(Fake.Func4),
-                        new FuncTestCase<Func<object, object, object, object, object, object>>(
-                            method => method.CreateFunc4(),
-                            (fake, func) => func(fake, 1, 1, 1, 1)
-                        ),
-                        4
-                    },
-                    new object[] {
-                        nameof(Fake.Func5),
-                        new FuncTestCase<Func<Fake, object, object, object, object, object, object>>(
-                            method => method.CreateFunc5<Fake>(),
-                            (fake, func) => func(fake, 1, 1, 1, 1, 1)
-                        ),
-                        5
-                    },
-                    new object[] {
-                        nameof(Fake.Func5),
-                        new FuncTestCase<Func<object, object, object, object, object, object, object>>(
-                            method => method.CreateFunc5(),
-                            (fake, func) => func(fake, 1, 1, 1, 1, 1)
-                        ),
-                        5
-                    },
-                    new object[] {
-                        nameof(Fake.Func6),
-                        new FuncTestCase<Func<Fake, object, object, object, object, object, object, object>>(
-                            method => method.CreateFunc6<Fake>(),
-                            (fake, func) => func(fake, 1, 1, 1, 1, 1, 1)
-                        ),
-                        6
-                    },
-                    new object[] {
-                        nameof(Fake.Func6),
-                        new FuncTestCase<Func<object, object, object, object, object, object, object, object>>(
-                            method => method.CreateFunc6(),
-                            (fake, func) => func(fake, 1, 1, 1, 1, 1, 1)
-                        ),
-                        6
-                    },
-                    new object[] {
-                        nameof(Fake.Func7),
-                        new FuncTestCase<Func<Fake, object, object, object, object, object, object, object, object>>(
-                            method => method.CreateFunc7<Fake>(),
-                            (fake, func) => func(fake, 1, 1, 1, 1, 1, 1, 1)
-                        ),
-                        7
-                    },
-                    new object[] {
-                        nameof(Fake.Func7),
-                        new FuncTestCase<Func<object, object, object, object, object, object, object, object, object>>(
-                            method => method.CreateFunc7(),
-                            (fake, func) => func(fake, 1, 1, 1, 1, 1, 1, 1)
-                        ),
-                        7
-                    },
-                    new object[] {
-                        nameof(Fake.Func8),
-                        new FuncTestCase<Func<Fake, object, object, object, object, object, object, object, object, object>>(
-                            method => method.CreateFunc8<Fake>(),
-                            (fake, func) => func(fake, 1, 1, 1, 1, 1, 1, 1, 1)
-                        ),
-                        8
-                    },
-                    new object[] {
-                        nameof(Fake.Func8),
-                        new FuncTestCase<Func<object, object, object, object, object, object, object, object, object, object>>(
-                            method => method.CreateFunc8(),
-                            (fake, func) => func(fake, 1, 1, 1, 1, 1, 1, 1, 1)
-                        ),
-                        8
-                    },
-                    new object[] {
-                        nameof(Fake.Func9),
-                        new FuncTestCase<Func<Fake, object, object, object, object, object, object, object, object, object, object>>(
-                            method => method.CreateFunc9<Fake>(),
-                            (fake, func) => func(fake, 1, 1, 1, 1, 1, 1, 1, 1, 1)
-                        ),
-                        9
-                    },
-                    new object[] {
-                        nameof(Fake.Func9),
-                        new FuncTestCase<Func<object, object, object, object, object, object, object, object, object, object, object>>(
-                            method => method.CreateFunc9(),
-                            (fake, func) => func(fake, 1, 1, 1, 1, 1, 1, 1, 1, 1)
-                        ),
-                        9
-                    },
-                    new object[] {
-                        nameof(Fake.Action0),
-                        new ActionTestCase<Action<Fake>>(
-                            method => method.CreateAction0<Fake>(),
-                            (fake, action) => action(fake)
-                        ),
-                        0
-                    },
-                    new object[] {
-                        nameof(Fake.Action0),
-                        new ActionTestCase<Action<object>>(
-                            method => method.CreateAction0(),
-                            (fake, action) => action(fake)
-                        ),
-                        0
-                    },
+                    new object[] { nameof(Fake.Func0), TypedTestCases.Func0, 0 },
+                    new object[] { nameof(Fake.Func0), TestCases.Func0, 0 },
+                    new object[] { nameof(Fake.Func1), TypedTestCases.Func1, 1 },
+                    new object[] { nameof(Fake.Func1), TestCases.Func1, 1 },
+                    new object[] { nameof(Fake.Func2), TypedTestCases.Func2, 2 },
+                    new object[] { nameof(Fake.Func2), TestCases.Func2, 2 },
+                    new object[] { nameof(Fake.Func3), TypedTestCases.Func3, 3 },
+                    new object[] { nameof(Fake.Func3), TestCases.Func3, 3 },
+                    new object[] { nameof(Fake.Func4), TypedTestCases.Func4, 4 },
+                    new object[] { nameof(Fake.Func4), TestCases.Func4, 4 },
+                    new object[] { nameof(Fake.Func5), TypedTestCases.Func5, 5 },
+                    new object[] { nameof(Fake.Func5), TestCases.Func5, 5 },
+                    new object[] { nameof(Fake.Func6), TypedTestCases.Func6, 6 },
+                    new object[] { nameof(Fake.Func6), TestCases.Func6, 6 },
+                    new object[] { nameof(Fake.Func7), TypedTestCases.Func7, 7 },
+                    new object[] { nameof(Fake.Func7), TestCases.Func7, 7 },
+                    new object[] { nameof(Fake.Func8), TypedTestCases.Func8, 8 },
+                    new object[] { nameof(Fake.Func8), TestCases.Func8, 8 },
+                    new object[] { nameof(Fake.Func9), TypedTestCases.Func9, 9 },
+                    new object[] { nameof(Fake.Func9), TestCases.Func9, 9 },
+                    new object[] { nameof(Fake.Action0), TypedTestCases.Action0, 0 },
+                    new object[] { nameof(Fake.Action0), TestCases.Action0, 0 },
                     new object[] {
                         nameof(Fake.Action1),
-                        new ActionTestCase<Action<Fake, int>>(
-                            method => method.CreateAction1<Fake, int>(),
+                        new ActionTestCase<Action<IFake, int>>(
+                            method => method.CreateAction1<IFake, int>(),
                             (fake, action) => action(fake, 1)
                         ),
                         1
                     },
-                    new object[] {
-                        nameof(Fake.Action1),
-                        new ActionTestCase<Action<Fake, object>>(
-                            method => method.CreateAction1<Fake>(),
-                            (fake, action) => action(fake, 1)
-                        ),
-                        1
-                    },
-                    new object[] {
-                        nameof(Fake.Action1),
-                        new ActionTestCase<Action<object, object>>(
-                            method => method.CreateAction1(),
-                            (fake, action) => action(fake, 1)
-                        ),
-                        1
-                    }
+                    new object[] { nameof(Fake.Action1), TypedTestCases.Action1, 1 },
+                    new object[] { nameof(Fake.Action1), TestCases.Action1, 1 }
                 };
             }
         }
 
         [Theory]
         [MemberData(nameof(AssignableBaseTypeCases))]
-        public void CreateDelegate_AssignableBaseTypeImpl<TAction>(
+        public void CreateDelegate_ExactBaseType<TAction>(
             String methodName,
             ITestCase<TAction> test,
             int expectedValue) {
@@ -598,7 +375,7 @@ namespace Invio.Extensions.Reflection {
             // Arrange
 
             var fake = new Fake();
-            var method = typeof(Fake).GetMethod(methodName);
+            var method = typeof(IFake).GetMethod(methodName);
 
             // Act
 
@@ -661,8 +438,216 @@ namespace Invio.Extensions.Reflection {
             Assert.IsType<ArgumentNullException>(exception);
         }
 
+        public static class TypedTestCases {
+
+            public static ITestCase<Func<IFake, object>> Func0 =
+                new FuncTestCase<Func<IFake, object>>(
+                    method => method.CreateFunc0<IFake>(),
+                    (fake, func) => func(fake)
+                );
+
+            public static ITestCase<Func<IFake, object, object>> Func1 =
+                new FuncTestCase<Func<IFake, object, object>>(
+                    method => method.CreateFunc1<IFake>(),
+                    (fake, func) => func(fake, 1)
+                );
+
+            public static ITestCase<Func<IFake, object, object, object>> Func2 =
+                new FuncTestCase<Func<IFake, object, object, object>>(
+                    method => method.CreateFunc2<IFake>(),
+                    (fake, func) => func(fake, 1, 1)
+                );
+
+            public static ITestCase<Func<IFake, object, object, object, object>> Func3 =
+                new FuncTestCase<Func<IFake, object, object, object, object>>(
+                    method => method.CreateFunc3<IFake>(),
+                    (fake, func) => func(fake, 1, 1, 1)
+                );
+
+            public static ITestCase<Func<IFake,  object, object, object, object, object>> Func4 =
+                new FuncTestCase<Func<IFake, object, object, object, object, object>>(
+                    method => method.CreateFunc4<IFake>(),
+                    (fake, func) => func(fake, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<Func<IFake, object, object, object, object, object, object>> Func5 =
+                new FuncTestCase<Func<IFake, object, object, object, object, object, object>>(
+                    method => method.CreateFunc5<IFake>(),
+                    (fake, func) => func(fake, 1, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<Func<IFake, object, object, object, object, object, object, object>> Func6 =
+                new FuncTestCase<Func<IFake, object, object, object, object, object, object, object>>(
+                    method => method.CreateFunc6<IFake>(),
+                    (fake, func) => func(fake, 1, 1, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<Func<IFake, object, object, object, object, object, object, object, object>> Func7 =
+                new FuncTestCase<Func<IFake, object, object, object, object, object, object, object, object>>(
+                    method => method.CreateFunc7<IFake>(),
+                    (fake, func) => func(fake, 1, 1, 1, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<Func<IFake, object, object, object, object, object, object, object, object, object>> Func8 =
+                new FuncTestCase<Func<IFake, object, object, object, object, object, object, object, object, object>>(
+                    method => method.CreateFunc8<IFake>(),
+                    (fake, func) => func(fake, 1, 1, 1, 1, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<Func<IFake, object, object, object, object, object, object, object, object, object, object>> Func9 =
+                new FuncTestCase<Func<IFake, object, object, object, object, object, object, object, object, object, object>>(
+                    method => method.CreateFunc9<IFake>(),
+                    (fake, func) => func(fake, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<Action<IFake>> Action0 =
+                new ActionTestCase<Action<IFake>>(
+                    method => method.CreateAction0<IFake>(),
+                    (fake, action) => action(fake)
+                );
+
+            public static ITestCase<Action<IFake, object>> Action1 =
+                new ActionTestCase<Action<IFake, object>>(
+                    method => method.CreateAction1<IFake>(),
+                    (fake, action) => action(fake, 1)
+                );
+
+        }
+
+        public static class TestCases {
+
+            public static ITestCase<Func<object, object>> Func0 =
+                new FuncTestCase<Func<object, object>>(
+                    method => method.CreateFunc0(),
+                    (fake, func) => func(fake)
+                );
+
+            public static ITestCase<Func<object, object, object>> Func1 =
+                new FuncTestCase<Func<object, object, object>>(
+                    method => method.CreateFunc1(),
+                    (fake, func) => func(fake, 1)
+                );
+
+            public static ITestCase<Func<object, object, object, object>> Func2 =
+                new FuncTestCase<Func<object, object, object, object>>(
+                    method => method.CreateFunc2(),
+                    (fake, func) => func(fake, 1, 1)
+                );
+
+            public static ITestCase<Func<object, object, object, object, object>> Func3 =
+                new FuncTestCase<Func<object, object, object, object, object>>(
+                    method => method.CreateFunc3(),
+                    (fake, func) => func(fake, 1, 1, 1)
+                );
+
+            public static ITestCase<Func<object, object, object, object, object, object>> Func4 =
+                new FuncTestCase<Func<object, object, object, object, object, object>>(
+                    method => method.CreateFunc4(),
+                    (fake, func) => func(fake, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<Func<object, object, object, object, object, object, object>> Func5 =
+                new FuncTestCase<Func<object, object, object, object, object, object, object>>(
+                    method => method.CreateFunc5(),
+                    (fake, func) => func(fake, 1, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<Func<object, object, object, object, object, object, object, object>> Func6 =
+                new FuncTestCase<Func<object, object, object, object, object, object, object, object>>(
+                    method => method.CreateFunc6(),
+                    (fake, func) => func(fake, 1, 1, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<Func<object, object, object, object, object, object, object, object, object>> Func7 =
+                new FuncTestCase<Func<object, object, object, object, object, object, object, object, object>>(
+                    method => method.CreateFunc7(),
+                    (fake, func) => func(fake, 1, 1, 1, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<Func<object, object, object, object, object, object, object, object, object, object>> Func8 =
+                new FuncTestCase<Func<object, object, object, object, object, object, object, object, object, object>>(
+                    method => method.CreateFunc8(),
+                    (fake, func) => func(fake, 1, 1, 1, 1, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<Func<object, object, object, object, object, object, object, object, object, object, object>> Func9 =
+                new FuncTestCase<Func<object, object, object, object, object, object, object, object, object, object, object>>(
+                    method => method.CreateFunc9(),
+                    (fake, func) => func(fake, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+                );
+
+            public static ITestCase<Action<object>> Action0 =
+                new ActionTestCase<Action<object>>(
+                    method => method.CreateAction0(),
+                    (fake, action) => action(fake)
+                );
+
+            public static ITestCase<Action<object, object>> Action1 =
+                new ActionTestCase<Action<object, object>>(
+                    method => method.CreateAction1(),
+                    (fake, action) => action(fake, 1)
+                );
+
+        }
+
+        public interface ITestCase<TFunc> {
+
+            TFunc CreateDelegate(MethodInfo method);
+            int InvokeDelegate(IFake fake, TFunc func);
+
+        }
+
+        private class FuncTestCase<TFunc> : ITestCase<TFunc> {
+
+            private Func<MethodInfo, TFunc> createDelegate { get; }
+            private Func<IFake, TFunc, object> invokeDelegate { get; }
+
+            public FuncTestCase(
+                Func<MethodInfo, TFunc> createDelegate,
+                Func<IFake, TFunc, object> invokeDelegate) {
+
+                this.createDelegate = createDelegate;
+                this.invokeDelegate = invokeDelegate;
+            }
+
+            public TFunc CreateDelegate(MethodInfo method) {
+                return this.createDelegate(method);
+            }
+
+            public int InvokeDelegate(IFake fake, TFunc action) {
+                return (int)this.invokeDelegate(fake, action);
+            }
+
+        }
+
+        private class ActionTestCase<TAction> : ITestCase<TAction> {
+
+            private Func<MethodInfo, TAction> createDelegate { get; }
+            private Action<IFake, TAction> invokeDelegate { get; }
+
+            public ActionTestCase(
+                Func<MethodInfo, TAction> createDelegate,
+                Action<IFake, TAction> invokeDelegate) {
+
+                this.createDelegate = createDelegate;
+                this.invokeDelegate = invokeDelegate;
+            }
+
+            public TAction CreateDelegate(MethodInfo method) {
+                return this.createDelegate(method);
+            }
+
+            public int InvokeDelegate(IFake fake, TAction action) {
+                this.invokeDelegate(fake, action);
+
+                return fake.Value;
+            }
+
+        }
+
         public interface IFake {
 
+            int Value { get; }
             int Func0();
             int Func1(int a);
             int Func2(int a, int b);

@@ -666,8 +666,9 @@ namespace Invio.Extensions.Reflection {
 
             if (!method.DeclaringType.IsAssignableFrom(typeof(TBase))) {
                 throw new ArgumentException(
-                    "The declaring type of the method did not match the generic " +
-                    "parameter T.",
+                    $"Type parameter '{nameof(TBase)}' was '{typeof(TBase).Name}', " +
+                    $"which is not assignable to the property's declaring type of " +
+                    $"'{method.DeclaringType.Name}'.",
                     nameof(method)
                 );
             }
