@@ -1,6 +1,5 @@
 using System;
 using System.Reflection;
-using Peddler;
 using Invio.Xunit;
 using Xunit;
 
