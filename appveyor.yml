@@ -22,7 +22,7 @@ deploy:
 - provider: NuGet
   name: production
   api_key:
-    secure: PhzvKEzboYRGqGP1b9vHQIYr7yma8Aoadz8X7Fh3K+3/AbSu20BCeK3wvvgdQ0Co
+    secure: he2Qn1pXBg16ragqdM4UbDn1F5Z8bm8cijTz/Ozatfsz/D5j24WYRw1ko2CbWn+H
   on:
     branch: master
     appveyor_repo_tag: true
