@@ -10,6 +10,79 @@ namespace Invio.Extensions.Reflection {
     [UnitTest]
     public class MethodInfoExtensionsTests {
 
+        public static IEnumerable<object[]> CachedDelegateCases {
+            get {
+                return new List<object[]> {
+                    new object[] { nameof(Fake.Func0), TypedTestCases<Fake>.Func0 },
+                    new object[] { nameof(Fake.Func0), TestCases<Fake>.Func0 },
+                    new object[] { nameof(Fake.Func1), TypedTestCases<Fake>.Func1 },
+                    new object[] { nameof(Fake.Func1), TestCases<Fake>.Func1 },
+                    new object[] { nameof(Fake.Func2), TypedTestCases<Fake>.Func2 },
+                    new object[] { nameof(Fake.Func2), TestCases<Fake>.Func2 },
+                    new object[] { nameof(Fake.Func3), TypedTestCases<Fake>.Func3 },
+                    new object[] { nameof(Fake.Func3), TestCases<Fake>.Func3 },
+                    new object[] { nameof(Fake.Func4), TypedTestCases<Fake>.Func4 },
+                    new object[] { nameof(Fake.Func4), TestCases<Fake>.Func4 },
+                    new object[] { nameof(Fake.Func5), TypedTestCases<Fake>.Func5 },
+                    new object[] { nameof(Fake.Func5), TestCases<Fake>.Func5 },
+                    new object[] { nameof(Fake.Func6), TypedTestCases<Fake>.Func6 },
+                    new object[] { nameof(Fake.Func6), TestCases<Fake>.Func6 },
+                    new object[] { nameof(Fake.Func7), TypedTestCases<Fake>.Func7 },
+                    new object[] { nameof(Fake.Func7), TestCases<Fake>.Func7 },
+                    new object[] { nameof(Fake.Func8), TypedTestCases<Fake>.Func8 },
+                    new object[] { nameof(Fake.Func8), TestCases<Fake>.Func8 },
+                    new object[] { nameof(Fake.Func9), TypedTestCases<Fake>.Func9 },
+                    new object[] { nameof(Fake.Func9), TestCases<Fake>.Func9 },
+                    new object[] { nameof(Fake.Action0), TypedTestCases<Fake>.Action0 },
+                    new object[] { nameof(Fake.Action0), TestCases<Fake>.Action0 },
+                    new object[] { nameof(Fake.Action1), TypedTestCases<Fake>.Action1 },
+                    new object[] { nameof(Fake.Action1), TestCases<Fake>.Action1 },
+                    new object[] { nameof(Fake.Action2), TypedTestCases<Fake>.Action2 },
+                    new object[] { nameof(Fake.Action2), TestCases<Fake>.Action2 },
+                    new object[] { nameof(Fake.Action3), TypedTestCases<Fake>.Action3 },
+                    new object[] { nameof(Fake.Action3), TestCases<Fake>.Action3 },
+                    new object[] { nameof(Fake.Action4), TypedTestCases<Fake>.Action4 },
+                    new object[] { nameof(Fake.Action4), TestCases<Fake>.Action4 },
+                    new object[] { nameof(Fake.Action5), TypedTestCases<Fake>.Action5 },
+                    new object[] { nameof(Fake.Action5), TestCases<Fake>.Action5 },
+                    new object[] { nameof(Fake.Action6), TypedTestCases<Fake>.Action6 },
+                    new object[] { nameof(Fake.Action6), TestCases<Fake>.Action6 },
+                    new object[] { nameof(Fake.Action7), TypedTestCases<Fake>.Action7 },
+                    new object[] { nameof(Fake.Action7), TestCases<Fake>.Action7 },
+                    new object[] { nameof(Fake.Action8), TypedTestCases<Fake>.Action8 },
+                    new object[] { nameof(Fake.Action8), TestCases<Fake>.Action8 },
+                    new object[] { nameof(Fake.Action9), TypedTestCases<Fake>.Action9 },
+                    new object[] { nameof(Fake.Action9), TestCases<Fake>.Action9 }
+                };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(CachedDelegateCases))]
+        public void CreateDelegate_CachedInstances<TFunc>(
+            String methodName,
+            ITestCase<Fake, TFunc> testCase) {
+
+            // Arrange
+
+            var method = typeof(Fake).GetMethod(methodName);
+
+            // Act
+
+            var left = testCase.CreateDelegate(method);
+            var right = testCase.CreateDelegate(method);
+
+            // Assert
+
+            Assert.NotNull(left);
+            Assert.NotNull(right);
+
+            Assert.True(
+                Object.ReferenceEquals(left, right),
+                "Expect the same instance to be returned from the cache."
+            );
+        }
+
         public static IEnumerable<object[]> ActionWithReturnTypeCases {
             get {
                 return new List<object[]> {
