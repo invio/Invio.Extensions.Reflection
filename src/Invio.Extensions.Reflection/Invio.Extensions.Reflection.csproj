@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyTitle>Invio Extensions to System.Reflection</AssemblyTitle>
+    <VersionPrefix>1.0.1</VersionPrefix>
+    <Authors>Saqib Rokadia &lt;saqib@invioinc.com&gt;;Brian Caruso &lt;brian@invioinc.com&gt;</Authors>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <DebugType>full</DebugType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Invio.Extensions.Reflection</AssemblyName>
+    <PackageId>Invio.Extensions.Reflection</PackageId>
+    <PackageTags>reflection;core</PackageTags>
+    <PackageProjectUrl>https://github.com/invio/Invio.Extensions.Reflection/</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/invio/Invio.Extensions.Reflection/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>git@github.com:invio/Invio.Extensions.Reflection</RepositoryUrl>
+    <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0" />
+  </ItemGroup>
+
+</Project>
