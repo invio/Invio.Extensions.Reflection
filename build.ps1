@@ -52,7 +52,8 @@ if(Test-Path .\artifacts) { Remove-Item .\artifacts -Force -Recurse }
 
 EnsurePsbuildInstalled
 
-exec { & dotnet restore }
+exec { & dotnet restore .\src\Invio.Extensions.Reflection }
+exec { & dotnet restore .\test\Invio.Extensions.Reflection.Tests }
 
 exec { & dotnet build .\src\Invio.Extensions.Reflection }
 exec { & dotnet build .\test\Invio.Extensions.Reflection.Tests }
@@ -60,6 +61,6 @@ exec { & dotnet build .\test\Invio.Extensions.Reflection.Tests }
 $revision = @{ $true = $env:APPVEYOR_BUILD_NUMBER; $false = 1 }[$env:APPVEYOR_BUILD_NUMBER -ne $NULL];
 $revision = "{0:D4}" -f [convert]::ToInt32($revision, 10)
 
-exec { & dotnet test .\test\Invio.Extensions.Reflection.Tests -c Release }
+exec { & dotnet test .\test\Invio.Extensions.Reflection.Tests\Invio.Extensions.Reflection.Tests.csproj -c Release }
 
-exec { & dotnet pack .\src\Invio.Extensions.Reflection -c Release -o .\artifacts }
+exec { & dotnet pack .\src\Invio.Extensions.Reflection -c Release -o ..\..\artifacts }
