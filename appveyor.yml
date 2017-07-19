@@ -12,7 +12,6 @@ nuget:
 build_script:
 - ps: .\build.ps1
 after_build:
-- ps: .\set-debug-type.ps1
 - ps: .\coverage.ps1
 test: off
 artifacts:
