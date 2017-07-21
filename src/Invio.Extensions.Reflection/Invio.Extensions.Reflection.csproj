@@ -5,7 +5,7 @@
     <VersionPrefix>1.0.2</VersionPrefix>
     <Authors>Saqib Rokadia &lt;saqib@invioinc.com&gt;;Brian Caruso &lt;brian@invioinc.com&gt;</Authors>
     <TargetFramework>netstandard1.3</TargetFramework>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Invio.Extensions.Reflection</AssemblyName>
     <PackageId>Invio.Extensions.Reflection</PackageId>
