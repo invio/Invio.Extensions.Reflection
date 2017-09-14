@@ -22,7 +22,7 @@ deploy:
 - provider: NuGet
   name: production
   api_key:
-    secure: PhzvKEzboYRGqGP1b9vHQIYr7yma8Aoadz8X7Fh3K+3/AbSu20BCeK3wvvgdQ0Co
+    secure: https://twitter.com/rokadias/status/907651827239337984
   on:
     branch: master
     appveyor_repo_tag: true
