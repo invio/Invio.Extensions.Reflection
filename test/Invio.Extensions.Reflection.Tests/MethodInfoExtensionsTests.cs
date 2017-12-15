@@ -74,9 +74,6 @@ namespace Invio.Extensions.Reflection {
 
             // Assert
 
-            Assert.NotNull(left);
-            Assert.NotNull(right);
-
             Assert.True(
                 Object.ReferenceEquals(left, right),
                 "Expect the same instance to be returned from the cache."
