@@ -65,10 +65,13 @@ namespace Invio.Extensions.Reflection {
 
         [Theory]
         [InlineData(typeof(object), typeof(object))]
+        [InlineData(typeof(string), typeof(object))]
         [InlineData(typeof(ClassUnderTest<int, string>), typeof(ClassUnderTest<int, string>))]
         [InlineData(typeof(ClassUnderTest<int, string>), typeof(ClassUnderTest<,>))]
         [InlineData(typeof(List<string>), typeof(IList<string>))]
         [InlineData(typeof(List<int>), typeof(IList<>))]
+        [InlineData(typeof(IList<int>), typeof(IList<>))]
+        [InlineData(typeof(IDictionary<string, int>), typeof(IDictionary<,>))]
         [InlineData(typeof(ArgumentNullException), typeof(ArgumentException))]
         [InlineData(typeof(IList), typeof(IEnumerable))]
         [InlineData(typeof(IList<>), typeof(IEnumerable<>))]

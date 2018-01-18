@@ -135,7 +135,7 @@ namespace Invio.Extensions.Reflection {
             IEnumerable<Type> potentialMatches;
 
             if (parentTypeInfo.IsInterface) {
-                potentialMatches = type.GetInterfaces();
+                potentialMatches = new [] { type }.Concat(type.GetInterfaces());
             } else {
                 potentialMatches = GetBaseTypes(type);
             }
