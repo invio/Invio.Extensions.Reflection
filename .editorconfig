@@ -9,12 +9,12 @@ end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-# 2 space indentation
-[*.cs]
-indent_style = space
-indent_size = 4
-
-# 2 space indentation
+# 2 space indentation by default
 [*.*]
 indent_style = space
 indent_size = 2
+
+# 4 space indentation for c# files
+[*.cs]
+indent_style = space
+indent_size = 4

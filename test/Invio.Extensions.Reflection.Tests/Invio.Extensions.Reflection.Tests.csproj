@@ -6,9 +6,6 @@
     <AssemblyName>Invio.Extensions.Reflection.Tests</AssemblyName>
     <PackageId>Invio.Extensions.Reflection.Tests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <AssetTargetFallback>
-      $(PackageTargetFallback);dotnet5.4;portable-net451+win8
-    </AssetTargetFallback>
     <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
       2.0.3
     </RuntimeFrameworkVersion>
