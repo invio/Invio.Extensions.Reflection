@@ -11,12 +11,12 @@ namespace Invio.Extensions.Reflection {
     ///   a delegate. This speeds up the getting and setting of values stored
     ///   in these properties from the extended <see cref="PropertyInfo" />.
     /// </summary>
-    public static class PropertyInfoExtensions {
+    public static class CachedDelegatesPropertyInfoExtensions {
 
         private static ConcurrentDictionary<Tuple<Type, Type, object>, object> setters { get; }
         private static ConcurrentDictionary<Tuple<Type, Type, object>, object> getters { get; }
 
-        static PropertyInfoExtensions() {
+        static CachedDelegatesPropertyInfoExtensions() {
             setters = new ConcurrentDictionary<Tuple<Type, Type, object>, object>();
             getters = new ConcurrentDictionary<Tuple<Type, Type, object>, object>();
         }

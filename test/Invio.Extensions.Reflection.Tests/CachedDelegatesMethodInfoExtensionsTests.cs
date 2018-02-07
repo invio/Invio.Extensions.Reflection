@@ -8,7 +8,7 @@ using Xunit;
 namespace Invio.Extensions.Reflection {
 
     [UnitTest]
-    public class MethodInfoExtensionsTests {
+    public sealed class CachedDelegatesMethodInfoExtensionsTests {
 
         public static IEnumerable<object[]> CachedDelegateCases {
             get {

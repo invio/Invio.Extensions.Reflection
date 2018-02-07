@@ -6,7 +6,7 @@ using Xunit;
 namespace Invio.Extensions.Reflection {
 
     [UnitTest]
-    public class PropertyInfoExtensionsTests {
+    public sealed class CachedDelegatesPropertyInfoExtensionsTests {
 
         // CreateGetter<TBase, TProperty>()
 

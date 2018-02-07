@@ -6,7 +6,7 @@ using Xunit;
 namespace Invio.Extensions.Reflection {
 
     [UnitTest]
-    public class FieldInfoExtensionsTests {
+    public sealed class CachedDelegatesFieldInfoExtensionsTests {
 
         [Fact]
         public void CreateGetter_BothTyped_Null() {

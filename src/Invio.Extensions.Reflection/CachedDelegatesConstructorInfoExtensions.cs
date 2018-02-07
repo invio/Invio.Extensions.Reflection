@@ -12,14 +12,14 @@ namespace Invio.Extensions.Reflection {
     ///   a delegate. This speeds up the instantiation of objects normally
     ///   created from the extended <see cref="ConstructorInfo" />.
     /// </summary>
-    public static class ConstructorInfoExtensions {
+    public static class CachedDelegatesConstructorInfoExtensions {
 
         private static ConcurrentDictionary<ConstructorInfo, Func<object[], object>> untypedArrays { get; }
         private static ConcurrentDictionary<Tuple<Type, ConstructorInfo>, object> typedArrays { get; }
         private static ConcurrentDictionary<ConstructorInfo, object> untypedFuncs { get; }
         private static ConcurrentDictionary<Tuple<Type, ConstructorInfo>, object> typedFuncs { get; }
 
-        static ConstructorInfoExtensions() {
+        static CachedDelegatesConstructorInfoExtensions() {
             untypedArrays = new ConcurrentDictionary<ConstructorInfo, Func<object[], object>>();
             typedArrays = new ConcurrentDictionary<Tuple<Type, ConstructorInfo>, object>();
             untypedFuncs = new ConcurrentDictionary<ConstructorInfo, object>();

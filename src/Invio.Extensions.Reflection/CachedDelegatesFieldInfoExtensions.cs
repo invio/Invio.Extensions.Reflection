@@ -12,12 +12,12 @@ namespace Invio.Extensions.Reflection {
     ///   This speeds up the getting and setting of values stored
     ///   in these fields from the extended <see cref="FieldInfo" />.
     /// </summary>
-    public static class FieldInfoExtensions {
+    public static class CachedDelegatesFieldInfoExtensions {
 
         private static ConcurrentDictionary<Tuple<Type, Type, object>, object> setters { get; }
         private static ConcurrentDictionary<Tuple<Type, Type, object>, object> getters { get; }
 
-        static FieldInfoExtensions() {
+        static CachedDelegatesFieldInfoExtensions() {
             setters = new ConcurrentDictionary<Tuple<Type, Type, object>, object>();
             getters = new ConcurrentDictionary<Tuple<Type, Type, object>, object>();
         }

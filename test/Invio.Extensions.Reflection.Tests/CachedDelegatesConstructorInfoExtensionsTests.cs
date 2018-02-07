@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Invio.Xunit;
 using Xunit;
 
 namespace Invio.Extensions.Reflection {
 
-    public class ConstructorInfoExtensionsTests {
+    [UnitTest]
+    public sealed class CachedDelegatesConstructorInfoExtensionsTests {
 
         [Fact]
         public void CreateFunc0_Typed_Null() {

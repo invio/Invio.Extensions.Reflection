@@ -12,12 +12,12 @@ namespace Invio.Extensions.Reflection {
     ///   a delegate. This speeds up the invocation of methods normally
     ///   performed via the extended <see cref="MethodInfo" />.
     /// </summary>
-    public static class MethodInfoExtensions {
+    public static class CachedDelegatesMethodInfoExtensions {
 
         private static ConcurrentDictionary<Tuple<MethodInfo, Type, Type>, object> typed { get; }
         private static ConcurrentDictionary<Tuple<MethodInfo, Type>, object> untyped { get; }
 
-        static MethodInfoExtensions() {
+        static CachedDelegatesMethodInfoExtensions() {
             typed = new ConcurrentDictionary<Tuple<MethodInfo, Type, Type>, object>();
             untyped = new ConcurrentDictionary<Tuple<MethodInfo, Type>, object>();
         }
