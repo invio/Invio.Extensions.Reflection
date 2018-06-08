@@ -1,6 +1,6 @@
 language: csharp
 sudo: required
-dotnet: 2.0.3
+dotnet: 2.1.300
 
 matrix:
   include:
