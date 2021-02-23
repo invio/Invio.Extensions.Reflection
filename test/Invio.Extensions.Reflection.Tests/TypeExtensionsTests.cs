@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 using Invio.Xunit;
 
@@ -98,12 +99,52 @@ namespace Invio.Extensions.Reflection {
             Assert.False(type.IsDerivativeOf(parentType));
         }
 
+        [Fact]
+        public void GetGenericInterfaceTypes_HasMatch() {
+            var result = typeof(HashSet<String>).GetGenericInterfaceTypes(typeof(ISet<>));
+
+            Assert.NotNull(result);
+            var resultArray = result.ToArray();
+            Assert.Single(resultArray);
+            Assert.Equal(typeof(ISet<String>), resultArray[0]);
+        }
+
+        [Fact]
+        public void GetGenericInterfaceTypes_NoMatch() {
+            var result = typeof(List<String>).GetGenericInterfaceTypes(typeof(ISet<>));
+
+            Assert.NotNull(result);
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public void GetGenericInterfaceTypes_MultipleMatches() {
+            var result = typeof(MultipleImplementationClass).GetGenericInterfaceTypes(typeof(ISimpleGenericInterface<>));
+
+            Assert.NotNull(result);
+            var resultArray = result.ToArray();
+            Assert.Equal(2, resultArray.Length);
+            Assert.Contains(typeof(ISimpleGenericInterface<String>), resultArray);
+            Assert.Contains(typeof(ISimpleGenericInterface<Int32>), resultArray);
+        }
+
         private class ClassUnderTest<T, U> { }
 
         private class ChildUnderTest<T> : ClassUnderTest<T, string> {}
 
         private class GrandchildUnderTest : ChildUnderTest<int> {}
 
+        private interface ISimpleGenericInterface<in T> {
+            void Action(T input);
+        }
+
+        private class MultipleImplementationClass : ISimpleGenericInterface<String>, ISimpleGenericInterface<Int32> {
+            public void Action(String input) {
+            }
+
+            public void Action(Int32 input) {
+            }
+        }
     }
 
 }

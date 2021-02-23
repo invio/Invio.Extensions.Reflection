@@ -12,11 +12,11 @@ namespace Invio.Extensions.Reflection {
     /// </summary>
     public static class TypeExtensions {
 
-        private static ConcurrentDictionary<Tuple<Type, Type>, bool>
+        private static ConcurrentDictionary<Tuple<Type, Type>, Boolean>
             isDerivativeOfCache { get; }
 
         static TypeExtensions() {
-            isDerivativeOfCache = new ConcurrentDictionary<Tuple<Type, Type>, bool>();
+            isDerivativeOfCache = new ConcurrentDictionary<Tuple<Type, Type>, Boolean>();
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace Invio.Extensions.Reflection {
         ///   </list>
         ///   In all other situations, this method returns <c>false</c>.
         /// </returns>
-        public static bool IsDerivativeOf(this Type type, Type parentType) {
+        public static Boolean IsDerivativeOf(this Type type, Type parentType) {
             if (type == null) {
                 throw new ArgumentNullException(nameof(type));
             } else if (parentType == null) {
@@ -117,7 +117,41 @@ namespace Invio.Extensions.Reflection {
             );
         }
 
-        private static bool IsDerivativeOfImpl(Type type, Type parentType) {
+        /// <summary>
+        /// Give a concrete type and an open generic interface type, finds the
+        /// closed generic interface type implemented by the concrete type.
+        /// </summary>
+        /// <param name="type">
+        /// The concrete type to search for an interface implementation.
+        /// </param>
+        /// <param name="interfaceType"></param>
+        /// <returns></returns>
+        public static IEnumerable<Type> GetGenericInterfaceTypes(this Type type, Type interfaceType) {
+            if (type == null) {
+                throw new ArgumentNullException(nameof(type));
+            }
+            if (interfaceType == null) {
+                throw new ArgumentNullException(nameof(interfaceType));
+            }
+
+            var interfaceTypeInfo = interfaceType.GetTypeInfo();
+            if (!interfaceTypeInfo.IsInterface) {
+                throw new ArgumentException(
+                    $"The parameter {nameof(interfaceType)} must be an interface type.",
+                    nameof(interfaceType)
+                );
+            }
+            if (!interfaceTypeInfo.IsGenericType || !interfaceTypeInfo.IsGenericTypeDefinition) {
+                throw new ArgumentException(
+                    $"The parameter {nameof(interfaceType)} must be an open generic type definition.",
+                    nameof(interfaceType)
+                );
+            }
+
+            return type.GetInterfaces().Where(t => t.IsConstructedGenericType && t.GetGenericTypeDefinition() == interfaceType);
+        }
+
+        private static Boolean IsDerivativeOfImpl(Type type, Type parentType) {
             if (type == parentType || parentType == typeof(object)) {
                 return true;
             }
