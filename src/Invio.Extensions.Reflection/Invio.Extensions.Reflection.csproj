@@ -14,7 +14,6 @@
     <PackageLicenseUrl>https://github.com/invio/Invio.Extensions.Reflection/blob/master/LICENSE.txt</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git@github.com:invio/Invio.Extensions.Reflection</RepositoryUrl>
-    <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
