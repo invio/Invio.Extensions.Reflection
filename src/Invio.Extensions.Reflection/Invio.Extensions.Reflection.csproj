@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <AssemblyTitle>Invio Extensions to System.Reflection</AssemblyTitle>
-    <VersionPrefix>1.0.9</VersionPrefix>
+    <VersionPrefix>1.0.10</VersionPrefix>
     <Authors>Invio Developers &lt;developers@invioinc.com&gt;</Authors>
     <TargetFramework>netstandard1.3</TargetFramework>
     <DebugType>portable</DebugType>
